@@ -3,6 +3,13 @@
     "content_in_root": false,
     "render_readme": true,
     "image": "images/assets.png",
-    "zip_release": true,
-    "filename": "custom_components"
+    "domains": [
+    "ads_waterlevel",
+    "mcp23017",
+    "mpu650",
+    "onewire_sysbus",
+    "smartshunt",
+    "victron_component"
+  ],
+  "country": "DE"
 }
