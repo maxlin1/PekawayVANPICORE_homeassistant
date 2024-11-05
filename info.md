@@ -110,7 +110,8 @@ reboot
 
 ### Methode B: Manuelle Installation (empfohlen)
 * Klonen oder lade  dieses Repository herunter
-* Verschiebe den inhalt des Ordners custom_components/ im Download in Ihren Home Assistant Konfigurationsordner das geht über `Studio Code Server` via drag and drop 
+* Verschiebe den inhalt des Ordners 'custom_components/' im Download in Ihren Home Assistant Konfigurationsordner das geht über `Studio Code Server` Siehe nächster Schritt via drag and drop 
+
 * Starte Home Assistant neu 
 
 ## 3. Einrichtung der Komponente
@@ -197,8 +198,22 @@ binary_sensor:
 ```
 * Stearte Homeassistant neu
 
+### N. Die 1-Wiere Sensoren werden über + Integration Hinzufügen geaddet
 
-* 
+<img width="350
+" alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-05 um 20.42.50.png">
+
+<img width="350
+" alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-05 um 20.43.00.png">
+
+<img width="350
+" alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-05 um 20.43.10.png">
+
+Und Fertig :-) Alle Sensoren und Relais sind in HA. Viel Spaß beim benützen 
+
+<img width="350
+" alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-05 um 20.52.51.png">
+
 
 
 ### Need help?
