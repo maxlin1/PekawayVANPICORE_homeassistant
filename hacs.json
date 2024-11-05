@@ -3,6 +3,6 @@
     "content_in_root": false,
     "render_readme": true,
     "image": "images/assets.png",
-    "multiple_files": true,
+    "zip_release": true,
     "filename": "custom_components"
 }
