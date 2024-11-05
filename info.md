@@ -54,10 +54,15 @@ Port 22222 welcher Zugriff direkt auf das Hauptsystem gibt. (diese brauchen wir)
 
 - Formatiere den USB-Stick mit FAT32 foratieren und benenne ihn `CONFIG` (case-sensetiv).
 - Auf den USB-Stick den Public Key als Textdatei mit dem namen **authorized_keys** (keine Erweiterung) kopieren
+
+- lege auf dem USB-Stick einen Ordner an mit dem Namen `modules` darin mit einer Datei namens: `rpi-i2c.conf` inhalt: `i2c-dev``
+
+- <img width="350
+" alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-06 um 00.08.07.png">
+
 - Den USB-Stick anschließen
 - Dann über das zuvor installierte SSH Web Termilal Plugin den Befehl 
 ```ha os import``` eingeben.
-
 
 - <img width="350
 " alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-05 um 07.14.15.png">
@@ -88,13 +93,6 @@ Die Oben angegebenen Zeilen am Ende der config.txt hinzufügen und neustarten!
 ````
 vi /mnt/boot/config.txt
 ````
-
-```
-mkdir -p /mnt/boot/CONFIG/modules
-echo "i2c-dev" > /mnt/boot/CONFIG/modules/rpi-i2c.conf
-```
-
-Durch die CONFIG kann es sein das ihr nach dem `reboot`nicht mehr via ssh auf den PI kommt, dann müsstet ihr den Step mit dem USB Sickt einfach wiederholen, hier muss ich mir noch was einfallen lassen. Für Tips bin ich dankbar. ggf. kann man die Config modules auch direkt mit am USB Stick anlegen. 
 
 ```
 reboot
