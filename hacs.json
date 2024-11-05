@@ -1,9 +1,9 @@
 {
-    "name": "PekawayVANPICORE Component",
+    "name": "VANPICORE Component",
     "render_readme": true,
     "domains": ["sensor"],
     "homeassistant": "2023.8.0",
     "zip_release": true,
-    "directory": "custom_components",
-    "multiple_files": true
+    "filename": ".",
+    "content_in_root": true
 }
