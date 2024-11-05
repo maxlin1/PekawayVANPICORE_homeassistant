@@ -197,6 +197,7 @@ binary_sensor:
 ```
 * Stearte Homeassistant neu
 
+
 * 
 
 
