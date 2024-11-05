@@ -1,6 +1,6 @@
 {
-  "domain": "victron_component",
-  "name": "Victron Energy",
+  "domain": "victron_smartshunt",
+  "name": "Victron SmartShunt 500A 50mV",
   "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
   "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
   "dependencies": [],

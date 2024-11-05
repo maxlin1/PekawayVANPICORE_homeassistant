@@ -129,12 +129,12 @@ Fürs bearbeiten der `configuration.yml` nütze ich den `Studio Code Server` es 
 sensor:
   - platform: mpu6050
 
-  - platform: victron_component
+  - platform: victron_mppt
     port: "/dev/ttyAMA4"
     baudrate: 19200
     sleeptime: 10
 
-  - platform: smartshunt
+  - platform: victron_smartshunt
     port: "/dev/ttyAMA5"
     baudrate: 19200
     sleeptime: 10

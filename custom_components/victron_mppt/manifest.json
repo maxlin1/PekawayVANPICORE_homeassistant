@@ -1,6 +1,6 @@
 {
-  "domain": "smartshunt",
-  "name": "Victron SmartShunt Component",
+  "domain": "victron_mppt",
+  "name": "Victron MPPT 75/15",
   "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
   "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
   "dependencies": [],
