@@ -1,15 +1,10 @@
 {
     "name": "PekawayVANPICORE Component",
-    "content_in_root": false,
     "render_readme": true,
+    "homeassistant": "2024.10.0",
     "image": "images/assets.png",
-    "domains": [
-    "ads_waterlevel",
-    "mcp23017",
-    "mpu650",
-    "onewire_sysbus",
-    "smartshunt",
-    "victron_component"
-  ],
-  "country": "DE"
+    "zip_release": true,
+    "filename": "custom_components",
+    "content_in_root": false
+    "country": "DE"
 }
