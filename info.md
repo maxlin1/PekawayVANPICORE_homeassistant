@@ -102,16 +102,16 @@ reboot
 
 
 ## 2. Installation der Integration
-### Methode A: Installation über HACS (empfohlen)
+### Methode A: Installation über HACS Funtkioniert aktuell leider noch nicht!
 * Nutze [HACS](https://hacs.xyz/) -> [Install and download anleitung ](https://hacs.xyz/docs/use/download/download/) -> Plugin schnell finden [hier](https://my.home-assistant.io/redirect/supervisor_addon/?addon=cb646a50_get&repository_url=https%3A%2F%2Fgithub.com%2Fhacs%2Faddons) klicken 
 
 * Füge https://github.com/maxlin1/homeassistant_PekawayVANPICORE zu Ihren [benutzerdefinierten Repositories](https://hacs.xyz/docs/faq/custom_repositories/) hinzu
+* ....
 
-### Methode B: Manuelle Installation
+### Methode B: Manuelle Installation (empfohlen)
 * Klonen oder lade  dieses Repository herunter
-* Verschiebe den inhalt des Ordners custom_components/ im Download in Ihren Home Assistant Konfigurationsordner
-* Starten Home Assistant neu und löschen Sie den Browser-Cache (oder starten Sie den Browser neu)
-  Dies ist erforderlich, damit der neue Konfigurationsassistent angezeigt wird
+* Verschiebe den inhalt des Ordners custom_components/ im Download in Ihren Home Assistant Konfigurationsordner das geht über `Studio Code Server` via drag and drop 
+* Starte Home Assistant neu 
 
 ## 3. Einrichtung der Komponente
 
@@ -119,7 +119,6 @@ Fürs bearbeiten der `configuration.yml` nütze ich den `Studio Code Server` es 
 
 <img width="350
 " alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-04 um 22.21.54.png">
-
 
 
 ### A. Die configuration.yaml bearbeiten
@@ -196,6 +195,10 @@ binary_sensor:
       7: Button_8
 
 ```
+* Stearte Homeassistant neu
+
+* 
+
 
 ### Need help?
 - Report bugs or issues on [GitHub](https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues)
