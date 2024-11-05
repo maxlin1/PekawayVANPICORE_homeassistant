@@ -1,0 +1,12 @@
+{
+    "domain": "mpu650",
+    "name": "MPU6050 Sensor",
+    "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
+    "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
+    "codeowners": ["@maxlin1"],
+    "dependencies": [],
+    "integration_type": "hub",
+    "iot_class": "local_polling",
+    "requirements": ["smbus2", "mpu6050-raspberrypi==1.1"],
+    "version": "1.0.0"
+}

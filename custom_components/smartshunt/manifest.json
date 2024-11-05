@@ -1,0 +1,11 @@
+{
+  "domain": "smartshunt",
+  "name": "Victron SmartShunt Component",
+  "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
+  "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
+  "dependencies": [],
+  "codeowners": ["@maxlin1"],
+  "requirements": ["pyserial"],
+  "version": "1.0.0",
+  "iot_class": "local_push"
+}

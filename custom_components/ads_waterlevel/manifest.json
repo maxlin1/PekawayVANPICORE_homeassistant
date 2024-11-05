@@ -1,0 +1,11 @@
+{
+    "domain": "ads_waterlevel",
+    "name": "ADS Water Level",
+    "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
+    "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
+    "codeowners": ["@maxlin1"],
+    "dependencies": [],
+    "iot_class": "local_push",
+    "requirements": [],
+    "version": "1.0.0"
+}
