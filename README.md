@@ -11,54 +11,20 @@ Diese benutzerdefinierte Komponente integriert das VAN PI CORE Board mit Home As
 - Integriert MPU6050 (Beschleunigungs- und Lagersensor für die Van Ausrichtung)
 - Integriert ADS1115 (Wasserlevel)
 - Integriert bis zu 5 1-Wire Sensoren (als Temperatursensoren)
-- Integriert Uart 1 (RJ45)
-- Integriert Uart 2 (RJ11 LIN)
+- Integriert UART 1 (RJ45)
+- Integriert UART 2 (RJ11 LIN)
 - Integriert UART 4 (MPPT 75/15 Victron)
 - Integriert UART 5 (SmartShunt 500A/50mV Victron)
 
+INFO: UART3 gibt es nicht auf dem Pin lauscht der 1-Wire Sensor!
 
-## Configuration
+## 1. Installation von Homeassistant
 
-Die Configuration der HACS Komponente in HomeAssistant findet ihr in der [info.md](./info.md) hier unter Installation packe ich die grund info wie Ihr Homeassistant installieren könnt.
+Wer noch nie Homeassistant selbst installiert hat findet in der [installHA.md](./installHA.md) die Anleitung Stand Novemner 2024.
 
+## 2. Configuration und Installation
 
-## Installation
-
-
-### Install Home Assistant ### 
-
-SD Karte Flashen:
-
-https://www.home-assistant.io/installation/raspberrypi#install-home-assistant-operating-system
-
-- SD Karte in den RPI4 am PeakawayBoard einstetzen
-- Strom anschließen
-- Wichtig der RPI4 muss mit einem Router mit Internet verbunden sein!
-- 5-10min je nach RPI 4/8GB warten
-
-### Config Home Assistant ### 
-
-Im Browser 'http://IP-VOM-RPI:8123/' eingeben, ist euer DNS im Router richtig konfiguriert sollte auch 'http://homeassistant.local:8123' gehen.
-
-<img width="350" alt="Konfig Fenster Homeassistant" src="assets/377777963-13886d0d-30d3-4d62-821f-5db632fde90d.png">
-
-Die Schritte zeige ich jetzt nicht im einzelnen sind aber selbterklärend und ihr müsst einfach Homeassistant mit Name, Passwort usw. konfigurieren.
-
-Anschließend Sehen wir eine noch relativ leere Oberfläche.
-
-<img width="350" alt="Erster Start Homeassistant" src="assets/377779266-6ce55e0e-9ff7-4df2-9c88-53bf6e7bb89c.png">
-
-
-### Erweiterte Modus einschalten
-
-Unten Links auf den 'Usernamen' klicken um dann den -> Erweiterten Modus einschalten.
-
-<img width="350" alt="Erweiterter Modus" src="assets/377796060-22ff2178-28d7-4c6b-86b3-a63f1ed0face.png">
-
-
--> Neustart! Die installation ist Geschafft! 🥳
-
--> Nun geht es in der [info.md](./info.md) weiter
+Die Configuration der HACS Komponente in HomeAssistant findet ihr in der [info.md](./info.md) 
 
 
 ## Contributing Mitwirkung

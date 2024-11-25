@@ -1,8 +1,8 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+
 ## homeassistant_PekawayVANPICORE
 
 Diese benutzerdefinierte Komponente integriert das VAN PI CORE Board mit Home Assistant und ermöglicht es dir, die Systeme deines Vans über die Home Assistant zu überwachen und zu steuern.
-
 
 ### Features
 
@@ -19,11 +19,11 @@ Diese benutzerdefinierte Komponente integriert das VAN PI CORE Board mit Home As
 
 # Installation
 
-## 1. Vorbereitung der Integration
+## 1. Vorbereitung des CORES für die Integration
 
-In der Datei mnt/boot/config.txt muss folgendes hinzugefügt werden:
+In der Datei mnt/boot/config.txt muss via SSH-Terminal folgendes hinzugefügt werden:
 
-
+**ℹ️ Die UART3 darf nicht angegeben werden auf diesem Pin liegt der 1-Wire Temp Sensor!**
 ```
 dtparam=i2c_vc=on
 dtparam=i2c_arm=on                                                   
@@ -34,9 +34,7 @@ dtoverlay=uart4
 dtoverlay=uart5
 ```
 
-ℹ️ Die UART3 darf nicht angegeben werden auf diesem Pin liegt der 1-Wire Temp Sensor! 
-
-### Dazu mpssen wir uns auf den RPI Verbinden 
+### Um die config.txt anzupassen müssen wir uns auf den RPI Verbinden 
 
 #### 1. Einstellungen -> Add-ons -> ADD-On Store -> SUCHE: Advanced SSH & Web Terminal
 
@@ -47,7 +45,8 @@ dtoverlay=uart5
 ℹ️ Es gibt zwei Zugänge am Terminal:
 
 Port 22 welcher Zugriff zum Docker Container gibt
-Port 22222 welcher Zugriff direkt auf das Hauptsystem gibt. (diese brauchen wir)
+Port 22222 welcher Zugriff direkt auf das Hauptsystem gibt. 
+Da wir leider selbst über das Advanced Terminal nicht auf das Hautpsystem kommen müssen wir das via PC / Mac machen.
 
 - Ihr braucht einen **leeren USB-Stick** und ein **authorized_keyfile**
 (SSH-Key erstellen ([Windows](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/create-with-putty/), [Mac](https://docs.github.com/de/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#platform-mac)))
@@ -55,12 +54,12 @@ Port 22222 welcher Zugriff direkt auf das Hauptsystem gibt. (diese brauchen wir)
 - Formatiere den USB-Stick mit FAT32 foratieren und benenne ihn `CONFIG` (case-sensetiv).
 - Auf den USB-Stick den Public Key als Textdatei mit dem namen **authorized_keys** (keine Erweiterung) kopieren
 
-- lege auf dem USB-Stick einen Ordner an mit dem Namen `modules` darin mit einer Datei namens: `rpi-i2c.conf` inhalt: `i2c-dev``
+- lege auf dem USB-Stick zusätzlich einen Ordner an mit dem Namen `modules` darin mit einer Datei namens: `rpi-i2c.conf` Inhalt der Datei: `i2c-dev`
 
 - <img width="350
 " alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-06 um 00.08.07.png">
 
-- Den USB-Stick anschließen
+- Den USB-Stick nun am RPI anschließen
 - Dann über das zuvor installierte SSH Web Termilal Plugin den Befehl 
 ```ha os import``` eingeben.
 
@@ -75,20 +74,20 @@ Port 22222 welcher Zugriff direkt auf das Hauptsystem gibt. (diese brauchen wir)
 - <img width="350
 " alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-05 um 07.16.25.png">
 
-ℹ️  Zum Deaktivieren einen leeren CONFIG benannten USB-Stick anstecken und das System neustarten, dann wird der Zugang wieder deaktiviert.
-
+ℹ️ Wollt ihr das später wieder einmal deaktivieren Einfach einen leeren CONFIG benannten USB-Stick anstecken und das System neustarten, dann wird der Zugang wieder deaktiviert.
 
 Auf den RPI via Terminal verbinden, Mac über das Terminal:
+
 ```
  ssh root@homeassistant.local -p 22222 
  ```
 
-Windows: Über Putty (Der Private key (Endung .ppk) Key muss über Connection -> ssh -> Auth hinterlegt werden).
-
 <img width="350
 " alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-04 um 21.38.08.png">
 
-Die Oben angegebenen Zeilen am Ende der config.txt hinzufügen und neustarten!
+Windows: Über Putty (Hier muss der Private Key (Endung .ppk) s über Connection -> ssh -> Auth hinterlegt werden).
+
+Die Oben angegebenen Zeilen via VI am Ende der config.txt hinzufügen und neustarten!
 
 ````
 vi /mnt/boot/config.txt
@@ -100,15 +99,19 @@ reboot
 
 
 ## 2. Installation der Integration
-### Methode A: Installation über HACS Funtkioniert aktuell leider noch nicht!
-* Nutze [HACS](https://hacs.xyz/) -> [Install and download anleitung ](https://hacs.xyz/docs/use/download/download/) -> Plugin schnell finden [hier](https://my.home-assistant.io/redirect/supervisor_addon/?addon=cb646a50_get&repository_url=https%3A%2F%2Fgithub.com%2Fhacs%2Faddons) klicken 
 
-* Füge https://github.com/maxlin1/homeassistant_PekawayVANPICORE zu Ihren [benutzerdefinierten Repositories](https://hacs.xyz/docs/faq/custom_repositories/) hinzu
+## Installation über HACS Funtkioniert aktuell leider noch nicht!
+~~ Nutze [HACS](https://hacs.xyz/) -> [Install and download anleitung ](https://hacs.xyz/docs/use/download/download/) -> Plugin schnell finden [hier](https://my.home-assistant.io/redirect/supervisor_addon/?addon=cb646a50_get&repository_url=https%3A%2F%2Fgithub.com%2Fhacs%2Faddons) klicken ~~
+
+~~ Füge https://github.com/maxlin1/homeassistant_PekawayVANPICORE zu Ihren [benutzerdefinierten Repositories](https://hacs.xyz/docs/faq/custom_repositories/) hinzu ~~
 * ....
 
-### Methode B: Manuelle Installation (empfohlen)
+### So muss man aktuell noch Installieren: Manuelle Installation (empfohlen)
 * Klonen oder lade  dieses Repository herunter
 * Verschiebe den inhalt des Ordners 'custom_components/' im Download in Ihren Home Assistant Konfigurationsordner das geht über `Studio Code Server` Siehe nächster Schritt via drag and drop 
+
+<img width="350
+" alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Dateien.png">
 
 * Starte Home Assistant neu 
 
@@ -194,9 +197,9 @@ binary_sensor:
       7: Button_8
 
 ```
-* Stearte Homeassistant neu
+* Nun Starte Homeassistant neu
 
-### N. Die 1-Wiere Sensoren werden über + Integration Hinzufügen geaddet
+### Die 1-Wiere Sensoren werden über + Integration Hinzufügen geaddet
 
 <img width="350
 " alt="Bildschirmfoto 2024-10-18 um 10 50 10" src="assets/Bildschirmfoto 2024-11-05 um 20.42.50.png">
@@ -220,7 +223,7 @@ Und Fertig :-) Alle Sensoren und Relais sind in HA. Viel Spaß beim benützen
 
 
 
-## Danke an die Entwickler folgender Komponenten, Ich habed diese mit integriert
+## Danke an die Entwickler folgender Komponenten. Ich habe diese mit integriert
 
 - mcp23017: [Repository](https://github.com/jpcornil-git/HA-mcp23017) für die Relais und Eingänge
 - 1-Wire: [MCP23017 component](https://github.com/thecode/ha-onewire-sysbus) für die Temperatur Sensoren
