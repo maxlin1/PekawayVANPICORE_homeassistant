@@ -4,6 +4,18 @@ This custom component integrates the VAN PI CORE Board with Home Assistant, allo
 
 Diese benutzerdefinierte Komponente integriert das VAN PI CORE Board mit Home Assistant und ermöglicht es dir, die Systeme deines Vans über die Home Assistant zu überwachen und zu steuern.
 
+##Disclaimer
+
+Ich habe mein Bestes getan, um diese Komponente so zuverlässig und nützlich wie möglich zu gestalten. Bitte beachte jedoch:
+
+- Die Nutzung dieser Komponente erfolgt auf eigenes Risiko.
+- Ich kann leider keine Haftung für etwaige Schäden übernehmen, die durch die Verwendung oder Nichtverwendung entstehen könnten.
+- Dies gilt für alle Arten von Schäden, sei es direkt oder indirekt.
+
+Bei mir funktioniert die Komponente einwandfrei, und ich bin zuversichtlich, dass sie auch bei dir  laufen wird! 😊
+Solltest du dennoch auf Probleme stoßen oder Fragen haben, zögere  bitte nicht, mich zu kontaktieren. Ich helfe im Rahmen meiner Möglichkeiten gerne weiter und freue mich über dein Feedback!
+Eine Antwort kann jedoch auch mal mehrere Tage dauern.
+
 ## Features
 
 - Integriert Inputs 1-8
