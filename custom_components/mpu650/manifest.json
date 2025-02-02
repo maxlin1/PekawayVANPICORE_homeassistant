@@ -7,7 +7,6 @@
     "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
     "integration_type": "hub",
     "iot_class": "local_polling",
-    "platforms": ["sensor", "switch", "button"],
     "requirements": ["smbus2", "mpu6050-raspberrypi==1.1"],  
     "version": "1.0"
 }
