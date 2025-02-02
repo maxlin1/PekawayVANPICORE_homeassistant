@@ -1,14 +1,13 @@
 {
     "domain": "mpu6050",
     "name": "MPU6050 Sensor",
-    "version": "1.0",
-    "documentation": "https://example.com",
-    "requirements": ["smbus2", "mpu6050-raspberrypi==1.1"],
-    "dependencies": [],
-    "codeowners": [],
-    "iot_class": "local_polling",
+    "codeowners": ["@maxlin1"],
     "config_flow": false,
-    "homeassistant": "2021.6.0",
+    "dependencies": [],
+    "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
     "integration_type": "hub",
-    "platforms": ["sensor", "switch", "button"]
+    "iot_class": "local_polling",
+    "platforms": ["sensor", "switch", "button"],
+    "requirements": ["smbus2", "mpu6050-raspberrypi==1.1"],  
+    "version": "1.0"
 }

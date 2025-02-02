@@ -1,11 +1,11 @@
 {
   "domain": "victron_smartshunt",
   "name": "Victron SmartShunt 500A 50mV",
-  "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
-  "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
-  "dependencies": [],
   "codeowners": ["@maxlin1"],
+  "dependencies": [],
+  "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
   "requirements": ["pyserial"],
-  "version": "1.0.0",
-  "iot_class": "local_push"
+  "version": "1.0.0"
 }
