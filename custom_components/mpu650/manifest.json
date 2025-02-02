@@ -1,5 +1,5 @@
 {
-    "domain": "mpu6050",
+    "domain": "mpu650",
     "name": "MPU6050 Sensor",
     "codeowners": ["@maxlin1"],
     "config_flow": false,
