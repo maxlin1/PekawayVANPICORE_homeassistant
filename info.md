@@ -33,6 +33,17 @@ dtoverlay=uart2
 dtoverlay=uart4
 dtoverlay=uart5
 ```
+Wenn du einen PI 5 hast musst du es so angeben:
+```                                                                    
+dtparam=i2c_vc=on                                                         
+dtparam=i2c_arm=on                                                        
+dtoverlay=w1-gpio                                                         
+dtoverlay=uart5                                                           
+dtoverlay=uart0-pi5                                                       
+dtoverlay=uart4-pi5                                                       
+enable_uart=1
+```
+
 
 ### Um die config.txt anzupassen müssen wir uns auf den RPI Verbinden 
 
