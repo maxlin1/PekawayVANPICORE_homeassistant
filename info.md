@@ -152,27 +152,70 @@ sensor:
     sleeptime: 10
 
   - platform: ads_waterlevel
+    
+    # Paar-Defaults (optional, hier für Übersicht gesetzt)
+    pair_config:
+      "1-2":                # CH1 & CH2
+        mode: voltage       # Spannung messen
+        v_max: 3.3
+        invert: false
+      "3-4":                # CH3 & CH4
+        mode: resistive     # Widerstand (Ω) berechnen + extra Entität
+        v_max: 3.3          # nur für Level (Volt→Liter) relevant
+        invert: false
+        r_pullup_ohm: 47000 # interner Pull-Up ~47 kΩ
+        v_ref: 3.3
+      
+
+    # Einzel-Sensoren (überschreiben ggf. die Paar-Defaults)
     sensors:
-      - name: "Water Tank 1"
-        channel: 0
-        divider_ratio: 3
-        measure_type: "capacitive"
-        mapping_file: "/config/custom_components/ads_waterlevel/mapping_tank1.json"
-      - name: "Water Tank 2"
-        channel: 1
-        divider_ratio: 3
-        measure_type: "capacitive"
-        mapping_file: "/config/custom_components/ads_waterlevel/mapping_tank2.json"
-      - name: "Water Tank 3"
-        channel: 2
-        divider_ratio: 3
-        measure_type: "capacitive"
-        mapping_file: "/config/custom_components/ads_waterlevel/mapping_tank3.json"
-      - name: "Water Tank 4"
-        channel: 3
-        divider_ratio: 3
-        measure_type: "resistive"
-        mapping_file: "/config/custom_components/ads_waterlevel/mapping_tank4.json"
+      # CH1 = Abwasser, Volt + eigenes Mapping
+      - name: "Abwasser Tank"
+        channel: 1 # Board-Kanal 1 
+        divider_ratio: 1.0
+        mode: voltage
+        mapping_points:
+          - { v: 0.00, l: 0 }
+          - { v: 0.49, l: 50 }
+          - { v: 0.60, l: 60 }
+          - { v: 0.81, l: 70 }
+          - { v: 1.12, l: 80 }
+          - { v: 1.25, l: 87 }
+          - { v: 1.33, l: 90 }
+          - { v: 1.44, l: 95 }
+          - { v: 1.60, l: 100 }
+
+      # CH2 = Volt, linear bis 2.50 V = 100 L
+      - name: "Wasser Tank"
+        channel: 2 # Board-Kanal 2 
+        divider_ratio: 1.0
+        mode: voltage
+        mapping_points:
+          - { v: 0.00, l: 0 }
+          - { v: 0.25, l: 10 }
+          - { v: 0.50, l: 20 }
+          - { v: 0.75, l: 30 }
+          - { v: 1.00, l: 40 }
+          - { v: 1.25, l: 50 }
+          - { v: 1.50, l: 60 }
+          - { v: 1.75, l: 70 }
+          - { v: 2.00, l: 80 }
+          - { v: 2.25, l: 90 }
+          - { v: 2.50, l: 100 }
+
+       # CH3 = Widerstand (Ohm)
+      - name: "Tank 3"
+        channel: 3          # Board-Kanal 3 
+        divider_ratio: 1.0
+        mode: resistive     # erzeugt zusätzlich "… Resistance" (Ω)
+        # mapping_points:    # optional: Volt→Liter-Kurve ergänzen, falls gewünscht
+
+      # CH4 = Widerstand (Ohm)
+      - name: "Tank 4"
+        channel: 4          # Board-Kanal 4 
+        divider_ratio: 1.0
+        mode: resistive
+        # mapping_points:    # optional
 
 switch:
   - platform: mpu6050
