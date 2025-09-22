@@ -1,11 +1,11 @@
 {
-    "domain": "ads_waterlevel",
-    "name": "ADS Water Level",
-    "codeowners": ["@maxlin1"],
-    "dependencies": [],
-    "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
-    "iot_class": "local_push",
-    "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
-    "requirements": [],
-    "version": "1.0.0"
+  "domain": "ads_waterlevel",
+  "name": "ADS Water Level",
+  "version": "1.2.0",
+  "documentation": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE",
+  "issue_tracker": "https://github.com/maxlin1/homeassistant_PekawayVANPICORE/issues",
+  "codeowners": ["@maxlin1"],
+  "iot_class": "local_polling",
+  "dependencies": [],
+  "requirements": ["smbus2>=0.4.2", "aiofiles>=23.1.0"]
 }
