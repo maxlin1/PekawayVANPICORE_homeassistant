@@ -32,7 +32,7 @@ INFO: UART3 gibt es nicht auf dem Pin lauscht der 1-Wire Sensor!
 
 ## 1. Installation von Homeassistant
 
-Wer noch nie Homeassistant selbst installiert hat findet in der [installHA.md](./installHA.md) die Anleitung Stand Novemner 2024.
+Wer noch nie Homeassistant selbst installiert hat findet in der [installHA.md](./installHA.md) die Anleitung Stand November 2025.
 
 ## 2. Configuration und Installation
 
