@@ -206,7 +206,7 @@
             "air_up": "Je Seite, ab normaler Fahrhöhe",
             "air_down": "Je Seite, ab normaler Fahrhöhe",
             "block_height": "Höhe einer Stufe bzw. Lage des Keils",
-            "head_direction": "Lässt sich der Van nicht ganz ausgleichen, wird eine Variante bevorzugt, bei der der Kopf höher liegt als die Füße."
+            "head_direction": "Ziel bleibt immer 0,0°. Nur wenn das nicht ganz geht, wählt die Empfehlung unter den Varianten, die höchstens 0,2° schlechter sind als die beste, die mit dem Kopf höher."
           }
         },
         "reconfigure": {
@@ -234,7 +234,7 @@
             "air_up": "Je Seite, ab normaler Fahrhöhe",
             "air_down": "Je Seite, ab normaler Fahrhöhe",
             "block_height": "Höhe einer Stufe bzw. Lage des Keils",
-            "head_direction": "Lässt sich der Van nicht ganz ausgleichen, wird eine Variante bevorzugt, bei der der Kopf höher liegt als die Füße."
+            "head_direction": "Ziel bleibt immer 0,0°. Nur wenn das nicht ganz geht, wählt die Empfehlung unter den Varianten, die höchstens 0,2° schlechter sind als die beste, die mit dem Kopf höher."
           }
         }
       },

@@ -232,19 +232,26 @@ def _air_adjust(vehicle: Vehicle, heights: dict[str, float]) -> tuple[float, flo
     return a, b
 
 
+# Die Schlafrichtung entscheidet nur zwischen Varianten, deren Restneigung
+# höchstens so viel schlechter ist als die beste (Grad).
+HEAD_MARGIN = 0.2
+
+
 def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
     """Sucht die Blockverteilung mit der kleinsten Restneigung.
 
     Probiert jede Auswahl von bis zu ``stacks`` Rädern mit 0..blocks_per_stack
     Blöcken. Mit Luftfederung wird für jede Verteilung zusätzlich die beste
-    Höhe hinten links/rechts im Federweg berechnet. Ist eine Schlafrichtung
-    gesetzt, zählt Restneigung mit Kopf tiefer doppelt. Bei gleicher Restneigung
+    Höhe hinten links/rechts im Federweg berechnet. Bei gleicher Restneigung
     (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken.
+
+    Ist eine Schlafrichtung gesetzt, wird unter allen Varianten, die höchstens
+    HEAD_MARGIN schlechter sind als die beste, die mit dem Kopf am wenigsten
+    tief gewählt. Ziel bleibt also immer möglichst gerade.
     """
     base = wheel_heights(vehicle, pitch, roll)
     stacks = max(0, min(vehicle.stacks, len(WHEELS)))
-    best: BlockPlan | None = None
-    best_key: tuple[float, int] | None = None
+    plans: list[BlockPlan] = []
     for wheels in combinations(WHEELS, stacks):
         for counts in product(range(vehicle.blocks_per_stack + 1), repeat=stacks):
             blocks = {w: 0 for w in WHEELS}
@@ -260,14 +267,18 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
                 heights["hr"] += b
                 air = {"hl": round(a, 1), "hr": round(b, 1)}
             rp, rr = plane_tilt(vehicle, heights)
-            plan = BlockPlan(
-                blocks=dict(blocks), residual_pitch=rp, residual_roll=rr, air=air
+            plans.append(
+                BlockPlan(blocks=dict(blocks), residual_pitch=rp, residual_roll=rr, air=air)
             )
-            # Kopf tiefer als die Füße zählt doppelt: so eine Variante gewinnt
-            # nur, wenn sie deutlich gerader steht.
-            head_low = max(0.0, -plan.head_tilt(vehicle.head))
-            key = (round(plan.residual + head_low, 2), plan.total_blocks)
-            if best_key is None or key < best_key:
-                best, best_key = plan, key
-    assert best is not None
-    return best
+    best = min(plans, key=lambda p: (round(p.residual, 2), p.total_blocks))
+    if not vehicle.head:
+        return best
+    near = [p for p in plans if p.residual <= best.residual + HEAD_MARGIN]
+    return min(
+        near,
+        key=lambda p: (
+            round(max(0.0, -p.head_tilt(vehicle.head)), 1),
+            round(p.residual, 2),
+            p.total_blocks,
+        ),
+    )
