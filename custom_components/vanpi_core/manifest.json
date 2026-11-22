@@ -7,7 +7,7 @@
   "integration_type": "hub",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/maxlin1/PekawayVANPICORE_homeassistant/issues",
-  "requirements": ["smbus2>=0.4.2"],
+  "requirements": ["smbus2>=0.4.2", "pyserial>=3.5"],
   "single_config_entry": true,
   "version": "0.1.7"
 }

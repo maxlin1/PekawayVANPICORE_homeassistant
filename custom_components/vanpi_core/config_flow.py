@@ -9,6 +9,7 @@ from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
     ConfigFlowResult,
+    ConfigSubentryFlow,
     OptionsFlow,
 )
 from homeassistant.core import callback
@@ -36,6 +37,7 @@ from .const import (
     SOURCE_MPU6050,
 )
 from .leveling.mpu6050 import MPU6050
+from .modules.config_flow import SUBENTRY_FLOWS
 
 MPU_ADDRESSES = {"0x68": 0x68, "0x69": 0x69}
 
@@ -168,6 +170,14 @@ class VanPiConfigFlow(ConfigFlow, domain=DOMAIN):
                 options=_normalize_numbers(user_input),
             )
         return self.async_show_form(step_id="vehicle", data_schema=vehicle_schema({}))
+
+    @classmethod
+    @callback
+    def async_get_supported_subentry_types(
+        cls, config_entry: ConfigEntry
+    ) -> dict[str, type[ConfigSubentryFlow]]:
+        """Board-Module (Relais, Tanks, 1-Wire, Victron), siehe modules/."""
+        return SUBENTRY_FLOWS
 
     @staticmethod
     @callback

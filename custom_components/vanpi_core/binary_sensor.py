@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -16,6 +17,7 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     async_add_entities([LevelBinarySensor(entry.runtime_data.leveling, "level")])
+    entry.runtime_data.modules.register_platform(Platform.BINARY_SENSOR, async_add_entities)
 
 
 class LevelBinarySensor(LevelingEntity, BinarySensorEntity):

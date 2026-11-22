@@ -15,11 +15,13 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN, PLATFORMS
 from .leveling.manager import LevelingManager
+from .modules import ModuleManager
 
 
 @dataclass
 class VanPiData:
     leveling: LevelingManager
+    modules: ModuleManager
 
 
 type VanPiConfigEntry = ConfigEntry[VanPiData]
@@ -29,7 +31,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: VanPiConfigEntry) -> boo
     _enable_reset_button(hass, entry)
     leveling = LevelingManager(hass, entry)
     await leveling.async_setup()
-    entry.runtime_data = VanPiData(leveling=leveling)
+    modules = ModuleManager(hass, entry)
+    await modules.async_setup()
+    entry.runtime_data = VanPiData(leveling=leveling, modules=modules)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
@@ -39,12 +43,14 @@ async def async_unload_entry(hass: HomeAssistant, entry: VanPiConfigEntry) -> bo
     unloaded = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unloaded:
         await entry.runtime_data.leveling.async_shutdown()
+        await entry.runtime_data.modules.async_shutdown()
     return unloaded
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: VanPiConfigEntry) -> None:
     """Geänderte Einstellungen live übernehmen (Nivellierung bleibt an)."""
     entry.runtime_data.leveling.apply_options()
+    await entry.runtime_data.modules.async_sync()
 
 
 def _enable_reset_button(hass: HomeAssistant, entry: VanPiConfigEntry) -> None:

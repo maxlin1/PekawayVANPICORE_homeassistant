@@ -12,7 +12,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import DEGREE, EntityCategory, UnitOfLength
+from homeassistant.const import DEGREE, EntityCategory, Platform, UnitOfLength
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -106,6 +106,7 @@ async def async_setup_entry(
 ) -> None:
     manager = entry.runtime_data.leveling
     async_add_entities(LevelingSensor(manager, d) for d in SENSORS)
+    entry.runtime_data.modules.register_platform(Platform.SENSOR, async_add_entities)
 
 
 class LevelingSensor(LevelingEntity, SensorEntity):

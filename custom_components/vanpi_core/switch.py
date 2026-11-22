@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -18,6 +19,7 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     async_add_entities([LevelingSwitch(entry.runtime_data.leveling, "active")])
+    entry.runtime_data.modules.register_platform(Platform.SWITCH, async_add_entities)
 
 
 class LevelingSwitch(LevelingEntity, SwitchEntity):

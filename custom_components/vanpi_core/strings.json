@@ -92,6 +92,18 @@
         "+z": "+Z (out of the chip)",
         "-z": "-Z"
       }
+    },
+    "tank_mode": {
+      "options": {
+        "voltage": "Voltage (0-3.3 V)",
+        "resistive": "Resistive sender"
+      }
+    },
+    "victron_type": {
+      "options": {
+        "shunt": "SmartShunt / BMV",
+        "mppt": "MPPT solar charger"
+      }
     }
   },
   "entity": {
@@ -167,6 +179,151 @@
   "device": {
     "leveling": {
       "name": "Leveling"
+    }
+  },
+  "config_subentries": {
+    "io": {
+      "entry_type": "Relays & inputs (MCP23017)",
+      "initiate_flow": {
+        "user": "Add relays & inputs",
+        "reconfigure": "Change relays & inputs"
+      },
+      "step": {
+        "user": {
+          "title": "Relays & inputs",
+          "description": "On the VAN PI CORE the MCP23017 sits at 0x20 on I2C bus 1: GPA0-7 = inputs 1-8, GPB0-7 = relays 1-8.",
+          "data": {
+            "name": "Name",
+            "i2c_bus": "I2C bus",
+            "address": "I2C address",
+            "invert_inputs": "Invert inputs",
+            "invert_relays": "Invert relays",
+            "keep_state": "Keep relay state on restart"
+          },
+          "data_description": {
+            "invert_inputs": "On means input pulled to ground (default for the VAN PI CORE).",
+            "keep_state": "On: relays keep their state when Home Assistant restarts. Off: all relays are switched off on start."
+          }
+        },
+        "names": {
+          "title": "Names",
+          "description": "Names for relays and inputs. Names from the old mcp23017 component are pre-filled. Empty = 'Relais n' / 'Eingang n'.",
+          "data": {
+            "relay_1": "Relay 1",
+            "relay_2": "Relay 2",
+            "relay_3": "Relay 3",
+            "relay_4": "Relay 4",
+            "relay_5": "Relay 5",
+            "relay_6": "Relay 6",
+            "relay_7": "Relay 7",
+            "relay_8": "Relay 8",
+            "input_1": "Input 1",
+            "input_2": "Input 2",
+            "input_3": "Input 3",
+            "input_4": "Input 4",
+            "input_5": "Input 5",
+            "input_6": "Input 6",
+            "input_7": "Input 7",
+            "input_8": "Input 8"
+          }
+        }
+      },
+      "error": {
+        "not_found": "No MCP23017 answers at this address.",
+        "already_configured": "This address is already set up."
+      },
+      "abort": {
+        "reconfigure_successful": "Saved."
+      }
+    },
+    "tank": {
+      "entry_type": "Tank (ADS1115)",
+      "initiate_flow": {
+        "user": "Add tank",
+        "reconfigure": "Change tank"
+      },
+      "step": {
+        "user": {
+          "title": "Tank",
+          "description": "Tank input 1-4 of the VAN PI CORE. The curve maps the measured voltage to the level.",
+          "data": {
+            "name": "Name",
+            "channel": "Board channel",
+            "mode": "Sensor type",
+            "unit": "Unit",
+            "curve": "Curve voltage:level",
+            "divider_ratio": "Voltage divider factor",
+            "r_pullup_ohm": "Pull-up resistor",
+            "v_ref": "Reference voltage",
+            "scan_interval": "Read every",
+            "address": "ADS1115 address"
+          },
+          "data_description": {
+            "curve": "Pairs voltage:level separated by comma, e.g. 0:0, 0.49:50, 1.6:100. Below the first / above the last point the end value is used.",
+            "divider_ratio": "1 if the sensor is connected directly.",
+            "r_pullup_ohm": "Only for resistive sensors (about 47 kΩ on the board)."
+          }
+        }
+      },
+      "error": {
+        "invalid_curve": "Curve not readable. Example: 0:0, 1.6:100",
+        "not_found": "No ADS1115 answers at this address.",
+        "already_configured": "This channel is already set up."
+      },
+      "abort": {
+        "reconfigure_successful": "Saved."
+      }
+    },
+    "onewire": {
+      "entry_type": "1-Wire temperature sensors",
+      "initiate_flow": {
+        "user": "Add 1-Wire",
+        "reconfigure": "Change 1-Wire"
+      },
+      "step": {
+        "user": {
+          "title": "1-Wire",
+          "description": "All temperature sensors on the 1-Wire bus are found automatically. Names from the old onewire_sysbus component are taken over.",
+          "data": {
+            "name": "Name",
+            "mount_dir": "Sysfs directory",
+            "scan_interval": "Read every"
+          }
+        }
+      },
+      "error": {
+        "invalid_path": "Directory not found. Is dtoverlay=w1-gpio set in config.txt?"
+      },
+      "abort": {
+        "already_configured": "1-Wire is already set up.",
+        "reconfigure_successful": "Saved."
+      }
+    },
+    "victron": {
+      "entry_type": "Victron VE.Direct",
+      "initiate_flow": {
+        "user": "Add Victron device",
+        "reconfigure": "Change Victron device"
+      },
+      "step": {
+        "user": {
+          "title": "Victron VE.Direct",
+          "description": "VAN PI CORE: UART4 (/dev/ttyAMA4) = MPPT, UART5 (/dev/ttyAMA5) = SmartShunt. Important: remove the old YAML entry for the same port first, two readers on one port disturb each other.",
+          "data": {
+            "device_type": "Device type",
+            "port": "Serial port",
+            "name": "Name",
+            "scan_interval": "Update at most every"
+          }
+        }
+      },
+      "error": {
+        "port_not_found": "Port does not exist.",
+        "already_configured": "This port is already set up."
+      },
+      "abort": {
+        "reconfigure_successful": "Saved."
+      }
     }
   }
 }
