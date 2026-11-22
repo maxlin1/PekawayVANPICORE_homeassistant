@@ -116,7 +116,7 @@ async def test_io_module(hass: HomeAssistant, hardware) -> None:
     assert hass.states.get(relay).state == "on"
 
     ign = entity_id(hass, "_input_7", "binary_sensor")
-    assert ign == "binary_sensor.van_pi_zundung_ein"
+    assert ign == "binary_sensor.van_pi_tur_offen"
     assert hass.states.get(ign).state == "off"
     mcp_bus.pins_in = 0xBF  # Eingang 7 gegen Masse
     await asyncio.sleep(0.05)
