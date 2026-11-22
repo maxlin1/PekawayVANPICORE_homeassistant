@@ -15,6 +15,7 @@ Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bish
 - Nivellierung mit MPU6050 oder beliebigem X/Y/Z-Sensor: Neigung, Blockempfehlung je Rad, optional Luftfederung,
   Fahrt-Kalibrierung, Dashboard-Karten `vanpi-level-card` (Wasserwaage) und `vanpi-van-card` (Draufsicht).
 - Schlafrichtung: bei nicht ganz ausgleichbarem Gelände wird unter fast gleich guten Varianten (max. 0,2° Unterschied) die mit Kopf höher empfohlen.
+- Restneigung mit Richtung als Text (Attribut `restneigung_text`), z. B. „vorne 0,9° tiefer, rechts 0,4° tiefer“.
 - Neue Dokumentation: Installation, Einrichtung, Umstieg, Beispiel-Dashboard, Haftungs- und Sicherheitshinweise.
 - Installation über Marketplace/HACS möglich (nur noch eine Integration im Repository).
 

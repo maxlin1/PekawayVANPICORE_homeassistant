@@ -63,7 +63,7 @@ sections:
           - {{ teil }}
           {%- endfor %}
 
-          Restneigung danach: {{ states('sensor.nivellierung_restneigung') | replace('.', ',') }}°
+          Danach noch: {{ state_attr('sensor.nivellierung_restneigung', 'restneigung_text') or 'eben' }} (insgesamt {{ states('sensor.nivellierung_restneigung') | replace('.', ',') }}°)
           {% endif %}
         grid_options:
           columns: 12
