@@ -30,12 +30,15 @@ Die Nivellierung läuft dabei weiter.
   Beispiel 100-L-Tank: `0:0, 0.49:50, 1.6:100` heißt 0 V = 0 L, 0,49 V = 50 L,
   1,6 V = 100 L. Dazwischen wird linear gerechnet. Die aktuelle Spannung zeigt
   der Sensor „Spannung“ des Tanks. Ändern jederzeit über das Zahnrad am Tank.
-- **Tankeingänge (Sensortyp):** Das Board schaltet den 47-kΩ-Pull-up immer für
-  zwei Eingänge gemeinsam (GPIO19 für 1+2, GPIO16 für 3+4). Deshalb gibt es einen
-  eigenen Eintrag „Tankeingänge“ mit je einer Auswahl für 1+2 und 3+4:
+- **Sensortyp der Tankeingänge:** Das Board schaltet den 47-kΩ-Pull-up immer für
+  zwei Eingänge gemeinsam (GPIO19 für 1+2, GPIO16 für 3+4). Deshalb stellst du den
+  Sensortyp nicht am einzelnen Tank ein, sondern am Zahnrad des Haupteintrags
+  „VAN PI CORE“, je eine Auswahl für 1+2 und 3+4:
   *Spannung* (kapazitive Sonde, Stabsonde mit Platine; Pull-up aus) oder
-  *Widerstandsgeber* (Schwimmer gegen Masse; Pull-up an). Ohne diesen Eintrag
-  gilt *Spannung*. Gesetzt wird bei jedem Start von Home Assistant.
+  *Widerstandsgeber* (Schwimmer gegen Masse; Pull-up an). Voreingestellt ist
+  *Spannung*. Gesetzt wird bei jedem Start von Home Assistant und sofort nach
+  dem Speichern. Ein Eintrag „Tankeingänge“ aus Version 0.1.7 wird beim Update
+  automatisch übernommen und entfernt.
 - Jede Messung ist der Median aus 3 Einzelmessungen. Liest die alte Komponente
   gleichzeitig, werden vermischte Messungen erkannt und wiederholt.
 
