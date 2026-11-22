@@ -205,14 +205,17 @@ async def test_onewire_module(hass: HomeAssistant, hardware, tmp_path) -> None:
     registry = er.async_get(hass)
     old = MockConfigEntry(domain="onewire_sysbus")
     old.add_to_hass(hass)
+    from homeassistant.helpers import device_registry as dr
+
+    device = dr.async_get(hass).async_get_or_create(
+        config_entry_id=old.entry_id, identifiers={("onewire_sysbus", "28-0000012345ab")},
+        name="28-0000012345ab",
+    )
+    dr.async_get(hass).async_update_device(device.id, name_by_user="Außen")
     registry.async_get_or_create(
         "sensor", "onewire_sysbus", "/sys/bus/w1/devices/28-0000012345ab/w1_slave",
-        config_entry=old, original_name="28-0000012345ab Temperature",
+        config_entry=old, original_name="Temperature", device_id=device.id,
     )
-    eid = registry.async_get_entity_id(
-        "sensor", "onewire_sysbus", "/sys/bus/w1/devices/28-0000012345ab/w1_slave"
-    )
-    registry.async_update_entity(eid, name="Außen")
 
     entry = await setup_entry(hass)
     result = await add_subentry(

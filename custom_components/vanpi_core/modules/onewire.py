@@ -18,6 +18,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import Platform, UnitOfTemperature
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import Entity
 
@@ -133,12 +134,21 @@ class OneWireModule(BoardModule):
             await asyncio.sleep(self.interval)
 
     def old_name(self, sensor_id: str) -> str | None:
-        """Namen aus der alten Komponente onewire_sysbus übernehmen, falls vergeben."""
+        """Namen aus der alten Komponente onewire_sysbus übernehmen.
+
+        Dort hieß die Entität "Temperature", den Namen (z. B. "Außen") hat man
+        meist dem Gerät gegeben. Deshalb zuerst den Gerätenamen nehmen.
+        """
         registry = er.async_get(self.hass)
         unique = f"/sys/bus/w1/devices/{sensor_id}/w1_slave"
         entity_id = registry.async_get_entity_id("sensor", "onewire_sysbus", unique)
-        if entity_id and (entry := registry.async_get(entity_id)):
-            return entry.name or entry.original_name
+        if not entity_id or not (entry := registry.async_get(entity_id)):
+            return None
+        if entry.device_id and (device := dr.async_get(self.hass).async_get(entry.device_id)):
+            if device.name_by_user:
+                return device.name_by_user
+        if entry.name and entry.name.lower() != "temperature":
+            return entry.name
         return None
 
     def create_entities(self) -> dict[Platform, list[Entity]]:
