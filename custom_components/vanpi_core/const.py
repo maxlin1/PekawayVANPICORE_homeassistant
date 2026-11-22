@@ -34,7 +34,14 @@ CONF_ENTITY_Z = "entity_z"
 # Nivellierung: Ausrichtung
 CONF_FORWARD = "forward"
 FORWARD_DRIVE = "drive"  # aus Fahrt-Kalibrierung
-FORWARD_AXES = ["+x", "-x", "+y", "-y", "+z", "-z"]
+FORWARD_AXES = ["pos_x", "neg_x", "pos_y", "neg_y", "pos_z", "neg_z"]
+# Bis 2.0.0 gespeichert als "+x" usw. (kein gültiger Übersetzungs-Schlüssel)
+LEGACY_FORWARD = {"+x": "pos_x", "-x": "neg_x", "+y": "pos_y", "-y": "neg_y", "+z": "pos_z", "-z": "neg_z"}
+
+
+def axis_key(forward: str) -> str:
+    """Konfigurationswert ("pos_x", auch alt "+x") -> Schlüssel in AXIS_VECTORS ("+x")."""
+    return forward.replace("pos_", "+").replace("neg_", "-")
 
 # Fahrzeug und Blöcke
 CONF_WHEELBASE = "wheelbase"

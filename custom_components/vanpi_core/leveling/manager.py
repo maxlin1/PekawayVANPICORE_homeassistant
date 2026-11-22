@@ -52,6 +52,7 @@ from ..const import (
     SAMPLE_INTERVAL,
     SOURCE_MPU6050,
     STORAGE_VERSION,
+    axis_key,
 )
 from .drive_calibration import CalibrationError, DriveRecorder, average_directions
 from .filter import AdaptiveVectorFilter, Debounce
@@ -208,7 +209,7 @@ class LevelingManager:
         forward_cfg = self.config[CONF_FORWARD]
         if forward_cfg == FORWARD_DRIVE:
             return None
-        if dot(AXIS_VECTORS[forward_cfg], drive_forward) > math.cos(math.radians(45)):
+        if dot(AXIS_VECTORS[axis_key(forward_cfg)], drive_forward) > math.cos(math.radians(45)):
             return None
         axis = max(AXIS_VECTORS, key=lambda k: dot(AXIS_VECTORS[k], drive_forward))
         return (
@@ -232,7 +233,7 @@ class LevelingManager:
                 )
             forward, _ = average_directions(self.drive_runs)
         else:
-            forward = AXIS_VECTORS[forward_cfg]
+            forward = AXIS_VECTORS[axis_key(forward_cfg)]
         return Orientation.from_vectors(tuple(up), forward)
 
     # --------------------------------------------------------------- controls

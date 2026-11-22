@@ -44,12 +44,12 @@
     "forward": {
       "options": {
         "drive": "From drive calibration",
-        "+x": "+X (printed X arrow)",
-        "-x": "-X",
-        "+y": "+Y (printed Y arrow)",
-        "-y": "-Y",
-        "+z": "+Z (out of the chip)",
-        "-z": "-Z"
+        "pos_x": "+X (printed X arrow)",
+        "neg_x": "-X",
+        "pos_y": "+Y (printed Y arrow)",
+        "neg_y": "-Y",
+        "pos_z": "+Z (out of the chip)",
+        "neg_z": "-Z"
       }
     },
     "tank_mode": {
@@ -183,7 +183,7 @@
         },
         "vehicle": {
           "title": "Vehicle and blocks",
-          "description": "Everything can be changed later via the gear icon of the leveling entry. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/<file>.",
+          "description": "Everything can be changed later via the gear icon of the leveling entry. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/van_top.png (example file name).",
           "data": {
             "forward": "Board forward direction",
             "wheelbase": "Wheelbase",
@@ -211,7 +211,7 @@
         },
         "reconfigure": {
           "title": "Vehicle and blocks",
-          "description": "Quick guide: 1) Forward direction: pick the board axis that points to the front, or 'From drive calibration'. 2) Park on truly level ground and press 'Save as level' (can be repeated anytime, only changes the level reference). 3) Drive calibration (only needed for 'From drive calibration'): press start, wait 2 s, accelerate straight 1 to 3 times and brake to a full stop, then press stop. The switch 'Active' is not needed for calibrating. Full guide: link 'Visit' on the device page. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/<file>. Safety: only perform the drive calibration on a quiet, straight and clear stretch (e.g. an empty car park, at least 50 m). Read all steps beforehand. Do not look at the display while driving and obey traffic rules. Use at your own risk.",
+          "description": "Quick guide: 1) Forward direction: pick the board axis that points to the front, or 'From drive calibration'. 2) Park on truly level ground and press 'Save as level' (can be repeated anytime, only changes the level reference). 3) Drive calibration (only needed for 'From drive calibration'): press start, wait 2 s, accelerate straight 1 to 3 times and brake to a full stop, then press stop. The switch 'Active' is not needed for calibrating. Full guide: link 'Visit' on the device page. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/van_top.png (example file name). Safety: only perform the drive calibration on a quiet, straight and clear stretch (e.g. an empty car park, at least 50 m). Read all steps beforehand. Do not look at the display while driving and obey traffic rules. Use at your own risk.",
           "data": {
             "forward": "Board forward direction",
             "wheelbase": "Wheelbase",

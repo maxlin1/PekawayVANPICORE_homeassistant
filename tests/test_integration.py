@@ -12,7 +12,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from custom_components.vanpi_core.const import DOMAIN
 
 VEHICLE = {
-    "forward": "+x",
+    "forward": "pos_x",
     "wheelbase": 431.8,
     "track": 173.5,
     "block_height": 2.1,
@@ -187,7 +187,7 @@ async def test_migration_v1(hass: HomeAssistant) -> None:
         domain=DOMAIN, version=1, title="VAN PI CORE",
         data={"source": "entities", "entity_x": "sensor.acc_x",
               "entity_y": "sensor.acc_y", "entity_z": "sensor.acc_z"},
-        options={**VEHICLE, "auto_off_minutes": 1},
+        options={**VEHICLE, "forward": "+x", "auto_off_minutes": 1},
         subentries_data=[ConfigSubentryData(
             data={"pair_12": "resistive", "pair_34": "voltage"},
             subentry_type="tank_inputs", title="Tankeingänge", unique_id=None,
@@ -208,11 +208,13 @@ async def test_migration_v1(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert entry.version == 2
+    assert entry.minor_version == 2
     assert entry.data == {}
     assert entry.options == {"pair_12": "resistive", "pair_34": "voltage"}
     types = [s.subentry_type for s in entry.subentries.values()]
     assert types == ["leveling"]
     sub_id = leveling_subentry_id(entry)
+    assert entry.subentries[sub_id].data["forward"] == "pos_x"
     data = entry.subentries[sub_id].data
     assert data["wheelbase"] == VEHICLE["wheelbase"] and data["source"] == "entities"
     assert "auto_off_minutes" not in data
