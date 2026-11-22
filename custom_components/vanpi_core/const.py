@@ -47,6 +47,10 @@ CONF_TOLERANCE = "tolerance"
 CONF_AIR_SUSPENSION = "air_suspension"
 CONF_AIR_UP = "air_up"
 CONF_AIR_DOWN = "air_down"
+# Schlafrichtung: wohin zeigt der Kopf? Bei Restneigung soll der Kopf höher liegen.
+CONF_HEAD = "head_direction"
+HEAD_NONE = "none"
+HEAD_DIRECTIONS = [HEAD_NONE, "front", "rear", "left", "right"]
 
 DEFAULTS = {
     CONF_SOURCE: SOURCE_MPU6050,
@@ -62,6 +66,7 @@ DEFAULTS = {
     CONF_AIR_SUSPENSION: False,
     CONF_AIR_UP: 2.0,
     CONF_AIR_DOWN: 2.0,
+    CONF_HEAD: HEAD_NONE,
 }
 
 # Nur diese Schlüssel gehören zur Nivellierung (alte Optionen wie
@@ -70,7 +75,7 @@ LEVELING_KEYS = (
     CONF_SOURCE, CONF_I2C_BUS, CONF_MPU_ADDRESS, CONF_ENTITY_X, CONF_ENTITY_Y,
     CONF_ENTITY_Z, CONF_FORWARD, CONF_WHEELBASE, CONF_TRACK, CONF_BLOCK_HEIGHT,
     CONF_STACKS, CONF_BLOCKS_PER_STACK, CONF_TOLERANCE,
-    CONF_AIR_SUSPENSION, CONF_AIR_UP, CONF_AIR_DOWN,
+    CONF_AIR_SUSPENSION, CONF_AIR_UP, CONF_AIR_DOWN, CONF_HEAD,
 )
 
 AUTO_OFF_MINUTES = 15  # fest, Nivellierung schaltet sich danach selbst ab

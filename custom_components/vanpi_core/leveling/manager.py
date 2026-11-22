@@ -34,6 +34,7 @@ from ..const import (
     CONF_ENTITY_Y,
     CONF_ENTITY_Z,
     CONF_FORWARD,
+    CONF_HEAD,
     CONF_I2C_BUS,
     CONF_MPU_ADDRESS,
     CONF_SOURCE,
@@ -44,6 +45,7 @@ from ..const import (
     DEFAULTS,
     DOMAIN,
     FORWARD_DRIVE,
+    HEAD_NONE,
     LEVEL_DEBOUNCE_S,
     PUBLISH_INTERVAL,
     PUBLISH_MIN_CHANGE_DEG,
@@ -129,6 +131,7 @@ class LevelingManager:
             blocks_per_stack=int(self.config[CONF_BLOCKS_PER_STACK]),
             air_up=float(self.config[CONF_AIR_UP]) if self.config[CONF_AIR_SUSPENSION] else 0.0,
             air_down=float(self.config[CONF_AIR_DOWN]) if self.config[CONF_AIR_SUSPENSION] else 0.0,
+            head=None if self.config[CONF_HEAD] == HEAD_NONE else self.config[CONF_HEAD],
         )
         self.tolerance = float(self.config[CONF_TOLERANCE])
         self._published = None  # nächsten Wert sofort mit neuen Daten berechnen

@@ -63,6 +63,15 @@
         "shunt": "SmartShunt / BMV",
         "mppt": "MPPT-Laderegler"
       }
+    },
+    "head_direction": {
+      "options": {
+        "none": "Keine Vorgabe",
+        "front": "Vorne (Fahrerhaus)",
+        "rear": "Hinten (Hecktür)",
+        "left": "Links (Fahrerseite)",
+        "right": "Rechts (Schiebetür)"
+      }
     }
   },
   "entity": {
@@ -185,7 +194,8 @@
             "tolerance": "Gilt als eben bis",
             "air_suspension": "Luftfederung an der Hinterachse",
             "air_up": "Luftfederung: max. anheben",
-            "air_down": "Luftfederung: max. absenken"
+            "air_down": "Luftfederung: max. absenken",
+            "head_direction": "Schlafrichtung (Kopf zeigt nach)"
           },
           "data_description": {
             "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen. Fahrt-Kalibrierung nur auf ruhiger, gerader Strecke, StVO beachten.",
@@ -195,7 +205,8 @@
             "air_suspension": "Links und rechts getrennt verstellbar. Die Empfehlung nennt dann zusätzlich, um wie viel jede Seite hoch oder runter soll.",
             "air_up": "Je Seite, ab normaler Fahrhöhe",
             "air_down": "Je Seite, ab normaler Fahrhöhe",
-            "block_height": "Höhe einer Stufe bzw. Lage des Keils"
+            "block_height": "Höhe einer Stufe bzw. Lage des Keils",
+            "head_direction": "Lässt sich der Van nicht ganz ausgleichen, wird eine Variante bevorzugt, bei der der Kopf höher liegt als die Füße."
           }
         },
         "reconfigure": {
@@ -211,7 +222,8 @@
             "tolerance": "Gilt als eben bis",
             "air_suspension": "Luftfederung an der Hinterachse",
             "air_up": "Luftfederung: max. anheben",
-            "air_down": "Luftfederung: max. absenken"
+            "air_down": "Luftfederung: max. absenken",
+            "head_direction": "Schlafrichtung (Kopf zeigt nach)"
           },
           "data_description": {
             "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen. Fahrt-Kalibrierung nur auf ruhiger, gerader Strecke, StVO beachten.",
@@ -221,7 +233,8 @@
             "air_suspension": "Links und rechts getrennt verstellbar. Die Empfehlung nennt dann zusätzlich, um wie viel jede Seite hoch oder runter soll.",
             "air_up": "Je Seite, ab normaler Fahrhöhe",
             "air_down": "Je Seite, ab normaler Fahrhöhe",
-            "block_height": "Höhe einer Stufe bzw. Lage des Keils"
+            "block_height": "Höhe einer Stufe bzw. Lage des Keils",
+            "head_direction": "Lässt sich der Van nicht ganz ausgleichen, wird eine Variante bevorzugt, bei der der Kopf höher liegt als die Füße."
           }
         }
       },

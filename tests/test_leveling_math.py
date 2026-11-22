@@ -328,3 +328,17 @@ def test_air_suspension_limited_and_combined_with_blocks():
     plan = best_block_plan(van, pitch, roll)
     assert all(-2.0 <= v <= 2.0 for v in plan.air.values())
     assert plan.residual < best_block_plan(no_air, pitch, roll).residual
+
+
+def test_head_direction_prefers_head_high():
+    """Nicht ganz ausgleichbar: mit Kopf rechts soll rechts eher höher bleiben."""
+    van = Vehicle(wheelbase=403.5, track=180, block_height=4.5, stacks=2, blocks_per_stack=3)
+    roll = -math.degrees(math.atan(2.25 / 180))  # rechts 2,25 cm tiefer: halber Block
+    neutral = best_block_plan(van, 0.0, roll)
+    head_right = best_block_plan(
+        Vehicle(**{**van.__dict__, "head": "right"}), 0.0, roll
+    )
+    assert head_right.head_tilt("right") >= 0
+    assert head_right.residual <= neutral.residual + 0.1
+    head_left = best_block_plan(Vehicle(**{**van.__dict__, "head": "left"}), 0.0, roll)
+    assert head_left.head_tilt("left") >= 0

@@ -131,6 +131,8 @@ class Vehicle:
     # Luftfederung hinten: jede Seite um bis zu air_up cm heben, air_down cm senken
     air_up: float = 0.0
     air_down: float = 0.0
+    # Kopf beim Schlafen: "front", "rear", "left", "right" oder None
+    head: str | None = None
 
     @property
     def has_air(self) -> bool:
@@ -181,6 +183,15 @@ class BlockPlan:
     def residual(self) -> float:
         return math.hypot(self.residual_pitch, self.residual_roll)
 
+    def head_tilt(self, head: str | None) -> float:
+        """Restneigung in Schlafrichtung (Grad, > 0: Kopf höher als Füße)."""
+        return {
+            "front": self.residual_pitch,
+            "rear": -self.residual_pitch,
+            "right": self.residual_roll,
+            "left": -self.residual_roll,
+        }.get(head or "", 0.0)
+
     @property
     def total_blocks(self) -> int:
         return sum(self.blocks.values())
@@ -226,7 +237,8 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
 
     Probiert jede Auswahl von bis zu ``stacks`` Rädern mit 0..blocks_per_stack
     Blöcken. Mit Luftfederung wird für jede Verteilung zusätzlich die beste
-    Höhe hinten links/rechts im Federweg berechnet. Bei gleicher Restneigung
+    Höhe hinten links/rechts im Federweg berechnet. Ist eine Schlafrichtung
+    gesetzt, zählt Restneigung mit Kopf tiefer doppelt. Bei gleicher Restneigung
     (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken.
     """
     base = wheel_heights(vehicle, pitch, roll)
@@ -251,7 +263,10 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
             plan = BlockPlan(
                 blocks=dict(blocks), residual_pitch=rp, residual_roll=rr, air=air
             )
-            key = (round(plan.residual, 2), plan.total_blocks)
+            # Kopf tiefer als die Füße zählt doppelt: so eine Variante gewinnt
+            # nur, wenn sie deutlich gerader steht.
+            head_low = max(0.0, -plan.head_tilt(vehicle.head))
+            key = (round(plan.residual + head_low, 2), plan.total_blocks)
             if best_key is None or key < best_key:
                 best, best_key = plan, key
     assert best is not None
