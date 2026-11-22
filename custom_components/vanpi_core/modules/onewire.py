@@ -163,10 +163,24 @@ class OneWireTemperature(ModuleEntity, SensorEntity):
     module: OneWireModule
 
     def __init__(self, module: OneWireModule, sensor_id: str) -> None:
-        name = module.old_name(sensor_id) or f"Temperatur {sensor_id}"
-        super().__init__(module, sensor_id.lower(), name)
+        self._old_name = module.old_name(sensor_id)
+        super().__init__(module, sensor_id.lower(), f"Temperatur {sensor_id}")
         self.sensor_id = sensor_id
         self._attr_extra_state_attributes = {"sensor_id": sensor_id}
+        if self._old_name:
+            # Beim ersten Anlegen bestimmt der alte Name die Entity-ID.
+            self._attr_name = self._old_name
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        # Den übernommenen Namen dauerhaft als Namen in der Registry ablegen.
+        # So bleibt er erhalten, auch wenn onewire_sysbus später entfernt wird.
+        if not self._old_name or not self.registry_entry:
+            return
+        if self.registry_entry.name is None:
+            er.async_get(self.hass).async_update_entity(
+                self.entity_id, name=self._old_name
+            )
 
     @property
     def available(self) -> bool:
