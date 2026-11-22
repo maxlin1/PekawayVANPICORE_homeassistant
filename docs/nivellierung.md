@@ -92,4 +92,4 @@ image: /local/van_top.png   # optional
 
 Ohne `image` zeichnet die Karte einen schlichten Van. Für ein eigenes Foto ein Bild des eigenen Fahrzeugs von oben (Front zeigt nach oben, möglichst freigestellt, PNG) per Studio Code Server, Samba oder File Editor unter `/config/www/` ablegen, z. B. `/config/www/van_top.png`, und in der Karte als `/local/van_top.png` angeben. Nach dem ersten Anlegen von `/config/www` Home Assistant einmal neu starten.
 
-In der Draufsicht (picture-elements) einfach `sensor.ruuvitag_lift_*` und die Block-Templates durch `sensor.nivellierung_hubhohe_*` und `sensor.nivellierung_blocke_*` ersetzen, `input_boolean.leveling_aktiv` durch `switch.nivellierung_aktiv` und `binary_sensor.ruuvitag_van_level` durch `binary_sensor.nivellierung_eben` (Achtung: dort ist **an = eben**).
+Ein vollständiges Beispiel-Dashboard steht unter [beispiele/dashboard-nivellierung.yaml](beispiele/dashboard-nivellierung.yaml). Den Umstieg von RuuviTag-Vorlagen oder anderen Nivellier-Lösungen beschreibt [migration.md](migration.md).
