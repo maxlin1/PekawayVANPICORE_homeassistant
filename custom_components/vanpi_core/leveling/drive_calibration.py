@@ -1,7 +1,7 @@
 """Fahrt-Kalibrierung: Vorwärtsrichtung aus Anfahren und Bremsen bestimmen.
 
 Ablauf für den Nutzer: Start drücken (Van steht), geradeaus anfahren,
-kräftig bremsen bis zum Stillstand, Stop drücken.
+kräftig bremsen bis zum Stillstand (gern 1 bis 3 Mal), dann Stop drücken.
 
 Auswertung:
 1. Beim Start wird 1 s im Stand gemittelt: das ist "oben" für diese Fahrt.
@@ -14,7 +14,7 @@ Auswertung:
    überwiegend positiv. Damit gibt es keine 0°..90°-Mehrdeutigkeit wie bei
    Betragswerten.
 
-Mehrere Fahrten werden gemittelt, die Streuung zeigt die Qualität.
+Mehrere Anfahr-/Bremsvorgänge in einer Aufnahme machen das Ergebnis genauer.
 """
 
 from __future__ import annotations

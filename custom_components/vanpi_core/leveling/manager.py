@@ -67,7 +67,6 @@ from .mpu6050 import MPU6050
 _LOGGER = logging.getLogger(__name__)
 
 ZERO_SECONDS = 3.0
-MAX_DRIVE_RUNS = 3
 MAX_RECORD_SECONDS = 120
 
 
@@ -176,13 +175,12 @@ class LevelingManager:
         info: dict[str, Any] = {
             "nullung_gespeichert": self.zeroed,
             "vorwaertsrichtung": self.config[CONF_FORWARD],
-            "fahrten": len(self.drive_runs),
+            "fahrtrichtung_gespeichert": bool(self.drive_runs),
         }
         if self.auto_off_at is not None:
             info["automatisch_aus_um"] = self.auto_off_at.isoformat()
         if self.drive_runs:
-            fwd, spread = average_directions(self.drive_runs)
-            info["streuung_grad"] = round(spread, 1)
+            fwd, _ = average_directions(self.drive_runs)
             # Welche Board-Achse entspricht der Fahrtrichtung? Hilft beim Prüfen.
             axis, vec = max(AXIS_VECTORS.items(), key=lambda kv: dot(kv[1], fwd))
             angle = math.degrees(math.acos(max(-1.0, min(1.0, dot(vec, fwd)))))
@@ -270,7 +268,7 @@ class LevelingManager:
 
     async def async_drive_start(self) -> None:
         self.recorder = DriveRecorder()
-        self.status = "Fahrt-Aufnahme: kurz stehen bleiben, dann anfahren und kräftig bremsen"
+        self.status = "Fahrt-Aufnahme: 2 s stehen bleiben, dann 1 bis 3 Mal anfahren und bis zum Stillstand bremsen, danach beenden"
         self._notify()
         await self._async_start_sampling()
 
@@ -285,23 +283,16 @@ class LevelingManager:
             self.status = f"Fahrt nicht gespeichert: {err}"
             self._notify()
             raise HomeAssistantError(self.status) from err
-        runs = [list(v) for v in self.drive_runs][-(MAX_DRIVE_RUNS - 1) :]
-        note = ""
-        if runs:
-            previous, _ = average_directions([tuple(r) for r in runs])
-            if dot(previous, forward) < 0.5:  # mehr als 60° Unterschied
-                runs = []
-                note = " Frühere Fahrten widersprachen und wurden verworfen."
-        runs.append(list(forward))
-        self._stored["forward_runs"] = runs
+        # Eine Aufnahme (mit beliebig vielen Anfahr-/Bremsvorgängen) ersetzt
+        # die alte Fahrtrichtung komplett. Die Ebene ("Als eben") bleibt.
+        self._stored["forward_runs"] = [list(forward)]
         await self._store.async_save(self._stored)
-        _, spread = average_directions([tuple(r) for r in runs])
         self.status = (
-            f"Fahrt {len(runs)} gespeichert (Streuung {spread:.1f}°). "
-            "Unter Einstellungen 'Vorwärtsrichtung: aus Fahrt-Kalibrierung' wählen, falls noch nicht geschehen."
+            "Fahrtrichtung gespeichert. Unter Einstellungen 'Vorwärtsrichtung: "
+            "aus Fahrt-Kalibrierung' wählen, falls noch nicht geschehen."
             if self.config[CONF_FORWARD] != FORWARD_DRIVE
-            else f"Fahrt {len(runs)} gespeichert (Streuung {spread:.1f}°)"
-        ) + note
+            else "Fahrtrichtung gespeichert"
+        )
         self._notify()
 
     async def async_drive_cancel(self) -> None:

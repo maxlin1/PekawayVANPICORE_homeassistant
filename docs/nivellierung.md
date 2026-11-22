@@ -19,11 +19,12 @@ Alle Werte lassen sich später über **Konfigurieren** ändern, z. B. bei neuen 
 1. **Vorwärtsrichtung** festlegen (in den Einstellungen, Standard ist „Aus Fahrt-Kalibrierung“):
    - Board parallel zum Fahrzeug verbaut: die Achse wählen, die nach vorne zeigt (+X, −X, …).
    - Board schräg oder unbekannt: **„Aus Fahrt-Kalibrierung“** wählen und dann:
-     1. Auf gerader Strecke anhalten, **„Fahrt-Kalibrierung starten“** drücken, 1 Sekunde stehen bleiben.
-     2. Zügig auf etwa 20 km/h anfahren, dann kräftig bis zum Stillstand bremsen. Nicht lenken.
-     3. **„Fahrt-Kalibrierung beenden“** drücken.
-     4. Am besten 2–3 Mal wiederholen. Die letzten 3 Fahrten werden gemittelt, die Streuung steht im Status-Sensor. Widerspricht eine neue Fahrt den bisherigen deutlich (über 60°), werden die alten verworfen.
-2. Van auf **wirklich ebenen** Boden stellen (z. B. mit Wasserwaage prüfen) und **„Als eben speichern“** drücken (3 Sekunden nicht bewegen). Wichtig: Wer am schrägen Stellplatz speichert, macht diese Schräglage zur Null, alle späteren Werte sind dann falsch. Ohne Nullung nimmt die Integration an, dass das Board gerade eingebaut ist. Eine falsche Nullung entfernt **„Kalibrierung zurücksetzen“**.
+     1. Auf gerader Strecke anhalten, **„Fahrt-Kalibrierung starten“** drücken, 2 Sekunden stehen bleiben.
+     2. Zügig auf etwa 15–20 km/h anfahren, dann kräftig bis zum Stillstand bremsen. Nicht lenken, nicht rückwärts.
+     3. Für ein genaueres Ergebnis Schritt 2 noch ein- bis zweimal wiederholen, **ohne** zwischendurch zu beenden.
+     4. Im Stand **„Fahrt-Kalibrierung beenden“** drücken. Im Status-Sensor zeigt `fahrtrichtung_entspricht` die erkannte Board-Achse.
+     Eine neue Aufnahme ersetzt die alte Fahrtrichtung komplett. Die Ebene bleibt dabei erhalten.
+2. Van auf **wirklich ebenen** Boden stellen (z. B. mit Wasserwaage prüfen) und **„Als eben speichern“** drücken (3 Sekunden nicht bewegen). Wichtig: Wer am schrägen Stellplatz speichert, macht diese Schräglage zur Null, alle späteren Werte sind dann falsch. Ohne Nullung nimmt die Integration an, dass das Board gerade eingebaut ist. „Als eben speichern“ kann jederzeit wiederholt werden, z. B. wenn das Board verrutscht ist. Es ändert nur die Ebene, die Fahrtrichtung bleibt. **„Kalibrierung zurücksetzen“** löscht beides.
 
 Die Kalibrierung liegt im Home-Assistant-Speicher (`.storage`) und übersteht Updates und Neustarts.
 

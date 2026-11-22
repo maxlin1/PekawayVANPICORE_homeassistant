@@ -268,3 +268,12 @@ def test_drive_calibration_started_too_early():
     phases = [(0.5, 0.0, 0.0), (3.5, 0.25, 0.0), (2.0, 0.0, 0.0), (1.9, -0.4, 0.0), (1.0, 0.0, 0.0)]
     with pytest.raises(CalibrationError):
         _simulate(mount, phases).result()
+
+
+@pytest.mark.parametrize("mount_name", list(MOUNTS))
+def test_drive_calibration_several_cycles_one_recording(mount_name):
+    """Mehrfach anfahren und bremsen in einer Aufnahme, mit Pausen."""
+    mount = MOUNTS[mount_name]
+    cycle = [(2.5, 0.25, 0.0), (2.0, 0.0, 0.0), (1.6, -0.4, 0.0), (2.0, 0.0, 0.0)]
+    phases = [(1.5, 0.0, 0.0), *cycle, *cycle, *cycle]
+    assert _angle_to_forward(_simulate(mount, phases).result(), mount) < 5.0
