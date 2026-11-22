@@ -206,7 +206,7 @@
             "air_up": "Per side, from normal ride height",
             "air_down": "Per side, from normal ride height",
             "block_height": "Height of one step or layer of the ramp",
-            "head_direction": "If the van cannot be levelled completely, a variant with the head higher than the feet is preferred."
+            "head_direction": "If the van cannot be levelled completely, this only chooses between variants that are at most 0.2° less level than the best one; the one with the head higher wins. Level (0.0°) always comes first."
           }
         },
         "reconfigure": {
@@ -234,7 +234,7 @@
             "air_up": "Per side, from normal ride height",
             "air_down": "Per side, from normal ride height",
             "block_height": "Height of one step or layer of the ramp",
-            "head_direction": "If the van cannot be levelled completely, a variant with the head higher than the feet is preferred."
+            "head_direction": "If the van cannot be levelled completely, this only chooses between variants that are at most 0.2° less level than the best one; the one with the head higher wins. Level (0.0°) always comes first."
           }
         }
       },

@@ -342,3 +342,15 @@ def test_head_direction_prefers_head_high():
     assert head_right.residual <= neutral.residual + 0.1
     head_left = best_block_plan(Vehicle(**{**van.__dict__, "head": "left"}), 0.0, roll)
     assert head_left.head_tilt("left") >= 0
+
+
+def test_head_direction_never_much_worse():
+    """Fall von Max: Kopf rechts darf die Restneigung nicht deutlich verschlechtern."""
+    pitch = math.degrees(math.atan(-(17.8 + 23.4) / 2 / 403.5))
+    roll = math.degrees(math.atan((-23.4 - 5.6 + 17.8) / 2 / 180))
+    van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=3, air_down=2)
+    neutral = best_block_plan(van, pitch, roll)
+    head = best_block_plan(Vehicle(**{**van.__dict__, "head": "right"}), pitch, roll)
+    assert head.residual <= neutral.residual + 0.2
+    assert head.head_tilt("right") >= neutral.head_tilt("right")
+    assert head.blocks["vl"] >= 1

@@ -14,7 +14,7 @@ Die Integration **VAN PI CORE** (`custom_components/vanpi_core`) berechnet am St
 
 Mit **Luftfederung an der Hinterachse** (z. B. Goldschmidt) den Schalter einschalten und eintragen, wie weit jede Seite maximal angehoben und abgesenkt werden kann. Die Empfehlung kombiniert dann Keile und Luftfederung und nennt z. B. „Vorne rechts: 2 Blöcke (9.0 cm), Luftfederung hinten links +1.2 cm, Luftfederung hinten rechts −0.4 cm“.
 
-**Schlafrichtung (Kopf zeigt nach):** Wer möchte, dass bei nicht ganz ausgleichbarem Gelände der Kopf eher höher liegt als die Füße, stellt hier die Seite ein, zu der der Kopf zeigt (z. B. „Rechts (Schiebetür)“ bei Querschläfern). Varianten mit Kopf tiefer zählen dann doppelt. Standard ist „Keine Vorgabe“.
+**Schlafrichtung (Kopf zeigt nach):** Ziel bleibt immer, den Van möglichst auf 0,0° zu bringen. Nur wenn das mit den vorhandenen Blöcken nicht ganz geht, wählt die Empfehlung unter allen Varianten, die höchstens 0,2° schlechter sind als die beste, die mit dem Kopf am höchsten. Eine deutlich schiefere Variante wird also nie wegen der Schlafrichtung empfohlen. Einstellen kann man die Seite, zu der der Kopf zeigt (z. B. „Rechts (Schiebetür)“ bei Querschläfern). Standard ist „Keine Vorgabe“.
 
 Fahrzeug und Blöcke ändert man später über das **Zahnrad am Eintrag „Nivellierung“**. Das Zahnrad oben bei VAN PI CORE gehört zu den Grundeinstellungen des Boards.
 
