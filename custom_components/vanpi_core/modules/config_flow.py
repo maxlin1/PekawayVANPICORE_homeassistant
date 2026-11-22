@@ -53,6 +53,7 @@ from .const import (
     VICTRON_DEFAULT_INTERVAL,
 )
 from .curve import CurveError, format_curve, parse_curve
+from .gpio import pair_of
 from .i2c import probe
 from .io import input_key, relay_key
 
@@ -221,6 +222,14 @@ class TankSubentryFlow(_BaseSubentryFlow):
                     for o in self._others()
                 ):
                     errors[CONF_CHANNEL] = "already_configured"
+                elif address == ADS_DEFAULT_ADDRESS and any(
+                    int(o[CONF_ADDRESS]) == address
+                    and int(o[CONF_CHANNEL]) in pair_of(channel)
+                    and o.get(CONF_MODE, MODE_VOLTAGE) != user_input[CONF_MODE]
+                    for o in self._others()
+                ):
+                    # ein Pull-up-Schalter für Kanal 1+2 bzw. 3+4
+                    errors[CONF_MODE] = "pair_conflict"
                 elif not await self.hass.async_add_executor_job(probe, 1, address):
                     errors["base"] = "not_found"
             if not errors:

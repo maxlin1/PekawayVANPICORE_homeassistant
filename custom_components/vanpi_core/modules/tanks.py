@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import logging
+import time
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -39,6 +41,10 @@ from .const import (
     UNIT_LITERS,
 )
 from .curve import interpolate, parse_curve
+from .gpio import GpioError, set_pullup
+
+_LOGGER = logging.getLogger(__name__)
+PULLUP_REFRESH = 60  # s: Pull-up regelmäßig neu setzen (z. B. nach fremden Skripten)
 
 
 class TankModule(BoardModule):
@@ -50,6 +56,7 @@ class TankModule(BoardModule):
             int(self.data.get(CONF_I2C_BUS, 1)),
             int(self.data.get(CONF_ADDRESS, ADS_DEFAULT_ADDRESS)),
         )
+        self.onboard = int(self.data.get(CONF_ADDRESS, ADS_DEFAULT_ADDRESS)) == ADS_DEFAULT_ADDRESS
         self.channel = int(self.data[CONF_CHANNEL])  # 1-4 wie auf dem Board
         self.curve = parse_curve(self.data.get(CONF_CURVE) or TANK_DEFAULT_CURVE)
         self.divider = float(self.data.get(CONF_DIVIDER, 1.0)) or 1.0
@@ -58,6 +65,9 @@ class TankModule(BoardModule):
         self.vref = float(self.data.get(CONF_VREF, 3.3))
         self.interval = max(1, int(self.data.get(CONF_SCAN_INTERVAL, TANK_DEFAULT_INTERVAL)))
         self.voltage: float | None = None
+        self.pullup_on: bool | None = None  # tatsächlich gesetzter Zustand
+        self.pullup_error: str | None = None
+        self._pullup_set_at = 0.0
         self._task: asyncio.Task | None = None
 
     @property
@@ -87,8 +97,35 @@ class TankModule(BoardModule):
                 pass
             self._task = None
 
+    async def _apply_pullup(self) -> None:
+        """Pull-up des Kanalpaars passend zum Sensortyp schalten."""
+        want = self.resistive
+        try:
+            pin = await self.hass.async_add_executor_job(set_pullup, self.channel, want)
+        except GpioError as err:
+            if str(err) != self.pullup_error:
+                _LOGGER.warning(
+                    "%s: Pull-up konnte nicht %sgeschaltet werden (%s). "
+                    "Messwerte können verfälscht sein.",
+                    self.subentry.title, "ein" if want else "aus", err,
+                )
+            self.pullup_error = str(err)
+            self.pullup_on = None
+        else:
+            if self.pullup_on is None:
+                _LOGGER.debug("%s: Pull-up %s (sysfs %s)", self.subentry.title, want, pin)
+            self.pullup_error = None
+            self.pullup_on = want
+        self._pullup_set_at = time.monotonic()
+
     async def _run(self) -> None:
         while True:
+            # Pull-up-Schalter gibt es nur für den ADS1115 auf dem Board
+            if self.onboard and (
+                not self._pullup_set_at
+                or time.monotonic() - self._pullup_set_at >= PULLUP_REFRESH
+            ):
+                await self._apply_pullup()
             try:
                 v_adc = await self.hass.async_add_executor_job(
                     self.ads.read_voltage, self.channel - 1
@@ -142,6 +179,15 @@ class TankVoltageSensor(ModuleEntity, SensorEntity):
     @property
     def native_value(self) -> float | None:
         return self.module.voltage
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        m = self.module
+        return {
+            "kanal": m.channel,
+            "pull_up": {True: "an", False: "aus", None: "unbekannt"}[m.pullup_on],
+            **({"pull_up_fehler": m.pullup_error} if m.pullup_error else {}),
+        }
 
 
 class TankResistanceSensor(ModuleEntity, SensorEntity):

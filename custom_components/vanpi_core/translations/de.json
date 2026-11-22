@@ -95,8 +95,8 @@
     },
     "tank_mode": {
       "options": {
-        "voltage": "Spannung (0-3,3 V)",
-        "resistive": "Widerstandsgeber"
+        "voltage": "Spannung / kapazitiver Geber (Pull-up aus)",
+        "resistive": "Widerstandsgeber (Pull-up 47 kΩ an)"
       }
     },
     "victron_type": {
@@ -245,7 +245,7 @@
       "step": {
         "user": {
           "title": "Tank",
-          "description": "Tankeingang 1-4 des VAN PI CORE. Die Kennlinie rechnet die gemessene Spannung in den Füllstand um.",
+          "description": "Tankeingang 1-4 des VAN PI CORE. Der Sensortyp schaltet den Pull-up am Board, und zwar immer für das Kanalpaar 1+2 bzw. 3+4. Beide Kanäle eines Paars brauchen deshalb denselben Sensortyp. Die Kennlinie rechnet die gemessene Spannung in den Füllstand um.",
           "data": {
             "name": "Name",
             "channel": "Board-Kanal",
@@ -261,14 +261,16 @@
           "data_description": {
             "curve": "Paare Spannung:Füllstand mit Komma getrennt, z. B. 0:0, 0.49:50, 1.6:100. Unter dem ersten / über dem letzten Punkt gilt der Endwert.",
             "divider_ratio": "1, wenn der Geber direkt angeschlossen ist.",
-            "r_pullup_ohm": "Nur für Widerstandsgeber (ca. 47 kΩ auf dem Board)."
+            "r_pullup_ohm": "Nur für Widerstandsgeber (ca. 47 kΩ auf dem Board).",
+            "mode": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde (ca. 0-2,4 V) oder Stabsonde mit Widerstandsplatine. Widerstandsgeber: klassischer Schwimmer-/Hebelgeber gegen Masse."
           }
         }
       },
       "error": {
         "invalid_curve": "Kennlinie nicht lesbar. Beispiel: 0:0, 1.6:100",
         "not_found": "Unter dieser Adresse antwortet kein ADS1115.",
-        "already_configured": "Dieser Kanal ist schon eingerichtet."
+        "already_configured": "Dieser Kanal ist schon eingerichtet.",
+        "pair_conflict": "Kanal 1+2 bzw. 3+4 teilen sich einen Pull-up. Der andere Kanal dieses Paars nutzt schon den anderen Sensortyp."
       },
       "abort": {
         "reconfigure_successful": "Gespeichert."

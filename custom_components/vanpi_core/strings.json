@@ -95,8 +95,8 @@
     },
     "tank_mode": {
       "options": {
-        "voltage": "Voltage (0-3.3 V)",
-        "resistive": "Resistive sender"
+        "voltage": "Voltage / capacitive sender (pull-up off)",
+        "resistive": "Resistive sender (47 kΩ pull-up on)"
       }
     },
     "victron_type": {
@@ -245,7 +245,7 @@
       "step": {
         "user": {
           "title": "Tank",
-          "description": "Tank input 1-4 of the VAN PI CORE. The curve maps the measured voltage to the level.",
+          "description": "Tank input 1-4 of the VAN PI CORE. The sensor type switches the board pull-up for the channel pair 1+2 or 3+4, so both channels of a pair need the same sensor type. The curve converts the measured voltage into the level.",
           "data": {
             "name": "Name",
             "channel": "Board channel",
@@ -261,14 +261,16 @@
           "data_description": {
             "curve": "Pairs voltage:level separated by comma, e.g. 0:0, 0.49:50, 1.6:100. Below the first / above the last point the end value is used.",
             "divider_ratio": "1 if the sensor is connected directly.",
-            "r_pullup_ohm": "Only for resistive sensors (about 47 kΩ on the board)."
+            "r_pullup_ohm": "Only for resistive sensors (about 47 kΩ on the board).",
+            "mode": "Voltage: sender with its own output voltage, e.g. a capacitive Votronic probe (about 0-2.4 V) or a rod probe with resistor board. Resistive: classic float/lever sender to ground."
           }
         }
       },
       "error": {
         "invalid_curve": "Curve not readable. Example: 0:0, 1.6:100",
         "not_found": "No ADS1115 answers at this address.",
-        "already_configured": "This channel is already set up."
+        "already_configured": "This channel is already set up.",
+        "pair_conflict": "Channels 1+2 and 3+4 share one pull-up. The other channel of this pair already uses the other sensor type."
       },
       "abort": {
         "reconfigure_successful": "Saved."

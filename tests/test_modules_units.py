@@ -140,3 +140,30 @@ def test_ads1115_driver(monkeypatch) -> None:
     # Kanalwechsel durch einen zweiten Leser wird erkannt und wiederholt
     bus.hijack_once = True
     assert ads.read_voltage(1) == pytest.approx(2.5, abs=0.001)
+
+
+def test_gpio_pullup(tmp_path) -> None:
+    from custom_components.vanpi_core.modules import gpio
+
+    for name, label, base, n in (("gpiochip512", "pinctrl-bcm2711", 512, 58),
+                                 ("gpiochip570", "raspberrypi-exp-gpio", 570, 8)):
+        chip = tmp_path / name
+        chip.mkdir()
+        (chip / "label").write_text(label + "\n")
+        (chip / "base").write_text(f"{base}\n")
+        (chip / "ngpio").write_text(f"{n}\n")
+    assert gpio.soc_base(str(tmp_path)) == 512
+    # Pin schon exportiert (sysfs legt den Ordner beim Export an)
+    for pin in (531, 528):
+        node = tmp_path / f"gpio{pin}"
+        node.mkdir()
+        (node / "direction").write_text("in")
+        (node / "value").write_text("1")
+    assert gpio.set_pullup(2, False, str(tmp_path)) == 531
+    assert (tmp_path / "gpio531" / "direction").read_text() == "low"
+    assert (tmp_path / "gpio531" / "value").read_text() == "0"
+    assert gpio.set_pullup(3, True, str(tmp_path)) == 528
+    assert (tmp_path / "gpio528" / "direction").read_text() == "high"
+    assert gpio.pair_of(4) == (3, 4) and gpio.pair_of(1) == (1, 2)
+    with pytest.raises(gpio.GpioError):
+        gpio.soc_base(str(tmp_path / "leer"))

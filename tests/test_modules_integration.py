@@ -12,7 +12,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.vanpi_core.modules import ads1115, i2c, io, mcp23017, victron
+from custom_components.vanpi_core.modules import ads1115, i2c, io, mcp23017, tanks, victron
 from custom_components.vanpi_core.modules import config_flow as sub_flow
 
 from .fakes import FakeAdsBus, FakeMcpBus, bus_cm
@@ -37,6 +37,9 @@ def hardware(monkeypatch):
     monkeypatch.setattr(ads1115, "i2c_bus", lambda n: bus_cm(ads_bus))
     monkeypatch.setattr(sub_flow, "probe", lambda bus, addr: True)
     monkeypatch.setattr(io, "IO_POLL_INTERVAL", 0.01)
+    pullups: list[tuple[int, bool]] = []
+    monkeypatch.setattr(tanks, "set_pullup", lambda ch, on: pullups.append((ch, on)) or 531)
+    ads_bus.pullups = pullups
     return mcp_bus, ads_bus
 
 
@@ -155,7 +158,10 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     await hass.async_block_till_done()
     level = "sensor.abwasser_fullstand"
     assert float(hass.states.get(level).state) == pytest.approx(50, abs=0.5)
-    assert float(hass.states.get("sensor.abwasser_spannung").state) == pytest.approx(0.49, abs=0.01)
+    volt = hass.states.get("sensor.abwasser_spannung")
+    assert float(volt.state) == pytest.approx(0.49, abs=0.01)
+    assert hardware[1].pullups == [(1, False)]
+    assert volt.attributes["pull_up"] == "aus"
 
     # ungültige Kennlinie
     bad = await hass.config_entries.subentries.async_init(
@@ -188,6 +194,19 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     assert float(state.state) == pytest.approx(50, abs=0.5)
     assert state.attributes["unit_of_measurement"] == "%"
     assert hass.states.get("sensor.abwasser_widerstand") is not None
+    assert hardware[1].pullups[-1] == (1, True)
+
+    # Kanal 2 teilt sich den Pull-up mit Kanal 1: anderer Sensortyp geht nicht
+    pair = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, "tank"), context={"source": config_entries.SOURCE_USER}
+    )
+    pair = await hass.config_entries.subentries.async_configure(
+        pair["flow_id"],
+        {"name": "Frisch", "channel": "2", "mode": "voltage", "unit": "L", "curve": "0:0, 2.4:100",
+         "divider_ratio": 1, "r_pullup_ohm": 47000, "v_ref": 3.3, "scan_interval": 5,
+         "address": "0x48"},
+    )
+    assert pair["errors"] == {"mode": "pair_conflict"}
 
     # Löschen entfernt die Entitäten
     hass.config_entries.async_remove_subentry(entry, subentry_id)
