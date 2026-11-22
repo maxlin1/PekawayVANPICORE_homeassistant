@@ -160,17 +160,38 @@ image: /local/van_top.png   # optional
 Die Karten der Integration (`vanpi-level-card`, `vanpi-van-card`) werden automatisch geladen, eine Ressource muss
 nicht eingetragen werden.
 
-## 3. Dashboard
+## 3. Dashboard-Seite „Van Nivellierung“
 
-Ein fertiges Beispiel-Dashboard für die Nivellierung (nur Bordmittel und die Karten dieser Integration) liegt unter
-[beispiele/dashboard-nivellierung.yaml](beispiele/dashboard-nivellierung.yaml):
+Im Repository liegt eine fertige Dashboard-Seite:
+**[beispiele/dashboard-nivellierung.yaml](beispiele/dashboard-nivellierung.yaml)**. Sie zeigt Schalter, Empfehlung
+je Rad, Draufsicht, Wasserwaage, Kalibrier-Knöpfe und eine Kurzanleitung. Sie braucht nur Bordmittel von Home
+Assistant und die beiden Karten dieser Integration.
 
-*Dashboard öffnen → ✏️ Bearbeiten → ⋮ → Raw-Konfigurationseditor* bzw. bei einer neuen Ansicht
-*Ansicht hinzufügen → ⋮ → In YAML bearbeiten* und den Inhalt einfügen.
+**Karten:** `custom:vanpi-level-card` (Wasserwaage) und `custom:vanpi-van-card` (Draufsicht) bringt die Integration
+selbst mit. Sie werden automatisch geladen. Es muss **nichts nach `/config/www` kopiert** und **keine Ressource
+eingetragen** werden. Sollten die Karten nach einem Update fehlen, den Browser-Cache leeren bzw. die App neu laden.
 
-> Die Entity-IDs hängen von der Sprache bei der Einrichtung ab. Weichen sie bei dir ab (z. B. englisch
-> `sensor.leveling_…`), im Editor mit Suchen & Ersetzen anpassen. Die eigenen IDs siehst du unter
-> *Einstellungen → Geräte & Dienste → Entitäten*, Filter „VAN PI CORE“.
+**Seite einfügen:**
+
+1. Die Datei [dashboard-nivellierung.yaml](beispiele/dashboard-nivellierung.yaml) auf GitHub öffnen und den Inhalt
+   kopieren (Knopf *Copy raw file* oben rechts).
+2. In Home Assistant das gewünschte Dashboard öffnen → ✏️ (*Dashboard bearbeiten*).
+3. Neben den vorhandenen Ansichten auf **+** (*Ansicht hinzufügen*) → im Dialog **⋮ → In YAML bearbeiten**.
+4. Den vorhandenen Text komplett durch den kopierten Inhalt ersetzen → **Speichern** → **Fertig**.
+
+Ein eigenes Dashboard nur für den Van geht genauso: *Einstellungen → Dashboards → Dashboard hinzufügen → Neues
+Dashboard von Grund auf*, öffnen und die Ansicht wie oben einfügen.
+
+**Eigenes Van-Bild:** In der Seite ist `image: /local/van_top.png` eingetragen. Das Bild ablegen wie unter
+[Eigenes Van-Bild für die Draufsicht](#eigenes-van-bild-für-die-draufsicht) beschrieben, oder die Zeile `image:`
+löschen, dann zeichnet die Karte einen schlichten Van.
+
+> Die Entity-IDs in der Vorlage gelten für eine Einrichtung auf Deutsch (`sensor.nivellierung_…`). Weichen sie bei
+> dir ab, z. B. bei englischer Sprache (`sensor.leveling_…`), im YAML-Editor mit Suchen & Ersetzen anpassen. Die
+> eigenen IDs stehen unter *Einstellungen → Geräte & Dienste → Entitäten*, Filter „VAN PI CORE“.
+
+Die Karten einzeln in ein bestehendes Dashboard setzen: *Karte hinzufügen* → nach „VAN PI CORE“ suchen, oder als
+YAML wie in [nivellierung.md](nivellierung.md#dashboard).
 
 ## Fehlersuche
 

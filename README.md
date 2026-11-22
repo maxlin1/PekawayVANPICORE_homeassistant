@@ -53,7 +53,7 @@ Kurzfassung, die ausführliche Anleitung steht in [docs/installation.md](docs/in
 | [Einrichtung](docs/einrichtung.md) | Hauptgerät, Relais, Tanks, 1-Wire, Victron, Nivellierung, eigenes Van-Bild, Fehlersuche |
 | [Module im Detail](docs/module.md) | Relais, Tanks, 1-Wire, Victron: Werte und Verhalten |
 | [Nivellierung](docs/nivellierung.md) | Kalibrierung, Benutzung am Stellplatz, Entitäten, Dashboard-Karten |
-| [Beispiel-Dashboard](docs/beispiele/dashboard-nivellierung.yaml) | fertige Ansicht für die Nivellierung |
+| [Dashboard-Seite Nivellierung](docs/beispiele/dashboard-nivellierung.yaml) | fertige Seite zum Einfügen, Anleitung in [Einrichtung, Abschnitt 3](docs/einrichtung.md#3-dashboard-seite-van-nivellierung) |
 | [Umstieg von den alten Komponenten](docs/migration.md) | von `mcp23017`, `ads_waterlevel`, `onewire_sysbus`, `victron_*`, `mpu650` |
 
 ## Voraussetzungen

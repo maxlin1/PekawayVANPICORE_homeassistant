@@ -1,6 +1,6 @@
 # Beispiel-Ansicht "Van Nivellierung" für ein Dashboard (Abschnitte/Sections).
-# Nutzt nur Bordmittel und die Karten der Integration VAN PI CORE.
-# Einfügen: Dashboard bearbeiten -> Ansicht hinzufügen -> ⋮ -> In YAML bearbeiten.
+# Nutzt nur Bordmittel und die Karten der Integration VAN PI CORE (werden automatisch geladen).
+# Einfügen: Dashboard bearbeiten -> Ansicht hinzufügen -> ⋮ -> In YAML bearbeiten -> Inhalt ersetzen.
 # Entity-IDs gelten für eine deutschsprachige Einrichtung; ggf. per Suchen & Ersetzen anpassen.
 title: Van Nivellierung
 path: van
@@ -45,33 +45,33 @@ sections:
             state: unavailable
         content: >-
           ⚠️ {{ states('sensor.nivellierung_status') }}
-      # Große Empfehlung
-      - type: tile
-        entity: sensor.nivellierung_blockempfehlung
-        name: Empfehlung
-        icon: mdi:stairs-up
-        color: orange
+      # Empfehlung: eine Zeile pro Rad bzw. Luftfederung, bricht sauber um
+      - type: markdown
         visibility:
           - condition: state
             entity: switch.nivellierung_aktiv
             state: "on"
-        grid_options:
-          columns: 12
-      - type: tile
-        entity: sensor.nivellierung_restneigung
-        name: Restneigung danach
-        visibility:
           - condition: state
-            entity: switch.nivellierung_aktiv
-            state: "on"
+            entity: sensor.nivellierung_blockempfehlung
+            state_not: unavailable
+        content: |
+          {% if is_state('binary_sensor.nivellierung_eben', 'on') -%}
+          ✅ **Der Van steht eben**
+          {%- else -%}
+          **Empfehlung**
+          {% for teil in states('sensor.nivellierung_blockempfehlung').split(', ') %}
+          - {{ teil }}
+          {%- endfor %}
+
+          Restneigung danach: {{ states('sensor.nivellierung_restneigung') | replace('.', ',') }}°
+          {% endif %}
         grid_options:
           columns: 12
       # Draufsicht aus der Integration VAN PI CORE: eigenes Foto von oben unter
       # /config/www/van_top.png ablegen (vorne = oben im Bild). Ohne image: gezeichneter Van.
-      # Kein eigenes Bild? Die Zeile "image:" einfach löschen.
       - type: custom:vanpi-van-card
         entity: sensor.nivellierung_blockempfehlung
-        image: /local/van_top.png
+        image: /local/van_top.png   # kein eigenes Bild? Zeile löschen
         grid_options:
           columns: 12
       # Wasserwaage aus der Integration VAN PI CORE (ab 0.2.0), Blase wandert zur höheren Seite
@@ -156,6 +156,9 @@ sections:
           **Als eben speichern:** Van auf wirklich ebenen Boden stellen, drücken, 3 s nicht bewegen. Jederzeit wiederholbar, ändert nur die Ebene.
 
           **Fahrt-Kalibrierung** (nur bei Vorwärtsrichtung „Aus Fahrt-Kalibrierung“):
+
+          > ⚠️ Nur auf verkehrsberuhigter, gerader, freier Strecke (z. B. leerer Parkplatz, mind. 50 m). Schritte vorher lesen. Während der Fahrt nicht aufs Display schauen, StVO beachten. Nutzung auf eigene Gefahr.
+
           1. Auf gerader Strecke anhalten, *Starten* drücken, 2 s stehen bleiben.
           2. Geradeaus zügig auf 15–20 km/h anfahren, kräftig bis zum Stillstand bremsen. Nicht lenken, nicht rückwärts.
           3. Schritt 2 gern 1–2 Mal wiederholen, ohne zu beenden.
