@@ -84,6 +84,9 @@ async def test_leveling_flow(hass: HomeAssistant) -> None:
 
 async def test_options_flow(hass: HomeAssistant) -> None:
     entry = await setup_entry(hass)
+    await hass.services.async_call(
+        "switch", "turn_on", {"entity_id": "switch.leveling_active"}, blocking=True
+    )
     result = await hass.config_entries.options.async_init(entry.entry_id)
     assert result["type"] is FlowResultType.FORM
     result = await hass.config_entries.options.async_configure(
@@ -93,3 +96,6 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     assert entry.options["block_height"] == 3.0
     assert entry.runtime_data.leveling.vehicle.block_height == 3.0
+    # Einstellungen ändern schaltet die Nivellierung nicht aus
+    assert hass.states.get("switch.leveling_active").state == "on"
+    assert await hass.config_entries.async_unload(entry.entry_id)

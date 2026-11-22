@@ -22,12 +22,13 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 
-from .geometry import Vector, add, cross, dot, horizontal, norm, normalize, scale
+from .geometry import Vector, add, cross, dot, horizontal, norm, normalize, scale, sub
 
 G = 9.80665
 MIN_PEAK_G = 0.12  # mindestens so viel waagerechte Beschleunigung nötig
 MIN_LINEARITY = 3.0  # Hauptachse muss deutlich dominieren
 REST_SECONDS = 1.0
+MAX_REST_SPREAD_G = 0.08
 
 
 class CalibrationError(ValueError):
@@ -83,6 +84,7 @@ class DriveRecorder:
         """Vorwärtsrichtung im Sensor-Koordinatensystem (Einheitsvektor)."""
         if self._up is None or len(self.samples) < 10:
             raise CalibrationError("Aufnahme zu kurz. Bitte anfahren und bremsen.")
+        self._check_rest()
         if self.peak_g < MIN_PEAK_G:
             raise CalibrationError(
                 f"Zu wenig Beschleunigung ({self.peak_g:.2f} g). "
@@ -90,7 +92,15 @@ class DriveRecorder:
             )
         assert self._e1 is not None and self._e2 is not None
         # 2D-Koordinaten in der Waagerechten
-        pts = [(t, dot(h, self._e1), dot(h, self._e2)) for t, h in self.samples]
+        raw = [(t, dot(h, self._e1), dot(h, self._e2)) for t, h in self.samples]
+        # Start und Ende im Stand: die echte Beschleunigung mittelt sich zu 0.
+        # Ein konstanter Rest (Gefälle, Ungenauigkeit von "oben") ist Messfehler
+        # und wird abgezogen. Sonst kann er bei langer Fahrt das Vorzeichen kippen.
+        n = len(raw)
+        bx = sum(x for _, x, _ in raw) / n
+        by = sum(y for _, _, y in raw) / n
+        pts = [(t, x - bx, y - by) for t, x, y in raw]
+
         sxx = sum(x * x for _, x, _ in pts)
         syy = sum(y * y for _, _, y in pts)
         sxy = sum(x * y for _, x, y in pts)
@@ -103,7 +113,8 @@ class DriveRecorder:
                 "Keine klare Fahrtrichtung erkannt. Bitte geradeaus fahren, "
                 "nicht lenken."
             )
-        # Vorzeichen über aufintegrierte Geschwindigkeit
+
+        # Vorzeichen 1: aufintegrierte Geschwindigkeit (vorwärts = überwiegend positiv)
         v = 0.0
         v_sum = 0.0
         prev_t = pts[0][0]
@@ -112,9 +123,46 @@ class DriveRecorder:
             prev_t = t
             v += (x * ax + y * ay) * G * dt
             v_sum += v * dt
-        if v_sum < 0:
+        sign_velocity = 1 if v_sum >= 0 else -1
+
+        # Vorzeichen 2: das erste deutliche Ereignis ist das Anfahren
+        threshold = max(0.06, 0.4 * self.peak_g)
+        sign_first = 0
+        for _, x, y in pts:
+            a = x * ax + y * ay
+            if abs(a) >= threshold:
+                sign_first = 1 if a > 0 else -1
+                break
+
+        if sign_first and sign_first != sign_velocity:
+            raise CalibrationError(
+                "Fahrtrichtung nicht eindeutig. Bitte erst 1 Sekunde stehen, "
+                "dann geradeaus anfahren, kräftig bis zum Stillstand bremsen "
+                "und erst danach beenden."
+            )
+        if sign_velocity < 0:
             ax, ay = -ax, -ay
         return normalize(add(scale(self._e1, ax), scale(self._e2, ay)))
+
+    def _check_rest(self) -> None:
+        """Beim Start muss der Van stehen, sonst ist "oben" verfälscht."""
+        if len(self.rest) < 3:
+            return
+        n = len(self.rest)
+        mean = scale(
+            (
+                sum(v[0] for v in self.rest),
+                sum(v[1] for v in self.rest),
+                sum(v[2] for v in self.rest),
+            ),
+            1.0 / n,
+        )
+        spread = max(norm(sub(v, mean)) for v in self.rest)
+        if spread > MAX_REST_SPREAD_G:
+            raise CalibrationError(
+                "Beim Start hat sich der Van schon bewegt. Bitte nach dem Drücken "
+                "von Start 1 Sekunde stehen bleiben."
+            )
 
 
 def average_directions(directions: list[Vector]) -> tuple[Vector, float]:

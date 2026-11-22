@@ -12,6 +12,7 @@ import logging
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -19,6 +20,7 @@ from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.storage import Store
+from homeassistant.util import dt as dt_util
 
 from ..const import (
     CONF_AUTO_OFF,
@@ -55,6 +57,7 @@ from .geometry import (
     Vector,
     Vehicle,
     best_block_plan,
+    dot,
     lift_per_wheel,
     normalize,
 )
@@ -106,6 +109,13 @@ class LevelingManager:
         self.state = LevelState()
         self.status = "Bereit"
 
+        self.auto_off_at: datetime | None = None
+        self.apply_options()
+
+    @callback
+    def apply_options(self) -> None:
+        """Einstellungen übernehmen, ohne die Nivellierung neu zu starten."""
+        self.config = _merged(self.entry)
         self.vehicle = Vehicle(
             wheelbase=float(self.config[CONF_WHEELBASE]),
             track=float(self.config[CONF_TRACK]),
@@ -114,6 +124,8 @@ class LevelingManager:
             blocks_per_stack=int(self.config[CONF_BLOCKS_PER_STACK]),
         )
         self.tolerance = float(self.config[CONF_TOLERANCE])
+        self._published = None  # nächsten Wert sofort mit neuen Daten berechnen
+        self._notify()
 
     # ------------------------------------------------------------------ setup
 
@@ -165,6 +177,8 @@ class LevelingManager:
             "vorwaertsrichtung": self.config[CONF_FORWARD],
             "fahrten": len(self.drive_runs),
         }
+        if self.auto_off_at is not None:
+            info["automatisch_aus_um"] = self.auto_off_at.isoformat()
         if self.drive_runs:
             _, spread = average_directions(self.drive_runs)
             info["streuung_grad"] = round(spread, 1)
@@ -200,12 +214,14 @@ class LevelingManager:
         if self._auto_off_unsub:
             self._auto_off_unsub()
             self._auto_off_unsub = None
+        self.auto_off_at = None
         if active:
             minutes = int(self.config[CONF_AUTO_OFF])
             if minutes > 0:
                 self._auto_off_unsub = async_call_later(
                     self.hass, minutes * 60, self._auto_off
                 )
+                self.auto_off_at = dt_util.now() + timedelta(minutes=minutes)
             self.status = "Aktiv"
             await self._async_start_sampling()
         else:
@@ -219,6 +235,7 @@ class LevelingManager:
     @callback
     def _auto_off(self, _now: Any) -> None:
         self._auto_off_unsub = None
+        _LOGGER.info("Nivellierung nach eingestellter Zeit automatisch ausgeschaltet")
         self.hass.async_create_task(self.async_set_active(False))
 
     async def async_zero(self) -> None:
@@ -264,6 +281,12 @@ class LevelingManager:
             self._notify()
             raise HomeAssistantError(self.status) from err
         runs = [list(v) for v in self.drive_runs][-(MAX_DRIVE_RUNS - 1) :]
+        note = ""
+        if runs:
+            previous, _ = average_directions([tuple(r) for r in runs])
+            if dot(previous, forward) < 0.5:  # mehr als 60° Unterschied
+                runs = []
+                note = " Frühere Fahrten widersprachen und wurden verworfen."
         runs.append(list(forward))
         self._stored["forward_runs"] = runs
         await self._store.async_save(self._stored)
@@ -273,7 +296,7 @@ class LevelingManager:
             "Unter Einstellungen 'Vorwärtsrichtung: aus Fahrt-Kalibrierung' wählen, falls noch nicht geschehen."
             if self.config[CONF_FORWARD] != FORWARD_DRIVE
             else f"Fahrt {len(runs)} gespeichert (Streuung {spread:.1f}°)"
-        )
+        ) + note
         self._notify()
 
     async def async_drive_cancel(self) -> None:

@@ -16,13 +16,13 @@ Alle Werte lassen sich später über **Konfigurieren** ändern, z. B. bei neuen 
 
 ## Einmalige Kalibrierung
 
-1. **Vorwärtsrichtung** festlegen (in den Einstellungen):
+1. **Vorwärtsrichtung** festlegen (in den Einstellungen, Standard ist „Aus Fahrt-Kalibrierung“):
    - Board parallel zum Fahrzeug verbaut: die Achse wählen, die nach vorne zeigt (+X, −X, …).
    - Board schräg oder unbekannt: **„Aus Fahrt-Kalibrierung“** wählen und dann:
      1. Auf gerader Strecke anhalten, **„Fahrt-Kalibrierung starten“** drücken, 1 Sekunde stehen bleiben.
      2. Zügig auf etwa 20 km/h anfahren, dann kräftig bis zum Stillstand bremsen. Nicht lenken.
      3. **„Fahrt-Kalibrierung beenden“** drücken.
-     4. Am besten 2–3 Mal wiederholen. Die letzten 3 Fahrten werden gemittelt, die Streuung steht im Status-Sensor.
+     4. Am besten 2–3 Mal wiederholen. Die letzten 3 Fahrten werden gemittelt, die Streuung steht im Status-Sensor. Widerspricht eine neue Fahrt den bisherigen deutlich (über 60°), werden die alten verworfen.
 2. Van auf ebenen Boden stellen und **„Als eben speichern“** drücken (3 Sekunden nicht bewegen).
 
 Die Kalibrierung liegt im Home-Assistant-Speicher (`.storage`) und übersteht Updates und Neustarts.
@@ -32,7 +32,7 @@ Die Kalibrierung liegt im Home-Assistant-Speicher (`.storage`) und übersteht Up
 1. Schalter **„Nivellierung Aktiv“** einschalten.
 2. Ablesen: **Blockempfehlung**, z. B. „Hinten links: 3 Blöcke (6.3 cm), Vorne links: 1 Block (2.1 cm)“.
 3. Blöcke unterlegen, draufrollen. Die Werte aktualisieren sich live, **„Eben“** geht nach 2 Sekunden Ruhe auf „an“.
-4. Ausschalten, oder es schaltet nach der eingestellten Zeit automatisch ab.
+4. Ausschalten, oder es schaltet nach der eingestellten Zeit automatisch ab (Standard 15 Minuten, 0 = nie). Die Uhrzeit steht im Status-Sensor unter `automatisch_aus_um`. Einstellungen ändern schaltet die Nivellierung nicht mehr aus.
 
 Ist die Nivellierung aus, wird der Sensor nicht gelesen (MPU6050 im Schlafmodus) und alle Messwerte sind „nicht verfügbar“. Beim Fahren entsteht also keine Last und nichts wird aufgezeichnet.
 

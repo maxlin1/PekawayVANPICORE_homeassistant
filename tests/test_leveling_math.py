@@ -226,3 +226,45 @@ def test_average_directions():
     mean, spread = average_directions([(1.0, 0.05, 0.0), (1.0, -0.05, 0.0)])
     assert mean[0] == pytest.approx(1.0, abs=0.01)
     assert spread == pytest.approx(math.degrees(math.atan(0.05)), abs=0.1)
+
+
+def _simulate(mount, phases, dt=0.05, seed=3):
+    rnd = random.Random(seed)
+    rec = DriveRecorder()
+    t = 0.0
+    for duration, a, bias in phases:
+        for _ in range(int(duration / dt)):
+            noise = tuple(rnd.gauss(0, 0.01) for _ in range(3))
+            reading = sensor_reading(mount, 0.0, 0.0, extra_vehicle=(a + bias, 0.0, 0.0))
+            rec.add(t, tuple(r + n for r, n in zip(reading, noise, strict=True)))
+            t += dt
+    return rec
+
+
+def _angle_to_forward(fwd, mount):
+    expected = normalize(forward_in_sensor(mount))
+    c = sum(a * b for a, b in zip(fwd, expected, strict=True))
+    return math.degrees(math.acos(max(-1, min(1, c))))
+
+
+@pytest.mark.parametrize("mount_name", list(MOUNTS))
+def test_drive_calibration_long_cruise_downhill(mount_name):
+    """Langes Rollen bergab (konstanter Fehler) darf das Vorzeichen nicht kippen."""
+    mount = MOUNTS[mount_name]
+    phases = [(1.5, 0.0, 0.0), (3.0, 0.25, 0.0), (25.0, 0.0, -0.05), (2.0, -0.4, 0.0), (1.0, 0.0, 0.0)]
+    fwd = _simulate(mount, phases).result()
+    assert _angle_to_forward(fwd, mount) < 5.0
+
+
+def test_drive_calibration_stop_pressed_late():
+    """Lange stehen nach dem Bremsen ist kein Problem."""
+    mount = MOUNTS["gedreht_155"]
+    phases = [(1.5, 0.0, 0.0), (2.5, 0.3, 0.0), (3.0, 0.0, 0.0), (1.5, -0.5, 0.0), (20.0, 0.0, 0.0)]
+    assert _angle_to_forward(_simulate(mount, phases).result(), mount) < 5.0
+
+
+def test_drive_calibration_started_too_early():
+    mount = MOUNTS["liegend"]
+    phases = [(0.5, 0.0, 0.0), (3.5, 0.25, 0.0), (2.0, 0.0, 0.0), (1.9, -0.4, 0.0), (1.0, 0.0, 0.0)]
+    with pytest.raises(CalibrationError):
+        _simulate(mount, phases).result()

@@ -41,5 +41,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: VanPiConfigEntry) -> bo
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: VanPiConfigEntry) -> None:
-    """Geänderte Einstellungen übernehmen."""
-    await hass.config_entries.async_reload(entry.entry_id)
+    """Geänderte Einstellungen live übernehmen (Nivellierung bleibt an)."""
+    entry.runtime_data.leveling.apply_options()
