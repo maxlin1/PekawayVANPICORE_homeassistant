@@ -117,3 +117,19 @@ async def test_auto_off_after_15_minutes(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     assert hass.states.get("switch.leveling_active").state == "off"
     assert await hass.config_entries.async_unload(entry.entry_id)
+
+
+async def test_reset_button_reenabled_after_update(hass: HomeAssistant) -> None:
+    """Alte Installationen: von der Integration deaktivierter Button wird aktiviert."""
+    from homeassistant.helpers import entity_registry as er
+
+    entry = await setup_entry(hass)
+    registry = er.async_get(hass)
+    entity_id = registry.async_get_entity_id(
+        "button", DOMAIN, f"{entry.entry_id}_leveling_reset_calibration"
+    )
+    assert entity_id
+    registry.async_update_entity(entity_id, disabled_by=er.RegistryEntryDisabler.INTEGRATION)
+    await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert registry.async_get(entity_id).disabled_by is None
