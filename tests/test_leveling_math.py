@@ -38,7 +38,7 @@ from leveling.geometry import (  # noqa: E402
     normalize,
 )
 
-MAX_VAN = Vehicle(wheelbase=431.8, track=173.5, block_height=2.1, stacks=2, blocks_per_stack=3)
+VAN_A = Vehicle(wheelbase=431.8, track=173.5, block_height=2.1, stacks=2, blocks_per_stack=3)
 
 
 def rot_matrix(yaw: float, pitch: float, roll: float):
@@ -109,7 +109,7 @@ def test_axis_choice_vertical_rejected():
 
 def test_lift_full_not_half():
     # 2 Grad Front tiefer: vorne muss um Radstand*tan(2°) = 15,1 cm hoch
-    lift = lift_per_wheel(MAX_VAN, -2.0, 0.0)
+    lift = lift_per_wheel(VAN_A, -2.0, 0.0)
     assert lift["vl"] == pytest.approx(15.08, abs=0.05)
     assert lift["vr"] == pytest.approx(15.08, abs=0.05)
     assert lift["hl"] == pytest.approx(0.0, abs=1e-6)
@@ -117,28 +117,28 @@ def test_lift_full_not_half():
 
 def test_lift_roll_sign():
     # Rechte Seite höher -> links anheben
-    lift = lift_per_wheel(MAX_VAN, 0.0, 1.0)
+    lift = lift_per_wheel(VAN_A, 0.0, 1.0)
     assert lift["vl"] > 0 and lift["hl"] > 0
     assert lift["vr"] == pytest.approx(0.0, abs=1e-6)
 
 
 def test_block_plan_level_needs_nothing():
-    plan = best_block_plan(MAX_VAN, 0.1, -0.1)
+    plan = best_block_plan(VAN_A, 0.1, -0.1)
     assert plan.total_blocks == 0
     assert plan.text(2.1) == "Keine Blöcke nötig"
 
 
 def test_block_plan_left_low():
     # Links ca. 4,2 cm tiefer: 2 Blöcke unter beide linken Räder
-    roll = math.degrees(math.atan(4.2 / MAX_VAN.track))
-    plan = best_block_plan(MAX_VAN, 0.0, roll)
+    roll = math.degrees(math.atan(4.2 / VAN_A.track))
+    plan = best_block_plan(VAN_A, 0.0, roll)
     assert plan.blocks == {"vl": 2, "vr": 0, "hl": 2, "hr": 0}
     assert plan.residual < 0.05
 
 
 def test_block_plan_front_low():
-    pitch = -math.degrees(math.atan(6.3 / MAX_VAN.wheelbase))
-    plan = best_block_plan(MAX_VAN, pitch, 0.0)
+    pitch = -math.degrees(math.atan(6.3 / VAN_A.wheelbase))
+    plan = best_block_plan(VAN_A, pitch, 0.0)
     assert plan.blocks["vl"] == 3 and plan.blocks["vr"] == 3
     assert plan.residual < 0.05
 
@@ -146,14 +146,14 @@ def test_block_plan_front_low():
 def test_block_plan_corner_low_only_two_stacks():
     # Vorne links tief: mit 2 Stapeln bestes Ergebnis besser als ohne Blöcke
     pitch, roll = -0.8, 1.0
-    plan = best_block_plan(MAX_VAN, pitch, roll)
+    plan = best_block_plan(VAN_A, pitch, roll)
     assert sum(1 for n in plan.blocks.values() if n) <= 2
     assert plan.residual < math.hypot(pitch, roll)
     assert plan.blocks["vl"] > 0
 
 
 def test_block_plan_limits():
-    plan = best_block_plan(MAX_VAN, -8.0, 0.0)  # zu steil für 3 Blöcke
+    plan = best_block_plan(VAN_A, -8.0, 0.0)  # zu steil für 3 Blöcke
     assert max(plan.blocks.values()) <= 3
     assert plan.residual > 1.0
 
@@ -279,19 +279,19 @@ def test_drive_calibration_several_cycles_one_recording(mount_name):
     assert _angle_to_forward(_simulate(mount, phases).result(), mount) < 5.0
 
 
-# Echte Werte aus Max' Van: Board hochkant, X zeigt nach unten, Z nach vorne
-MAX_UP = (-0.9737, -0.0071, -0.2277)
-MAX_FORWARD = (-0.2278, -0.0161, 0.9736)
+# Echte Messwerte eines Vans: Board hochkant, X zeigt nach unten, Z nach vorne
+VAN_B_UP = (-0.9737, -0.0071, -0.2277)
+VAN_B_FORWARD = (-0.2278, -0.0161, 0.9736)
 
 
-def test_max_van_x_axis_rejected():
+def test_van_b_x_axis_rejected():
     """+X liegt 77° gegen die Waagerechte, die Projektion zeigte nach hinten."""
     with pytest.raises(OrientationError):
-        Orientation.from_vectors(MAX_UP, AXIS_VECTORS["+x"])
+        Orientation.from_vectors(VAN_B_UP, AXIS_VECTORS["+x"])
 
 
-def test_max_van_front_low_recommends_front():
-    ori = Orientation.from_vectors(MAX_UP, MAX_FORWARD)
+def test_van_b_front_low_recommends_front():
+    ori = Orientation.from_vectors(VAN_B_UP, VAN_B_FORWARD)
     # Front 2° tiefer: "oben" kippt in Fahrzeugsicht nach hinten
     t = math.radians(-2.0)
     measured = tuple(
@@ -299,7 +299,7 @@ def test_max_van_front_low_recommends_front():
     )
     pitch, roll = ori.angles(measured)
     assert pitch == pytest.approx(-2.0, abs=0.05)
-    plan = best_block_plan(MAX_VAN, pitch, roll)
+    plan = best_block_plan(VAN_A, pitch, roll)
     assert plan.blocks["vl"] > 0 and plan.blocks["vr"] > 0
     assert plan.blocks["hl"] == 0 and plan.blocks["hr"] == 0
 
@@ -322,7 +322,7 @@ def test_air_suspension_limited_and_combined_with_blocks():
     van = Vehicle(wheelbase=403.5, track=180, block_height=4.5, stacks=2,
                   blocks_per_stack=3, air_up=2.0, air_down=2.0)
     no_air = Vehicle(wheelbase=403.5, track=180, block_height=4.5, stacks=2, blocks_per_stack=3)
-    # Max' Hang: vorne tiefer, rechts tiefer
+    # Hang aus einer echten Messung: vorne tiefer, rechts tiefer
     pitch = -math.degrees(math.atan(11.5 / 403.5))
     roll = -math.degrees(math.atan(5.8 / 180))
     plan = best_block_plan(van, pitch, roll)
