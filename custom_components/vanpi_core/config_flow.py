@@ -153,6 +153,7 @@ def _normalize_numbers(data: dict[str, Any]) -> dict[str, Any]:
 
 class VanPiConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 2
+    MINOR_VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:

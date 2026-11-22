@@ -44,12 +44,12 @@
     "forward": {
       "options": {
         "drive": "Aus Fahrt-Kalibrierung",
-        "+x": "+X (aufgedruckter Pfeil X)",
-        "-x": "-X",
-        "+y": "+Y (aufgedruckter Pfeil Y)",
-        "-y": "-Y",
-        "+z": "+Z (nach oben aus dem Chip)",
-        "-z": "-Z"
+        "pos_x": "+X (aufgedruckter Pfeil X)",
+        "neg_x": "-X",
+        "pos_y": "+Y (aufgedruckter Pfeil Y)",
+        "neg_y": "-Y",
+        "pos_z": "+Z (nach oben aus dem Chip)",
+        "neg_z": "-Z"
       }
     },
     "tank_mode": {
@@ -183,7 +183,7 @@
         },
         "vehicle": {
           "title": "Fahrzeug und Blöcke",
-          "description": "Alles lässt sich später über das Zahnrad am Eintrag Nivellierung ändern. Dashboard: Karten custom:vanpi-level-card (Wasserwaage) und custom:vanpi-van-card (Draufsicht). Eigenes Foto von oben unter /config/www/ ablegen und als image: /local/<datei> angeben.",
+          "description": "Alles lässt sich später über das Zahnrad am Eintrag Nivellierung ändern. Dashboard: Karten custom:vanpi-level-card (Wasserwaage) und custom:vanpi-van-card (Draufsicht). Eigenes Foto von oben unter /config/www/ ablegen und als image: /local/van_top.png angeben (Dateiname frei wählbar).",
           "data": {
             "forward": "Vorwärtsrichtung des Boards",
             "wheelbase": "Radstand",
@@ -211,7 +211,7 @@
         },
         "reconfigure": {
           "title": "Fahrzeug und Blöcke",
-          "description": "Kurzanleitung: 1) Vorwärtsrichtung: die Board-Achse wählen, die nach vorne zeigt, oder 'Aus Fahrt-Kalibrierung'. 2) Auf wirklich ebenem Boden 'Als eben speichern' drücken (jederzeit wiederholbar, ändert nur die Ebene). 3) Fahrt-Kalibrierung (nur bei 'Aus Fahrt-Kalibrierung' nötig): Starten, 2 s stehen, 1 bis 3 Mal geradeaus anfahren und bis zum Stillstand bremsen, dann Beenden. Den Schalter 'Aktiv' braucht man zum Kalibrieren nicht. Ausführliche Anleitung: Link 'Besuchen' auf der Geräteseite. Dashboard: Karten custom:vanpi-level-card (Wasserwaage) und custom:vanpi-van-card (Draufsicht). Eigenes Foto von oben unter /config/www/ ablegen und als image: /local/<datei> angeben. Sicherheit: Fahrt-Kalibrierung nur auf einer verkehrsberuhigten, geraden und freien Strecke (z. B. leerer Parkplatz, mind. 50 m) durchführen. Alle Schritte vorher in Ruhe lesen. Während der Fahrt nicht auf das Display schauen und die StVO beachten. Nutzung auf eigene Gefahr.",
+          "description": "Kurzanleitung: 1) Vorwärtsrichtung: die Board-Achse wählen, die nach vorne zeigt, oder 'Aus Fahrt-Kalibrierung'. 2) Auf wirklich ebenem Boden 'Als eben speichern' drücken (jederzeit wiederholbar, ändert nur die Ebene). 3) Fahrt-Kalibrierung (nur bei 'Aus Fahrt-Kalibrierung' nötig): Starten, 2 s stehen, 1 bis 3 Mal geradeaus anfahren und bis zum Stillstand bremsen, dann Beenden. Den Schalter 'Aktiv' braucht man zum Kalibrieren nicht. Ausführliche Anleitung: Link 'Besuchen' auf der Geräteseite. Dashboard: Karten custom:vanpi-level-card (Wasserwaage) und custom:vanpi-van-card (Draufsicht). Eigenes Foto von oben unter /config/www/ ablegen und als image: /local/van_top.png angeben (Dateiname frei wählbar). Sicherheit: Fahrt-Kalibrierung nur auf einer verkehrsberuhigten, geraden und freien Strecke (z. B. leerer Parkplatz, mind. 50 m) durchführen. Alle Schritte vorher in Ruhe lesen. Während der Fahrt nicht auf das Display schauen und die StVO beachten. Nutzung auf eigene Gefahr.",
           "data": {
             "forward": "Vorwärtsrichtung des Boards",
             "wheelbase": "Radstand",

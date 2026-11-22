@@ -19,7 +19,14 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.loader import async_get_integration
 
-from .const import DOMAIN, LEVELING_KEYS, PLATFORMS, SUBENTRY_LEVELING
+from .const import (
+    CONF_FORWARD,
+    DOMAIN,
+    LEGACY_FORWARD,
+    LEVELING_KEYS,
+    PLATFORMS,
+    SUBENTRY_LEVELING,
+)
 from .leveling.manager import LevelingManager
 from .modules import ModuleManager
 from .modules.const import CONF_PAIR_12, CONF_PAIR_34, SUBENTRY_TANK_INPUTS
@@ -108,8 +115,25 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """
     if entry.version > 2:
         return False
-    if entry.version == 2:
-        return True
+    if entry.version == 1:
+        _migrate_v1(hass, entry)
+    if entry.minor_version < 2:
+        _migrate_forward_keys(hass, entry)
+    return True
+
+
+def _migrate_forward_keys(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """2.1: Vorwärtsachse "+x" usw. heißt jetzt "pos_x" usw. (gültige Schlüssel)."""
+    if (subentry := leveling_subentry(entry)) is not None:
+        forward = subentry.data.get(CONF_FORWARD)
+        if forward in LEGACY_FORWARD:
+            hass.config_entries.async_update_subentry(
+                entry, subentry, data={**subentry.data, CONF_FORWARD: LEGACY_FORWARD[forward]}
+            )
+    hass.config_entries.async_update_entry(entry, minor_version=2)
+
+
+def _migrate_v1(hass: HomeAssistant, entry: ConfigEntry) -> None:
 
     leveling = {
         k: v for k, v in {**entry.data, **entry.options}.items() if k in LEVELING_KEYS
@@ -133,7 +157,6 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if subentry is not None:
         _move_leveling_to_subentry(hass, entry, subentry.subentry_id)
     _LOGGER.info("VAN PI CORE: Einstellungen auf Version 2 umgestellt")
-    return True
 
 
 def _move_leveling_to_subentry(hass: HomeAssistant, entry: ConfigEntry, subentry_id: str) -> None:
