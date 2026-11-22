@@ -23,7 +23,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from ..const import (
-    CONF_AUTO_OFF,
+    AUTO_OFF_MINUTES,
     CONF_BLOCK_HEIGHT,
     CONF_BLOCKS_PER_STACK,
     CONF_ENTITY_X,
@@ -216,7 +216,7 @@ class LevelingManager:
             self._auto_off_unsub = None
         self.auto_off_at = None
         if active:
-            minutes = int(self.config[CONF_AUTO_OFF])
+            minutes = AUTO_OFF_MINUTES
             if minutes > 0:
                 self._auto_off_unsub = async_call_later(
                     self.hass, minutes * 60, self._auto_off

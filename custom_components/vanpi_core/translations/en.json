@@ -35,8 +35,7 @@
           "block_height": "Height of one block",
           "stacks": "Number of stacks (wheels that can get blocks)",
           "blocks_per_stack": "Blocks per stack",
-          "tolerance": "Considered level up to",
-          "auto_off_minutes": "Auto off after (0 = never)"
+          "tolerance": "Considered level up to"
         },
         "data_description": {
           "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
@@ -64,8 +63,7 @@
           "block_height": "Height of one block",
           "stacks": "Number of stacks (wheels that can get blocks)",
           "blocks_per_stack": "Blocks per stack",
-          "tolerance": "Considered level up to",
-          "auto_off_minutes": "Auto off after (0 = never)"
+          "tolerance": "Considered level up to"
         },
         "data_description": {
           "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",

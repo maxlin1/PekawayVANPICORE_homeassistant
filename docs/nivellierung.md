@@ -10,7 +10,7 @@ Die Integration **VAN PI CORE** (`custom_components/vanpi_core`) berechnet am St
 4. Neigungssensor wählen:
    - **MPU6050 auf dem Board** (Standard: I2C-Bus 1, Adresse 0x69), oder
    - **andere Entitäten** mit Beschleunigung X/Y/Z, z. B. ein RuuviTag (Einheit g, mg oder m/s²).
-5. Fahrzeug und Blöcke eintragen: Radstand, Spurweite, Blockhöhe, Anzahl Stapel, Blöcke pro Stapel, Toleranz „eben“, Auto-Aus.
+5. Fahrzeug und Blöcke eintragen: Radstand, Spurweite, Blockhöhe, Anzahl Stapel, Blöcke pro Stapel, Toleranz „eben“.
 
 Alle Werte lassen sich später über **Konfigurieren** ändern, z. B. bei neuen Keilen oder anderer Einbaulage.
 
@@ -32,7 +32,7 @@ Die Kalibrierung liegt im Home-Assistant-Speicher (`.storage`) und übersteht Up
 1. Schalter **„Nivellierung Aktiv“** einschalten.
 2. Ablesen: **Blockempfehlung**, z. B. „Hinten links: 3 Blöcke (6.3 cm), Vorne links: 1 Block (2.1 cm)“.
 3. Blöcke unterlegen, draufrollen. Die Werte aktualisieren sich live, **„Eben“** geht nach 2 Sekunden Ruhe auf „an“.
-4. Ausschalten, oder es schaltet nach der eingestellten Zeit automatisch ab (Standard 15 Minuten, 0 = nie). Die Uhrzeit steht im Status-Sensor unter `automatisch_aus_um`. Einstellungen ändern schaltet die Nivellierung nicht mehr aus.
+4. Ausschalten, oder es schaltet nach der eingestellten Zeit automatisch ab (nach 15 Minuten). Die Uhrzeit steht im Status-Sensor unter `automatisch_aus_um`. Einstellungen ändern schaltet die Nivellierung nicht mehr aus.
 
 Ist die Nivellierung aus, wird der Sensor nicht gelesen (MPU6050 im Schlafmodus) und alle Messwerte sind „nicht verfügbar“. Beim Fahren entsteht also keine Last und nichts wird aufgezeichnet.
 

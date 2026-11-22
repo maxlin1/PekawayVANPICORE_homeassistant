@@ -19,7 +19,6 @@ VEHICLE = {
     "stacks": 2,
     "blocks_per_stack": 3,
     "tolerance": 1.5,
-    "auto_off_minutes": 15,
 }
 
 
@@ -98,4 +97,23 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     assert entry.runtime_data.leveling.vehicle.block_height == 3.0
     # Einstellungen ändern schaltet die Nivellierung nicht aus
     assert hass.states.get("switch.leveling_active").state == "on"
+    assert await hass.config_entries.async_unload(entry.entry_id)
+
+
+async def test_auto_off_after_15_minutes(hass: HomeAssistant) -> None:
+    from datetime import timedelta
+
+    from homeassistant.util import dt as dt_util
+    from pytest_homeassistant_custom_component.common import async_fire_time_changed
+
+    entry = await setup_entry(hass)
+    await hass.services.async_call(
+        "switch", "turn_on", {"entity_id": "switch.leveling_active"}, blocking=True
+    )
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=14))
+    await hass.async_block_till_done()
+    assert hass.states.get("switch.leveling_active").state == "on"
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=16))
+    await hass.async_block_till_done()
+    assert hass.states.get("switch.leveling_active").state == "off"
     assert await hass.config_entries.async_unload(entry.entry_id)

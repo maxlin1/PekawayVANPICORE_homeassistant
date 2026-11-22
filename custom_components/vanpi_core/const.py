@@ -37,7 +37,6 @@ CONF_BLOCK_HEIGHT = "block_height"
 CONF_STACKS = "stacks"
 CONF_BLOCKS_PER_STACK = "blocks_per_stack"
 CONF_TOLERANCE = "tolerance"
-CONF_AUTO_OFF = "auto_off_minutes"
 
 DEFAULTS = {
     CONF_SOURCE: SOURCE_MPU6050,
@@ -50,9 +49,9 @@ DEFAULTS = {
     CONF_STACKS: 2,
     CONF_BLOCKS_PER_STACK: 3,
     CONF_TOLERANCE: 1.0,
-    CONF_AUTO_OFF: 15,
 }
 
+AUTO_OFF_MINUTES = 15  # fest, Nivellierung schaltet sich danach selbst ab
 SAMPLE_INTERVAL = 0.05  # 20 Hz
 PUBLISH_INTERVAL = 0.5  # höchstens 2 Updates pro Sekunde an HA
 PUBLISH_MIN_CHANGE_DEG = 0.1

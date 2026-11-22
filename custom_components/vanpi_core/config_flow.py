@@ -15,7 +15,6 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .const import (
-    CONF_AUTO_OFF,
     CONF_BLOCK_HEIGHT,
     CONF_BLOCKS_PER_STACK,
     CONF_ENTITY_X,
@@ -81,7 +80,6 @@ def vehicle_schema(values: dict[str, Any]) -> vol.Schema:
                     mode=selector.NumberSelectorMode.BOX,
                 )
             ),
-            vol.Required(CONF_AUTO_OFF, default=v[CONF_AUTO_OFF]): _int(0, 240, "min"),
         }
     )
 
@@ -99,7 +97,7 @@ def entities_schema(values: dict[str, Any]) -> vol.Schema:
 
 def _normalize_numbers(data: dict[str, Any]) -> dict[str, Any]:
     out = dict(data)
-    for key in (CONF_STACKS, CONF_BLOCKS_PER_STACK, CONF_AUTO_OFF):
+    for key in (CONF_STACKS, CONF_BLOCKS_PER_STACK):
         if key in out:
             out[key] = int(out[key])
     return out

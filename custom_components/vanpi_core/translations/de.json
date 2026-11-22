@@ -35,8 +35,7 @@
           "block_height": "Höhe eines Blocks",
           "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
           "blocks_per_stack": "Blöcke pro Stapel",
-          "tolerance": "Gilt als eben bis",
-          "auto_off_minutes": "Automatisch aus nach (0 = nie)"
+          "tolerance": "Gilt als eben bis"
         },
         "data_description": {
           "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
@@ -64,8 +63,7 @@
           "block_height": "Höhe eines Blocks",
           "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
           "blocks_per_stack": "Blöcke pro Stapel",
-          "tolerance": "Gilt als eben bis",
-          "auto_off_minutes": "Automatisch aus nach (0 = nie)"
+          "tolerance": "Gilt als eben bis"
         },
         "data_description": {
           "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
