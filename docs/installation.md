@@ -184,7 +184,7 @@ Updates erscheinen danach automatisch unter *Einstellungen → Updates*.
    `/config/custom_components` noch nicht, einfach anlegen.
 3. Home Assistant neu starten.
 
-Nur `vanpi_core` wird gebraucht. Die alten Einzel-Komponenten liegen unter `legacy/` und gehören **nicht** mehr nach
+Nur `vanpi_core` wird gebraucht. Die alten Einzel-Komponenten gehören **nicht** mehr nach
 `/config/custom_components` (siehe [Umstieg](migration.md)).
 
 ### Weiter

@@ -2,7 +2,7 @@
 
 Bis Version 1.x bestand dieses Repository aus sechs einzelnen Komponenten, die per YAML eingerichtet wurden.
 Sie sind jetzt in der Integration **VAN PI CORE** (`vanpi_core`) zusammengefasst und werden in der Oberfläche
-eingerichtet. Die alten Komponenten liegen nur noch zum Nachschlagen unter [`legacy/`](../legacy/) und werden nicht
+eingerichtet. Der letzte Stand der alten Komponenten ist im Branch [`alte-komponenten-v1`](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/tree/alte-komponenten-v1) gesichert. Sie werden nicht
 mehr weiterentwickelt.
 
 | Alte Komponente | Einrichtung früher | Neu in VAN PI CORE |

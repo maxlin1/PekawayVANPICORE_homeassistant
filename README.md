@@ -54,8 +54,8 @@ oder entfernt werden.
 
 ## Alte Komponenten
 
-Bis Version 1.x bestand dieses Repository aus sechs einzelnen Komponenten mit YAML-Konfiguration. Sie liegen nur noch
-zum Nachschlagen unter [`legacy/`](legacy/) und werden nicht mehr gepflegt. Wie der Umstieg geht, steht in
+Bis Version 1.x bestand dieses Repository aus sechs einzelnen Komponenten mit YAML-Konfiguration. Sie sind
+nicht mehr im Hauptzweig enthalten. Ihr letzter Stand ist im Branch [`alte-komponenten-v1`](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/tree/alte-komponenten-v1) gesichert und wird nicht mehr gepflegt. Wie der Umstieg geht, steht in
 [docs/migration.md](docs/migration.md).
 
 ## Haftungsausschluss
