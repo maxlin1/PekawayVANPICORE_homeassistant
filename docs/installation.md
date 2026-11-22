@@ -9,7 +9,7 @@ Diese Anleitung führt in drei Schritten von einer leeren SD-Karte zur laufenden
 Danach geht es mit der [Einrichtung in der Oberfläche](einrichtung.md) weiter.
 
 > **Kurzfassung:** SD-Karte mit dem Raspberry Pi Imager flashen, starten, Board-Schnittstellen über die
-> `config.txt` und `i2c-dev` freischalten (zweimal neu starten!), Integration per HACS installieren, unter
+> `config.txt` und `i2c-dev` freischalten (zweimal neu starten!), Integration über den Marketplace installieren, unter
 > *Einstellungen → Geräte & Dienste* „VAN PI CORE“ hinzufügen.
 
 ---
@@ -162,19 +162,36 @@ Die Community-App aus <https://github.com/adamoutler/HassOSConfigurator> schalte
 
 ## 3. Integration installieren
 
-### Variante A: HACS (empfohlen)
+### Variante A: Marketplace (empfohlen)
 
-1. [HACS installieren](https://hacs.xyz/docs/use/download/download/), falls noch nicht vorhanden.
-2. Dieses Repository in HACS öffnen:
+Seit Home Assistant 2026.11 ist HACS als **Marketplace** fest eingebaut. VAN PI CORE ist dort (noch) nicht im Katalog,
+sondern wird als Repository per Link hinzugefügt:
 
-   [![In HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=maxlin1&repository=PekawayVANPICORE_homeassistant&category=integration)
+1. *Einstellungen → Marketplace*. Beim ersten Öffnen den Hinweis zu Community-Inhalten bestätigen.
+2. Oben rechts **Über Link hinzufügen** (englisch *Add from link*).
+3. Als GitHub-Link `https://github.com/maxlin1/PekawayVANPICORE_homeassistant` eintragen, **Hinzufügen**. Falls
+   gefragt, als Typ **Integration** wählen. Beim ersten Mal fragt Home Assistant nach einer Verbindung zu GitHub
+   (Anmeldung per Code auf github.com, es werden nur öffentliche Daten gelesen).
+4. **VAN PI CORE** öffnen → *Installieren*.
+5. Home Assistant neu starten (*Einstellungen → System → ⏻ → Home Assistant neu starten*).
 
-   Oder von Hand: *HACS → ⋮ → Benutzerdefinierte Repositories*, URL
-   `https://github.com/maxlin1/PekawayVANPICORE_homeassistant`, Typ **Integration**.
-3. **VAN PI CORE** auswählen → *Herunterladen*.
-4. Home Assistant neu starten (*Einstellungen → System → ⏻ → Home Assistant neu starten*).
+Der Knopf öffnet das Repository direkt (funktioniert mit dem Marketplace und mit HACS):
+
+[![Repository öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=maxlin1&repository=PekawayVANPICORE_homeassistant&category=integration)
 
 Updates erscheinen danach automatisch unter *Einstellungen → Updates*.
+
+<details>
+<summary>Home Assistant bis 2026.10: über HACS</summary>
+
+1. [HACS installieren](https://hacs.xyz/docs/use/download/download/), falls noch nicht vorhanden.
+2. *HACS → ⋮ → Benutzerdefinierte Repositories*, URL `https://github.com/maxlin1/PekawayVANPICORE_homeassistant`,
+   Typ **Integration**.
+3. **VAN PI CORE** auswählen → *Herunterladen*, danach Home Assistant neu starten.
+
+Beim Update auf 2026.11 übernimmt der Marketplace die Installation automatisch.
+
+</details>
 
 ### Variante B: manuell
 

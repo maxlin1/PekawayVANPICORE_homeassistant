@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Fragen und Austausch im Pekaway Forum
+    url: https://forum.pekaway.de
+    about: Allgemeine Fragen zum VAN PI CORE und zu eigenen Projekten
+  - name: Home Assistant Community
+    url: https://community.home-assistant.io
+    about: Allgemeine Fragen zu Home Assistant

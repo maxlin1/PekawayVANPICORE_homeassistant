@@ -4,7 +4,7 @@ Die Integration **VAN PI CORE** (`custom_components/vanpi_core`) berechnet am St
 
 ## Installation
 
-1. Ordner `custom_components/vanpi_core` nach `/config/custom_components/` kopieren (später per HACS).
+1. Integration installieren, am einfachsten über den Marketplace (bis HA 2026.10: HACS) oder manuell, siehe [Installation](installation.md#3-integration-installieren).
 2. Home Assistant neu starten.
 3. **Einstellungen → Geräte & Dienste → Integration hinzufügen → VAN PI CORE**. Abgefragt werden nur die Grundeinstellungen des Boards (Sensortyp der Tankeingänge).
 4. Auf der Integrationsseite **„Nivellierung einrichten“** wählen und den Neigungssensor angeben:

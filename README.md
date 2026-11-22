@@ -1,7 +1,14 @@
 # VAN PI CORE für Home Assistant
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/docs/faq/custom_repositories/)
-[![In HACS öffnen](https://img.shields.io/badge/HACS-Repository%20%C3%B6ffnen-41BDF5.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=maxlin1&repository=PekawayVANPICORE_homeassistant&category=integration)
+[![Marketplace / HACS: Custom Repository](https://img.shields.io/badge/Marketplace%20%2F%20HACS-Custom%20Repository-41BDF5.svg)](https://github.com/maxlin1/PekawayVANPICORE_homeassistant#installation)
+[![Release](https://img.shields.io/github/v/release/maxlin1/PekawayVANPICORE_homeassistant?include_prereleases&label=Release)](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases)
+[![Lizenz: MIT](https://img.shields.io/github/license/maxlin1/PekawayVANPICORE_homeassistant?label=Lizenz)](LICENSE)
+[![Home Assistant ab 2026.2](https://img.shields.io/badge/Home%20Assistant-2026.2%2B-18BCF2.svg?logo=homeassistant&logoColor=white)](https://www.home-assistant.io)
+[![hassfest](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/actions/workflows/hassfest.yaml)
+[![HACS-Validierung](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/actions/workflows/hacs.yaml/badge.svg)](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/actions/workflows/hacs.yaml)
+
+> ⚠️ **Privates Community-Projekt, Nutzung auf eigene Gefahr.** Bitte vor der Nutzung den
+> [Haftungsausschluss und die Sicherheitshinweise](#haftungsausschluss-und-sicherheitshinweise) lesen.
 
 Integration für das **[Pekaway VAN PI CORE](https://www.pekaway.de)** mit einem Raspberry Pi 4 und
 Home Assistant OS. Relais, Eingänge, Tanks, Temperaturfühler, Victron-Geräte und eine Nivellierungshilfe für den Van,
@@ -26,12 +33,15 @@ ships English and German translations.*
 Jede Funktion ist ein eigener Eintrag unter dem Hauptgerät *VAN PI CORE* und kann einzeln hinzugefügt, geändert
 oder entfernt werden.
 
-## Schnellstart
+## Installation
+
+Kurzfassung, die ausführliche Anleitung steht in [docs/installation.md](docs/installation.md):
 
 1. **Home Assistant OS** mit dem Raspberry Pi Imager auf die SD-Karte schreiben.
 2. **Board-Schnittstellen freischalten:** ein paar Zeilen in die `config.txt` und den I2C-Treiber `i2c-dev`
    aktivieren, per SSH-Entwicklerzugang oder direkt auf der SD-Karte. Danach zweimal neu starten.
-3. **Integration installieren** per HACS (benutzerdefiniertes Repository) oder manuell.
+3. **Integration installieren** über den Marketplace (*Einstellungen → Marketplace → Über Link hinzufügen*,
+   bis HA 2026.10 über HACS) oder manuell.
 4. **Einrichten:** *Einstellungen → Geräte & Dienste → Integration hinzufügen → VAN PI CORE*, danach die
    gewünschten Funktionen hinzufügen.
 
@@ -50,7 +60,8 @@ oder entfernt werden.
 
 - Pekaway VAN PI CORE mit Raspberry Pi 4
 - Home Assistant OS, aktuelle Version (getestet mit Home Assistant 2026.2 und neuer)
-- Für die Installation per HACS: [HACS](https://hacs.xyz)
+- Für die Installation per Link: Marketplace (ab Home Assistant 2026.11 eingebaut) bzw. [HACS](https://hacs.xyz) bei
+  älteren Versionen
 
 ## Alte Komponenten
 
@@ -58,16 +69,55 @@ Bis Version 1.x bestand dieses Repository aus sechs einzelnen Komponenten mit YA
 nicht mehr im Hauptzweig enthalten. Ihr letzter Stand ist im Branch [`alte-komponenten-v1`](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/tree/alte-komponenten-v1) gesichert und wird nicht mehr gepflegt. Wie der Umstieg geht, steht in
 [docs/migration.md](docs/migration.md).
 
-## Haftungsausschluss
+## Haftungsausschluss und Sicherheitshinweise
 
-Die Nutzung erfolgt auf eigenes Risiko. Für Schäden, die direkt oder indirekt durch die Verwendung entstehen, kann
-keine Haftung übernommen werden. Das gilt besonders für Relais, die Verbraucher im Fahrzeug schalten.
+**Privates Projekt, ohne Gewähr.** Diese Integration ist in meiner Freizeit für meinen eigenen Van entstanden. Bei mir
+funktioniert sie, getestet ist sie aber nur mit meiner Hardware und meinem Aufbau. Ob sie bei dir genauso funktioniert,
+kann ich nicht zusagen.
+
+- Die Nutzung erfolgt **auf eigene Gefahr**. Die Software wird unentgeltlich und „wie besehen“ bereitgestellt, ohne
+  Gewährleistung für Funktion, Fehlerfreiheit oder Eignung für einen bestimmten Zweck (siehe auch [LICENSE](LICENSE)).
+- Soweit gesetzlich zulässig, übernehme ich **keine Haftung** für Schäden an Fahrzeug, Bordelektrik, Batterien,
+  angeschlossenen Geräten, Daten oder Personen, die direkt oder indirekt durch Installation oder Nutzung entstehen.
+- **Arbeiten an der Bordelektrik** (12 V und erst recht 230 V) erfolgen auf eigenes Risiko. Im Zweifel eine
+  Fachkraft fragen. Falsch angeschlossene Relais, Sensoren oder Batterieleitungen können Brände verursachen.
+- **Keine sicherheitsrelevanten Funktionen** über Home Assistant schalten oder überwachen (z. B. Bremsen, Beleuchtung
+  nach StVZO, Gaswarner, Rauchmelder, Ladegeräte ohne eigene Schutzschaltung). Home Assistant, der Raspberry Pi oder
+  diese Integration können jederzeit ausfallen oder falsche Werte liefern.
+- Messwerte (Tankstände, Batteriewerte, Temperaturen, Neigung) dienen nur der Information und können falsch sein.
+
+**Im Straßenverkehr (StVO)**
+
+- Die Fahrt-Kalibrierung der Nivellierung nur auf einer **verkehrsberuhigten, geraden Strecke** ohne andere
+  Verkehrsteilnehmer durchführen, z. B. auf einem leeren Parkplatz. Kräftiges Bremsen nur, wenn niemand folgt.
+- **Während der Fahrt nicht aufs Handy, Tablet oder Display schauen** und keine Einstellungen ändern. Alle Schritte
+  vorher in Ruhe durchlesen. Die StVO gilt immer, insbesondere § 23 Abs. 1a (elektronische Geräte).
+- Einbauten (Display, Halterungen, Kabel) so befestigen, dass sie bei einer Vollbremsung oder einem Unfall niemanden
+  gefährden und die Sicht nicht einschränken.
+
+**Beim Nivellieren**
+
+- Die Blockempfehlung ist eine Rechenhilfe. Vor dem Auffahren auf Keile das Umfeld prüfen, langsam auffahren und eine
+  zweite Person einweisen lassen, wenn möglich.
+- Danach **Feststellbremse anziehen**, Gang bzw. P einlegen und die Keile bzw. Räder gegen Wegrollen sichern
+  (Unterlegkeile). Nur auf tragfähigem, ebenem Untergrund nivellieren.
+- **Nie unter einem Fahrzeug arbeiten, das nur auf Keilen, Auffahrrampen oder der Luftfederung steht.** Luftfederung
+  nur im Stand und nach Herstellerangaben verstellen.
+
+**Markenhinweis**
+
+Dies ist ein unabhängiges Community-Projekt. Es steht in keiner Verbindung zu Pekaway, zu Victron Energy, zur
+Open Home Foundation / Home Assistant, zu HACS oder zur Raspberry Pi Ltd. und wird von diesen weder unterstützt noch
+geprüft. Alle genannten Marken- und Produktnamen gehören ihren jeweiligen Inhabern und werden nur zur Beschreibung der
+Kompatibilität verwendet. Inhalte aus dem Marketplace bzw. HACS werden vom Home-Assistant-Projekt nicht getestet oder
+unterstützt.
 
 ## Mitmachen und Hilfe
 
 - Fehler und Wünsche: [GitHub Issues](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/issues).
   Bitte Home-Assistant-Version, Integrationsversion und einen Auszug aus dem Protokoll (`vanpi_core`) angeben.
-- Pull Requests sind willkommen.
+- Pull Requests sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).
+- Änderungen je Version: [CHANGELOG.md](CHANGELOG.md).
 - Austausch: [Pekaway Forum](https://forum.pekaway.de) und
   [Home Assistant Community](https://community.home-assistant.io).
 

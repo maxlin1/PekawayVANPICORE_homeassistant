@@ -133,6 +133,12 @@ Details zu allen Werten: [module.md](module.md).
 3. Einmal kalibrieren (Vorwärtsrichtung und „Als eben speichern“) und am Stellplatz benutzen. Die ausführliche
    Anleitung mit allen Entitäten steht in **[nivellierung.md](nivellierung.md)**.
 
+> ⚠️ **Sicherheit (StVO):** Die Fahrt-Kalibrierung nur auf einer verkehrsberuhigten, geraden und freien Strecke
+> durchführen, z. B. auf einem leeren Parkplatz. Alle Schritte vorher in Ruhe lesen. Während der Fahrt nicht aufs
+> Handy oder Display schauen und die StVO beachten. Nach dem Auffahren auf Keile Feststellbremse anziehen, gegen
+> Wegrollen sichern und nie unter dem Fahrzeug arbeiten. Mehr dazu im
+> [Haftungsausschluss](../README.md#haftungsausschluss-und-sicherheitshinweise).
+
 #### Eigenes Van-Bild für die Draufsicht
 
 Die Karte `custom:vanpi-van-card` zeigt Blöcke, fehlende Höhe und Luftfederung je Rad. Ohne Bild zeichnet sie einen
