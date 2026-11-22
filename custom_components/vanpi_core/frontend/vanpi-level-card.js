@@ -138,3 +138,139 @@ if (!customElements.get("vanpi-level-card")) {
     description: "Runde Wasserwaage für die Nivellierung",
   });
 }
+
+/* VAN PI CORE: Draufsicht mit Blöcken je Rad.
+ *
+ * type: custom:vanpi-van-card
+ * entity: sensor.xxx_blockempfehlung
+ * image: /local/van_top.png   # optional: eigenes Foto von oben, vorne = oben im Bild
+ *
+ * Ohne Bild wird ein schlichter Van gezeichnet. Ein eigenes Bild legt man
+ * unter /config/www/ ab und gibt es hier als /local/<dateiname> an.
+ */
+class VanPiVanCard extends HTMLElement {
+  setConfig(config) {
+    if (!config.entity) throw new Error("entity (Blockempfehlung) angeben");
+    this._config = config;
+    if (!this.shadowRoot) this.attachShadow({ mode: "open" });
+    this._render();
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    this._update();
+  }
+
+  getCardSize() {
+    return 7;
+  }
+
+  getGridOptions() {
+    return { columns: 12, rows: 7, min_rows: 5 };
+  }
+
+  static getStubConfig() {
+    return { entity: "" };
+  }
+
+  _render() {
+    const img = this._config.image
+      ? `<img class="van" src="${this._config.image}" alt="Van von oben">`
+      : `<svg class="van" viewBox="0 0 120 260" aria-hidden="true">
+           <rect x="8" y="6" width="104" height="248" rx="34" class="body"/>
+           <rect x="18" y="40" width="84" height="38" rx="10" class="glass"/>
+           <rect x="18" y="232" width="84" height="12" rx="4" class="glass"/>
+           <rect x="0" y="52" width="10" height="34" rx="4" class="tyre"/>
+           <rect x="110" y="52" width="10" height="34" rx="4" class="tyre"/>
+           <rect x="0" y="190" width="10" height="34" rx="4" class="tyre"/>
+           <rect x="110" y="190" width="10" height="34" rx="4" class="tyre"/>
+         </svg>`;
+    const wheel = (id) => `
+      <div class="w ${id}" id="${id}">
+        <div class="ic" id="${id}-ic">–</div>
+        <div><div class="n" id="${id}-n">–</div><div class="s" id="${id}-s"></div></div>
+      </div>`;
+    this.shadowRoot.innerHTML = `
+      <style>
+        ha-card { padding: 12px; }
+        .stage { position: relative; height: 340px; display: flex; justify-content: center; align-items: center; }
+        .van { height: 92%; max-width: 46%; object-fit: contain; }
+        svg .body { fill: var(--secondary-background-color, #2a2d33); stroke: var(--divider-color, #555); stroke-width: 2; }
+        svg .glass { fill: var(--divider-color, #555); opacity: 0.6; }
+        svg .tyre { fill: var(--primary-text-color, #ddd); opacity: 0.7; }
+        .front { position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--secondary-text-color); }
+        .w { position: absolute; display: flex; gap: 8px; align-items: center; min-width: 118px;
+             padding: 6px 10px; border-radius: 12px; background: var(--card-background-color, #1c1c1c);
+             border: 1px solid var(--divider-color, #444); font-family: var(--ha-font-family-body, sans-serif); }
+        .vl { top: 14%; left: 2%; } .vr { top: 14%; right: 2%; }
+        .hl { bottom: 8%; left: 2%; } .hr { bottom: 8%; right: 2%; }
+        .ic { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center;
+              font-weight: 700; font-size: 15px; background: var(--disabled-color, #666); color: #000; }
+        .ic.ok { background: var(--success-color, #4caf50); }
+        .ic.do { background: var(--warning-color, #ff9800); }
+        .n { font-weight: 600; color: var(--primary-text-color); }
+        .s { font-size: 12px; color: var(--secondary-text-color); }
+        .center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 8px 14px;
+                  border-radius: 12px; background: var(--card-background-color, #1c1c1c); border: 1px solid var(--divider-color, #444);
+                  font-weight: 600; color: var(--primary-text-color); display: none; text-align: center; }
+        .center.show { display: block; }
+      </style>
+      <ha-card>
+        <div class="stage">
+          <div class="front">▲ vorne</div>
+          ${img}
+          ${wheel("vl")}${wheel("vr")}${wheel("hl")}${wheel("hr")}
+          <div class="center" id="center"></div>
+        </div>
+      </ha-card>`;
+    this._update();
+  }
+
+  _update() {
+    if (!this.shadowRoot || !this._hass || !this._config) return;
+    const root = this.shadowRoot;
+    const st = this._hass.states[this._config.entity];
+    const center = root.getElementById("center");
+    if (!center) return;
+    const off = !st || st.state === "unavailable" || st.state === "unknown";
+    const a = (st && st.attributes) || {};
+    const blocks = a.bloecke || {};
+    const lift = a.hubhoehe_cm || {};
+    const air = a.luftfederung_cm || {};
+    const bh = a.blockhoehe_cm || 0;
+    const fmt = (v) => String(v.toFixed(1)).replace(".", ",");
+    for (const w of ["vl", "vr", "hl", "hr"]) {
+      const ic = root.getElementById(`${w}-ic`);
+      const n = blocks[w];
+      ic.className = "ic" + (off ? "" : n ? " do" : " ok");
+      ic.textContent = off ? "–" : n ? String(n) : "✓";
+      root.getElementById(`${w}-n`).textContent = off
+        ? "–"
+        : `${n || 0} ${n === 1 ? "Block" : "Blöcke"}${n ? ` (${fmt(n * bh)} cm)` : ""}`;
+      let sub = off || !(lift[w] >= 0.05) ? "" : `fehlt ${fmt(lift[w])} cm`;
+      if (!off && air[w] !== undefined && Math.abs(air[w]) >= 0.05) {
+        sub += `${sub ? " · " : ""}Luft ${air[w] > 0 ? "+" : ""}${fmt(air[w])} cm`;
+      }
+      root.getElementById(`${w}-s`).textContent = sub;
+    }
+    if (off) {
+      center.textContent = "Aus";
+      center.classList.add("show");
+    } else if (st.state === "Keine Blöcke nötig") {
+      center.textContent = "EBEN";
+      center.classList.add("show");
+    } else {
+      center.classList.remove("show");
+    }
+  }
+}
+
+if (!customElements.get("vanpi-van-card")) {
+  customElements.define("vanpi-van-card", VanPiVanCard);
+  window.customCards = window.customCards || [];
+  window.customCards.push({
+    type: "vanpi-van-card",
+    name: "VAN PI CORE Draufsicht",
+    description: "Van von oben mit Blöcken je Rad",
+  });
+}

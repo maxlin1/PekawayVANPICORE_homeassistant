@@ -51,6 +51,7 @@ def _plan_attrs(m: LevelingManager) -> dict[str, Any] | None:
         "restneigung_quer": round(plan.residual_roll, 2),
         "blockhoehe_cm": m.vehicle.block_height,
         "luftfederung_cm": plan.air or None,
+        "hubhoehe_cm": {w: round(v, 1) for w, v in (m.state.lift or {}).items()},
     }
 
 

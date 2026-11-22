@@ -82,4 +82,14 @@ max_angle: 5     # Rand der Libelle
 
 Wie bei einer echten Libelle wandert die Blase zur höheren Seite. Oben ist vorne, rechts ist rechts in Fahrtrichtung. Neigung längs ist positiv, wenn vorne höher ist, quer positiv, wenn rechts höher ist.
 
+Dazu die Draufsicht mit Blöcken, fehlender Höhe und Luftfederung je Rad:
+
+```yaml
+type: custom:vanpi-van-card
+entity: sensor.nivellierung_blockempfehlung
+image: /local/van_top.png   # optional
+```
+
+Ohne `image` zeichnet die Karte einen schlichten Van. Für ein eigenes Foto ein Bild des eigenen Fahrzeugs von oben (Front zeigt nach oben, möglichst freigestellt, PNG) per Studio Code Server, Samba oder File Editor unter `/config/www/` ablegen, z. B. `/config/www/van_top.png`, und in der Karte als `/local/van_top.png` angeben. Nach dem ersten Anlegen von `/config/www` Home Assistant einmal neu starten.
+
 In der Draufsicht (picture-elements) einfach `sensor.ruuvitag_lift_*` und die Block-Templates durch `sensor.nivellierung_hubhohe_*` und `sensor.nivellierung_blocke_*` ersetzen, `input_boolean.leveling_aktiv` durch `switch.nivellierung_aktiv` und `binary_sensor.ruuvitag_van_level` durch `binary_sensor.nivellierung_eben` (Achtung: dort ist **an = eben**).
