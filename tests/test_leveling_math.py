@@ -72,6 +72,12 @@ MOUNTS = {
     "hochkant": [[0, 0, 1], [0, 1, 0], [-1, 0, 0]],
     "gedreht_155": rot_matrix(155, 0, 0),
     "schief": rot_matrix(37, 70, -20),
+    # Wie bei Max: Board steht hochkant, Sensor-Z zeigt nach vorne
+    "hochkant_z_vorne": [[0, 0, 1], [1, 0, 0], [0, 1, 0]],
+    "kopfueber": rot_matrix(0, 0, 180),
+    "quer_90": rot_matrix(90, 0, 0),
+    "quer_270": rot_matrix(270, 0, 0),
+    "hochkant_seitlich": rot_matrix(0, 0, 90),
 }
 
 
@@ -354,3 +360,21 @@ def test_head_direction_never_much_worse():
     assert head.residual <= neutral.residual + 0.2
     assert head.head_tilt("right") >= neutral.head_tilt("right")
     assert head.blocks["vl"] >= 1
+
+
+@pytest.mark.parametrize("mount_name", list(MOUNTS))
+@pytest.mark.parametrize("head", [None, "right"])
+def test_front_right_low_any_mount(mount_name, head):
+    """Van hängt nach vorne und rechts: Blöcke vorne, rechts mehr, in jeder Einbaulage."""
+    mount = MOUNTS[mount_name]
+    ori = Orientation.from_vectors(sensor_reading(mount, 0, 0), forward_in_sensor(mount))
+    pitch, roll = ori.angles(sensor_reading(mount, -2.53, -1.78))
+    assert pitch < -2.4
+    assert roll < -1.7
+    van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=2, air_down=2, head=head)
+    plan = best_block_plan(van, pitch, roll)
+    assert plan.blocks["vr"] == 3
+    assert plan.blocks["vl"] >= 1
+    assert plan.blocks["hl"] == plan.blocks["hr"] == 0
+    assert all(-2 <= v <= 2 for v in plan.air.values())
+    assert plan.residual < 1.3
