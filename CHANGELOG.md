@@ -20,6 +20,7 @@ Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bish
 - Installation über Marketplace/HACS möglich (nur noch eine Integration im Repository).
 
 ### Korrigiert (gegenüber den alten Komponenten)
+- 1-Wire: aus `onewire_sysbus` übernommene Namen bleiben nach dem Entfernen der alten Komponente erhalten.
 - Victron MPPT: PV-Leistung, Ladestatus als Text, Ertrag gestern, maximale Leistung heute/gestern.
 - Victron SmartShunt: Zuordnung H5-H16, Starterbatterie-Spannung in V.
 - Victron allgemein: Prüfsumme je Datenblock, automatische Wiederverbindung.
