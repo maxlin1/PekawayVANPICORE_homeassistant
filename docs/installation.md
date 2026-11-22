@@ -8,9 +8,9 @@ Diese Anleitung führt in drei Schritten von einer leeren SD-Karte zur laufenden
 
 Danach geht es mit der [Einrichtung in der Oberfläche](einrichtung.md) weiter.
 
-> **Kurzfassung für Eilige:** SD-Karte mit dem Raspberry Pi Imager flashen, **bevor** sie in den Pi kommt die
-> Zeilen aus [Schritt 2](#2-board-schnittstellen-freischalten) in die `config.txt` auf der Karte schreiben, starten,
-> Integration per HACS installieren, unter *Einstellungen → Geräte & Dienste* „VAN PI CORE“ hinzufügen.
+> **Kurzfassung:** SD-Karte mit dem Raspberry Pi Imager flashen, starten, Board-Schnittstellen über die
+> `config.txt` und `i2c-dev` freischalten (zweimal neu starten!), Integration per HACS installieren, unter
+> *Einstellungen → Geräte & Dienste* „VAN PI CORE“ hinzufügen.
 
 ---
 
@@ -31,8 +31,8 @@ Die offizielle Anleitung von Home Assistant ist immer aktuell:
    Home Assistant OS (RPi 4/400)*.
 4. **Speicher:** die SD-Karte wählen und schreiben lassen. Die Frage nach „OS-Anpassungen“ mit *Nein* beantworten,
    Home Assistant OS nutzt sie nicht.
-5. **Karte noch nicht in den Pi stecken.** Zuerst [Schritt 2](#2-board-schnittstellen-freischalten) erledigen,
-   solange die Karte am PC hängt. Das spart später jeden Terminal-Zugriff.
+5. Wer [Weg B aus Schritt 2](#weg-b-direkt-auf-der-sd-karte-ohne-terminal) nutzen will, erledigt ihn jetzt,
+   solange die Karte noch am PC hängt.
 6. Karte in den Pi, Netzwerkkabel anschließen, Strom an. Der erste Start dauert einige Minuten.
 7. Im Browser <http://homeassistant.local:8123> öffnen (klappt das nicht, die IP-Adresse des Pi im Router
    nachschauen und `http://<IP-Adresse>:8123` verwenden).
@@ -52,18 +52,10 @@ WLAN statt Kabel geht natürlich auch: *Einstellungen → System → Netzwerk*.
 ## 2. Board-Schnittstellen freischalten
 
 Das VAN PI CORE spricht mit dem Raspberry Pi über I2C (Relais, Eingänge, Tanks, Lagesensor), 1-Wire
-(Temperaturfühler) und mehrere UARTs (Victron VE.Direct, RJ45, LIN). Diese Schnittstellen sind bei
-Home Assistant OS ab Werk aus und werden in der Datei `config.txt` auf der Boot-Partition eingeschaltet.
+(Temperaturfühler) und mehrere UARTs (Victron VE.Direct, RJ45, LIN). Bei Home Assistant OS sind diese
+Schnittstellen ab Werk aus. Zum Einschalten sind zwei Dinge nötig:
 
-### Empfohlen: direkt auf der SD-Karte (ohne Terminal, ohne SSH)
-
-Die Boot-Partition der SD-Karte ist FAT32 und erscheint am PC/Mac als Laufwerk **`hassos-boot`**.
-Windows, macOS und Linux können sie ohne Zusatzprogramme öffnen.
-
-1. SD-Karte in den Kartenleser stecken (bei einer frisch geflashten Karte ggf. einmal ab- und wieder anstecken).
-2. Auf dem Laufwerk `hassos-boot` die Datei **`config.txt`** mit einem einfachen Texteditor öffnen
-   (Windows: Editor/Notepad, Mac: TextEdit im Modus „Reiner Text“ oder VS Code).
-3. **Ganz am Ende** diese Zeilen anfügen und speichern:
+1. **Zeilen in der `config.txt`** auf der Boot-Partition (schaltet I2C, 1-Wire und die UARTs in der Hardware ein):
 
    ```ini
    # VAN PI CORE
@@ -78,23 +70,70 @@ Windows, macOS und Linux können sie ohne Zusatzprogramme öffnen.
 
    > ℹ️ **Kein `uart3`!** Auf dessen Pin (GPIO4) liegt beim VAN PI CORE der 1-Wire-Bus.
 
-4. Auf demselben Laufwerk einen Ordner **`CONFIG`** anlegen (Großbuchstaben), darin einen Ordner **`modules`** und
-   darin eine Textdatei **`rpi-i2c.conf`** mit genau einer Zeile:
+2. **Den I2C-Treiber `i2c-dev` laden**, damit `/dev/i2c-1` entsteht. Das geht bei Home Assistant OS nur über eine
+   Datei `CONFIG/modules/rpi-i2c.conf` mit dem Inhalt `i2c-dev`, die beim Start importiert wird.
 
-   ```text
-   i2c-dev
-   ```
+Dafür gibt es zwei Wege. Beide nutzen denselben Import-Mechanismus von Home Assistant OS.
 
-   Ergebnis: `hassos-boot/CONFIG/modules/rpi-i2c.conf`. Achte darauf, dass der Editor keine Endung wie `.txt`
-   anhängt. Home Assistant OS übernimmt die Datei beim Start und lädt damit den I2C-Treiber. Es ist normal, dass der
-   Ordner `CONFIG` danach wieder verschwindet.
+### Weg A: SSH-Entwicklerzugang (bewährt)
 
-5. Karte auswerfen, in den Pi stecken und starten. Gerade nach Schritt 4 kann ein **zweiter Neustart** nötig sein,
-   bevor `/dev/i2c-1` erscheint.
+So wurde das Board bisher freigeschaltet. Die normale SSH-App (*Terminal & SSH* bzw. *Advanced SSH & Web Terminal*)
+reicht dafür **nicht**, weil sie in einem Container läuft und die Boot-Partition nicht sieht. Man braucht den
+Entwicklerzugang auf Port 22222.
 
-**Home Assistant läuft schon?** Dann genauso, nur vorher sauber herunterfahren:
-*Einstellungen → System → ⏻ (oben rechts) → System herunterfahren*. Warten, bis die grüne LED aus ist, Strom ab,
-Karte entnehmen, Schritte 1-5. Startest du von einer SSD statt von der SD-Karte, die SSD per USB an den PC hängen.
+1. SSH-Schlüsselpaar am PC/Mac erzeugen, z. B. `ssh-keygen -t ed25519`
+   ([Anleitung Windows](https://learn.microsoft.com/de-de/windows-server/administration/openssh/openssh_keymanagement),
+   [Anleitung Mac](https://docs.github.com/de/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)).
+2. USB-Stick mit **FAT32** formatieren und **`CONFIG`** nennen (Großbuchstaben).
+3. Auf den Stick kopieren:
+   - Datei **`authorized_keys`** (ohne Endung) mit dem Inhalt des öffentlichen Schlüssels (`….pub`)
+   - Ordner **`modules`** mit der Datei **`rpi-i2c.conf`**, Inhalt: `i2c-dev`
+4. Stick an den Pi stecken und in der SSH-App `ha os import` ausführen (oder Home Assistant neu starten).
+5. Vom PC/Mac verbinden: `ssh root@homeassistant.local -p 22222`
+   (Windows mit PuTTY: privaten Schlüssel unter *Connection → SSH → Auth* angeben).
+6. `vi /mnt/boot/config.txt`, die Zeilen von oben **ganz ans Ende** schreiben, speichern.
+7. `reboot`. Danach noch **ein zweites Mal neu starten** (Begründung unten).
+8. Zugang wieder schließen: Stick leeren (nur `modules` drauf lassen oder ganz leer), erneut `ha os import`.
+
+### Weg B: direkt auf der SD-Karte (ohne Terminal)
+
+Home Assistant OS liest den Ordner `CONFIG` nicht nur von einem USB-Stick, sondern auch direkt von der
+Boot-Partition. Damit lässt sich alles am PC/Mac erledigen, am bequemsten direkt nach dem Flashen.
+
+> ⚠️ Dieser Weg folgt dem Quellcode von Home Assistant OS
+> ([`haos-config`](https://github.com/home-assistant/operating-system/blob/dev/buildroot-external/rootfs-overlay/usr/sbin/haos-config)),
+> ist aber auf dem VAN PI CORE noch nicht von mehreren Leuten bestätigt. Rückmeldungen gern als Issue. Klappt es
+> nicht, Weg A nehmen.
+
+1. SD-Karte in den Kartenleser. Die Boot-Partition erscheint als Laufwerk **`hassos-boot`**.
+   Läuft Home Assistant schon: vorher *Einstellungen → System → ⏻ → System herunterfahren*, warten, bis die grüne
+   LED aus ist, Strom ab, Karte entnehmen. Bei Start von SSD die SSD per USB an den PC hängen.
+2. **`config.txt`** mit einem reinen Texteditor öffnen (Windows: Editor, Mac: VS Code oder TextEdit mit
+   *Format → In reinen Text umwandeln*), die Zeilen von oben **ganz ans Ende** schreiben, speichern.
+3. Auf `hassos-boot` den Ordner **`CONFIG`** anlegen, darin **`modules`**, darin die Datei **`rpi-i2c.conf`** mit
+   der Zeile `i2c-dev`. Ergebnis: `hassos-boot/CONFIG/modules/rpi-i2c.conf`.
+4. Karte auswerfen, einsetzen, starten. Nach dem Hochfahren **ein zweites Mal neu starten**
+   (*Einstellungen → System → ⏻ → Neu starten → System neu starten*).
+
+### Warum es oft „nicht funktioniert“ (Stolperfallen)
+
+- **Zweiter Neustart fehlt.** Home Assistant OS übernimmt `CONFIG/modules` erst spät im Startvorgang, nachdem die
+  Treiber schon geladen sind. `i2c-dev` wird deshalb erst beim **nächsten** Start geladen. Direkt nach dem ersten
+  Start fehlt `/dev/i2c-1` noch, obwohl alles richtig ist.
+- **Der Ordner `CONFIG` verschwindet.** Das ist gewollt: Nach dem Import löscht Home Assistant OS den Ordner von der
+  Boot-Partition. Die Einstellung ist dann dauerhaft gespeichert.
+- **Falsche Dateiendung.** Windows blendet Endungen oft aus, aus `rpi-i2c.conf` wird unbemerkt
+  `rpi-i2c.conf.txt`. Diese Datei wird ignoriert. Im Explorer *Ansicht → Dateinamenerweiterungen* einschalten.
+  Ebenso muss `authorized_keys` ohne Endung sein.
+- **Formatierter Text.** TextEdit auf dem Mac speichert ohne Umstellung als RTF. Dann ist die `config.txt`
+  unbrauchbar.
+- **USB-Stick und Boot-Ordner gleichzeitig.** Steckt ein Stick namens `CONFIG`, wird nur der Stick gelesen und der
+  Ordner auf der Boot-Partition ignoriert.
+- **Nicht am Ende eingetragen.** Die `config.txt` hat Abschnitte wie `[pi4]`. Neue Zeilen gehören hinter die letzte
+  Zeile `[all]`, sonst gelten sie unter Umständen nur für ein bestimmtes Modell.
+
+Updates von Home Assistant OS behalten die `config.txt` auf dem Raspberry Pi 4 bei, die Freischaltung ist also nur
+einmal nötig.
 
 ### Prüfen, ob es geklappt hat
 
@@ -105,34 +144,17 @@ Karte entnehmen, Schritte 1-5. Startest du von einer SSD statt von der SD-Karte,
   Home-Assistant-OS-Version abweichen; maßgeblich ist, was hier steht)
 - unter `w1_bus_master1` die angeschlossenen 1-Wire-Fühler (`28-…`)
 
+Fehlt nur `/dev/i2c-1`, die UARTs sind aber da: `config.txt` ist richtig, `i2c-dev` fehlt noch. Noch einmal neu
+starten, sonst `rpi-i2c.conf` prüfen (Endung!) und erneut importieren.
+
 Fehlt etwas, meldet es spätestens die Integration beim Einrichten („Kein MCP23017 gefunden. I2C aktiviert?“,
 „Verzeichnis nicht gefunden. Steht dtoverlay=w1-gpio in der config.txt?“, „Schnittstelle gibt es nicht“).
 
-### Alternativen (nur falls der Weg über die SD-Karte nicht geht)
-
 <details>
-<summary><b>Entwicklerzugang per SSH auf Port 22222</b> (wenn die Karte nicht entnommen werden kann)</summary>
-
-So war es in älteren Versionen dieser Anleitung beschrieben. Es funktioniert weiterhin, ist aber deutlich aufwändiger.
-Die SSH-App (*Terminal & SSH* bzw. *Advanced SSH & Web Terminal*) reicht dafür **nicht**, weil sie nur in einem
-Container läuft und die Boot-Partition nicht schreiben darf.
-
-1. SSH-Schlüsselpaar am PC/Mac erzeugen (z. B. `ssh-keygen -t ed25519`).
-2. USB-Stick mit FAT32 formatieren und **`CONFIG`** nennen.
-3. Auf den Stick: Datei **`authorized_keys`** (ohne Endung) mit dem Inhalt des öffentlichen Schlüssels
-   (`…pub`) und, für I2C, den Ordner `modules` mit `rpi-i2c.conf` wie oben.
-4. Stick an den Pi stecken und in der SSH-App `ha os import` ausführen (oder Home Assistant neu starten).
-5. Vom PC: `ssh root@homeassistant.local -p 22222`, dann `vi /mnt/boot/config.txt`, die Zeilen von oben ans Ende
-   schreiben, speichern, `reboot`.
-6. Zugang wieder schließen: leeren `CONFIG`-Stick einstecken und erneut importieren.
-
-</details>
-
-<details>
-<summary><b>App „HassOS I2C Configurator“</b> (Community)</summary>
+<summary>Warum nicht die App „HassOS I2C Configurator“?</summary>
 
 Die Community-App aus <https://github.com/adamoutler/HassOSConfigurator> schaltet nur **I2C** ein, nicht UART und
-1-Wire. Für das VAN PI CORE reicht das nicht, deshalb wird sie hier nicht empfohlen.
+1-Wire. Für das VAN PI CORE reicht das nicht.
 
 </details>
 

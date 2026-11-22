@@ -29,8 +29,8 @@ oder entfernt werden.
 ## Schnellstart
 
 1. **Home Assistant OS** mit dem Raspberry Pi Imager auf die SD-Karte schreiben.
-2. **Board-Schnittstellen freischalten:** vor dem ersten Start ein paar Zeilen in die `config.txt` auf der SD-Karte
-   schreiben. Kein Terminal und kein SSH nötig.
+2. **Board-Schnittstellen freischalten:** ein paar Zeilen in die `config.txt` und den I2C-Treiber `i2c-dev`
+   aktivieren, per SSH-Entwicklerzugang oder direkt auf der SD-Karte. Danach zweimal neu starten.
 3. **Integration installieren** per HACS (benutzerdefiniertes Repository) oder manuell.
 4. **Einrichten:** *Einstellungen → Geräte & Dienste → Integration hinzufügen → VAN PI CORE*, danach die
    gewünschten Funktionen hinzufügen.
