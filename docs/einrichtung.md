@@ -117,13 +117,13 @@ Details zu allen Werten: [module.md](module.md).
 
 1. **Neigungssensor:** *MPU6050 auf dem Board* (I2C-Bus 1, Adresse `0x69`) oder drei beliebige Entitäten mit
    Beschleunigung X/Y/Z, z. B. von einem RuuviTag.
-2. **Fahrzeug und Blöcke**, Beispielwerte:
+2. **Fahrzeug und Blöcke**, Beispielwerte für einen Fiat Ducato L3 (gilt so für viele Ducato-Basisfahrzeuge, am besten trotzdem nachmessen):
 
    | Feld | Beispiel | Hinweis |
    |---|---|---|
    | Vorwärtsrichtung des Boards | Aus Fahrt-Kalibrierung | oder die Board-Achse, die zur Front zeigt (+X, −X, …) |
-   | Radstand | 350 cm | Mitte Vorderrad bis Mitte Hinterrad |
-   | Spurweite | 170 cm | Mitte Reifen links bis Mitte Reifen rechts |
+   | Radstand | 403,5 cm | Mitte Vorderrad bis Mitte Hinterrad |
+   | Spurweite | 180 cm | Mitte Reifen links bis Mitte Reifen rechts |
    | Höhe eines Blocks | 2,1 cm | Höhe einer Keilstufe |
    | Anzahl Stapel | 2 | wie viele Räder gleichzeitig unterlegt werden können |
    | Blöcke pro Stapel | 3 | Stufen je Keil |
