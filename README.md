@@ -1,68 +1,91 @@
-# homeassistant_PekawayVANPICORE
-VAN PI CORE Board Integration for Home Assistant
-This custom component integrates the VAN PI CORE Board with Home Assistant, allowing you to monitor and control your van's systems through the Home Assistant interface.
+# VAN PI CORE für Home Assistant
 
-Diese benutzerdefinierte Komponente integriert das VAN PI CORE Board mit Home Assistant und ermöglicht es dir, die Systeme deines Vans über die Home Assistant zu überwachen und zu steuern.
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/docs/faq/custom_repositories/)
+[![In HACS öffnen](https://img.shields.io/badge/HACS-Repository%20%C3%B6ffnen-41BDF5.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=maxlin1&repository=PekawayVANPICORE_homeassistant&category=integration)
 
-## Disclaimer
+Integration für das **[Pekaway VAN PI CORE](https://www.pekaway.de)** mit einem Raspberry Pi 4 und
+Home Assistant OS. Relais, Eingänge, Tanks, Temperaturfühler, Victron-Geräte und eine Nivellierungshilfe für den Van,
+komplett in der Oberfläche einzurichten.
 
-Ich habe mein Bestes getan, um diese Komponente so zuverlässig und nützlich wie möglich zu gestalten. Bitte beachte jedoch:
+*English: Home Assistant integration for the Pekaway VAN PI CORE board (relays, inputs, tank sensors, 1-Wire,
+Victron VE.Direct, van leveling). Set up entirely in the UI. The documentation is in German; the integration
+ships English and German translations.*
 
-- Die Nutzung dieser Komponente erfolgt auf eigenes Risiko.
-- Ich kann leider keine Haftung für etwaige Schäden übernehmen, die durch die Verwendung oder Nichtverwendung entstehen könnten.
-- Dies gilt für alle Arten von Schäden, sei es direkt oder indirekt.
+<img width="400" alt="VAN PI CORE" src="assets/preview.png">
 
-Bei mir funktioniert die Komponente einwandfrei, und ich bin zuversichtlich, dass sie auch bei dir  laufen wird! 😊
-Solltest du dennoch auf Probleme stoßen oder Fragen haben, zögere  bitte nicht, mich zu kontaktieren. Ich helfe im Rahmen meiner Möglichkeiten gerne weiter und freue mich über dein Feedback!
-Eine Antwort kann jedoch auch mal mehrere Tage dauern.
+## Funktionen
 
-## Features
+| Funktion | Hardware auf dem Board | Ergebnis in Home Assistant |
+|---|---|---|
+| **Relais & Eingänge** | MCP23017 (I2C `0x20`) | 8 Schalter, 8 Binärsensoren |
+| **Tanks** | ADS1115, 4 Eingänge, Pull-up je Kanalpaar umschaltbar | Füllstand (L oder %) mit eigener Kennlinie, Spannung, Widerstand |
+| **Temperatur** | 1-Wire (DS18B20 u. ä.) | ein Sensor je Fühler, automatisch gefunden |
+| **Victron VE.Direct** | UART4, UART5 (oder jeder andere Port) | alle Werte von MPPT und SmartShunt/BMV, Energie-Dashboard-tauglich |
+| **Nivellierung** | MPU6050 auf dem Board oder beliebiger X/Y/Z-Sensor (z. B. RuuviTag) | Neigung, Blockempfehlung je Rad, optional Luftfederung, Wasserwaage und Draufsicht als Dashboard-Karten |
 
-- Integriert Inputs 1-8
-- Integriert Relais 1-8
-- Integriert MPU6050 (Beschleunigungs- und Lagersensor für die Van Ausrichtung)
-- Integriert ADS1115 (Wasserlevel)
-- Integriert bis zu 5 1-Wire Sensoren (als Temperatursensoren)
-- Integriert UART 1 (RJ45)
-- Integriert UART 2 (RJ11 LIN)
-- Integriert UART 4 (MPPT 75/15 Victron)
-- Integriert UART 5 (SmartShunt 500A/50mV Victron)
+Jede Funktion ist ein eigener Eintrag unter dem Hauptgerät *VAN PI CORE* und kann einzeln hinzugefügt, geändert
+oder entfernt werden.
 
-INFO: UART3 gibt es nicht auf dem Pin lauscht der 1-Wire Sensor!
+## Schnellstart
 
-## Neu: Integration VAN PI CORE (Beta)
+1. **Home Assistant OS** mit dem Raspberry Pi Imager auf die SD-Karte schreiben.
+2. **Board-Schnittstellen freischalten:** vor dem ersten Start ein paar Zeilen in die `config.txt` auf der SD-Karte
+   schreiben. Kein Terminal und kein SSH nötig.
+3. **Integration installieren** per HACS (benutzerdefiniertes Repository) oder manuell.
+4. **Einrichten:** *Einstellungen → Geräte & Dienste → Integration hinzufügen → VAN PI CORE*, danach die
+   gewünschten Funktionen hinzufügen.
 
-Die neue Integration `custom_components/vanpi_core` wird über die Oberfläche eingerichtet und soll nach und nach alle Board-Funktionen bündeln. Als erstes Modul ist die **Nivellierung** enthalten (MPU6050 auf dem Board oder RuuviTag, Fahrt-Kalibrierung, Blockempfehlung für 2 Stapel). Anleitung: [docs/nivellierung.md](./docs/nivellierung.md).
+## Dokumentation
 
-## 1. Installation von Homeassistant
+| | |
+|---|---|
+| [Installation](docs/installation.md) | Home Assistant OS auf dem RPi 4, I2C/UART/1-Wire freischalten, Integration installieren |
+| [Einrichtung](docs/einrichtung.md) | Hauptgerät, Relais, Tanks, 1-Wire, Victron, Nivellierung, eigenes Van-Bild, Fehlersuche |
+| [Module im Detail](docs/module.md) | Relais, Tanks, 1-Wire, Victron: Werte und Verhalten |
+| [Nivellierung](docs/nivellierung.md) | Kalibrierung, Benutzung am Stellplatz, Entitäten, Dashboard-Karten |
+| [Beispiel-Dashboard](docs/beispiele/dashboard-nivellierung.yaml) | fertige Ansicht für die Nivellierung |
+| [Umstieg von den alten Komponenten](docs/migration.md) | von `mcp23017`, `ads_waterlevel`, `onewire_sysbus`, `victron_*`, `mpu650` |
 
-Wer noch nie Homeassistant selbst installiert hat findet in der [installHA.md](./installHA.md) die Anleitung Stand November 2025.
+## Voraussetzungen
 
-## 2. Configuration und Installation
+- Pekaway VAN PI CORE mit Raspberry Pi 4
+- Home Assistant OS, aktuelle Version (getestet mit Home Assistant 2026.2 und neuer)
+- Für die Installation per HACS: [HACS](https://hacs.xyz)
 
-Die Configuration der HACS Komponente in HomeAssistant findet ihr in der [info.md](./info.md) 
+## Alte Komponenten
 
+Bis Version 1.x bestand dieses Repository aus sechs einzelnen Komponenten mit YAML-Konfiguration. Sie liegen nur noch
+zum Nachschlagen unter [`legacy/`](legacy/) und werden nicht mehr gepflegt. Wie der Umstieg geht, steht in
+[docs/migration.md](docs/migration.md).
 
-## Contributing Mitwirkung
+## Haftungsausschluss
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-Mitwirken ist gerne gesehen!
+Die Nutzung erfolgt auf eigenes Risiko. Für Schäden, die direkt oder indirekt durch die Verwendung entstehen, kann
+keine Haftung übernommen werden. Das gilt besonders für Relais, die Verbraucher im Fahrzeug schalten.
 
-## License
+## Mitmachen und Hilfe
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Fehler und Wünsche: [GitHub Issues](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/issues).
+  Bitte Home-Assistant-Version, Integrationsversion und einen Auszug aus dem Protokoll (`vanpi_core`) angeben.
+- Pull Requests sind willkommen.
+- Austausch: [Pekaway Forum](https://forum.pekaway.de) und
+  [Home Assistant Community](https://community.home-assistant.io).
 
-## Acknowledgments Danksagungen
+Antworten können auch mal ein paar Tage dauern.
 
-- Vielen Dank an die Home Assistant-Community für ihre hervorragende Dokumentation und Beispiele.
+## Danksagungen
 
-- Besonderer Dank gilt den Entwicklern des VAN PI CORE Board für ihre Hardware- und API-Dokumentation.
+- Der Home-Assistant-Community für Dokumentation und Beispiele.
+- Pekaway für das VAN PI CORE und die Hardware-Dokumentation.
+- [@MikeTsenatek](https://github.com/MikeTsenatek), ohne ihn wäre das Projekt nicht so weit gekommen.
+- [@schroeder-robert](https://github.com/schroeder-robert) für den Austausch und weitere Ideen.
+- [@DerKleinePunk](https://github.com/DerKleinePunk) für Ideen und Austausch.
+- Die alten Komponenten bauten auf [jpcornil-git/HA-mcp23017](https://github.com/jpcornil-git/HA-mcp23017) und
+  [thecode/ha-onewire-sysbus](https://github.com/thecode/ha-onewire-sysbus) auf.
 
-- Vielen dan an [@MikeTsenatek](https://github.com/MikeTsenatek) ohne ihn wäre ich nicht weiter gekommen. 
+Viel Spaß mit dem VAN PI CORE in Home Assistant! Wenn ihr spannende Projekte umsetzt, teilt sie gern im Forum
+oder per Pull Request.
 
-- Danke an [@MSchroederRobert](https://github.com/schroeder-robert) für den Austausch und weitere Ideen
+## Lizenz
 
-- Danke an [@DerKleinePunk](https://github.com/DerKleinePunk) für seine Ideen und den Austausch
-
-## Schluss Worte
-Viel Spass mit eurem Peakaway board in Homeassistant wenn ihr spannende Projekte umgesetzt habe teilt Sie gerne mit der Comunity im [Pekaway Forum ](https://forum.pekaway.de) oder stellt einen Pullrequest so kann die Integration immer weiter wachsen.
+MIT, siehe [LICENSE](LICENSE).

@@ -1,0 +1,178 @@
+# Beispiel-Ansicht "Van Nivellierung" für ein Dashboard (Abschnitte/Sections).
+# Nutzt nur Bordmittel und die Karten der Integration VAN PI CORE.
+# Einfügen: Dashboard bearbeiten -> Ansicht hinzufügen -> ⋮ -> In YAML bearbeiten.
+# Entity-IDs gelten für eine deutschsprachige Einrichtung; ggf. per Suchen & Ersetzen anpassen.
+title: Van Nivellierung
+path: van
+icon: mdi:van-utility
+type: sections
+max_columns: 2
+sections:
+  # ---------------------------------------------------------------- Ausrichten
+  - type: grid
+    cards:
+      - type: heading
+        heading: Ausrichten
+        icon: mdi:car-brake-parking
+        badges:
+          - type: entity
+            entity: binary_sensor.nivellierung_eben
+            show_state: true
+            color: green
+            visibility:
+              - condition: state
+                entity: switch.nivellierung_aktiv
+                state: "on"
+      - type: tile
+        entity: switch.nivellierung_aktiv
+        name: Nivellierung
+        icon: mdi:axis-arrow
+        color: green
+        vertical: false
+        features_position: inline
+        features:
+          - type: toggle
+        grid_options:
+          columns: 12
+      # Hinweis, wenn etwas nicht stimmt (z. B. falsche Vorwärtsachse)
+      - type: markdown
+        visibility:
+          - condition: state
+            entity: switch.nivellierung_aktiv
+            state: "on"
+          - condition: state
+            entity: sensor.nivellierung_neigung_langs
+            state: unavailable
+        content: >-
+          ⚠️ {{ states('sensor.nivellierung_status') }}
+      # Große Empfehlung
+      - type: tile
+        entity: sensor.nivellierung_blockempfehlung
+        name: Empfehlung
+        icon: mdi:stairs-up
+        color: orange
+        visibility:
+          - condition: state
+            entity: switch.nivellierung_aktiv
+            state: "on"
+        grid_options:
+          columns: 12
+      - type: tile
+        entity: sensor.nivellierung_restneigung
+        name: Restneigung danach
+        visibility:
+          - condition: state
+            entity: switch.nivellierung_aktiv
+            state: "on"
+        grid_options:
+          columns: 12
+      # Draufsicht aus der Integration VAN PI CORE: eigenes Foto von oben unter
+      # /config/www/van_top.png ablegen (vorne = oben im Bild). Ohne image: gezeichneter Van.
+      # Kein eigenes Bild? Die Zeile "image:" einfach löschen.
+      - type: custom:vanpi-van-card
+        entity: sensor.nivellierung_blockempfehlung
+        image: /local/van_top.png
+        grid_options:
+          columns: 12
+      # Wasserwaage aus der Integration VAN PI CORE (ab 0.2.0), Blase wandert zur höheren Seite
+      - type: custom:vanpi-level-card
+        entity_pitch: sensor.nivellierung_neigung_langs
+        entity_roll: sensor.nivellierung_neigung_quer
+        tolerance: 1.5
+        max_angle: 5
+        visibility:
+          - condition: state
+            entity: switch.nivellierung_aktiv
+            state: "on"
+
+  # ---------------------------------------------------------------- Kalibrieren
+  - type: grid
+    cards:
+      - type: heading
+        heading: Kalibrieren
+        icon: mdi:tune-variant
+      - type: tile
+        entity: button.nivellierung_als_eben_speichern
+        name: Als eben speichern
+        icon: mdi:spirit-level
+        color: blue
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target: {entity_id: button.nivellierung_als_eben_speichern}
+          confirmation:
+            text: Steht der Van wirklich eben? 3 Sekunden nicht bewegen.
+        grid_options: {columns: 12}
+      - type: tile
+        entity: button.nivellierung_fahrt_kalibrierung_starten
+        name: Fahrt-Kalibrierung starten
+        icon: mdi:car-arrow-right
+        color: blue
+        visibility:
+          - condition: state
+            entity: button.nivellierung_fahrt_kalibrierung_starten
+            state_not: unavailable
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target: {entity_id: button.nivellierung_fahrt_kalibrierung_starten}
+        grid_options: {columns: 12}
+      - type: tile
+        entity: button.nivellierung_fahrt_kalibrierung_beenden
+        name: Fahrt-Kalibrierung beenden (im Stand)
+        icon: mdi:flag-checkered
+        color: green
+        visibility:
+          - condition: state
+            entity: button.nivellierung_fahrt_kalibrierung_beenden
+            state_not: unavailable
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target: {entity_id: button.nivellierung_fahrt_kalibrierung_beenden}
+        grid_options: {columns: 6}
+      - type: tile
+        entity: button.nivellierung_fahrt_kalibrierung_abbrechen
+        name: Abbrechen
+        icon: mdi:close-circle
+        color: red
+        visibility:
+          - condition: state
+            entity: button.nivellierung_fahrt_kalibrierung_abbrechen
+            state_not: unavailable
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target: {entity_id: button.nivellierung_fahrt_kalibrierung_abbrechen}
+        grid_options: {columns: 6}
+      - type: tile
+        entity: sensor.nivellierung_status
+        name: Status
+        icon: mdi:information-outline
+        grid_options: {columns: 12}
+      - type: markdown
+        title: Anleitung
+        content: |
+          **Als eben speichern:** Van auf wirklich ebenen Boden stellen, drücken, 3 s nicht bewegen. Jederzeit wiederholbar, ändert nur die Ebene.
+
+          **Fahrt-Kalibrierung** (nur bei Vorwärtsrichtung „Aus Fahrt-Kalibrierung“):
+          1. Auf gerader Strecke anhalten, *Starten* drücken, 2 s stehen bleiben.
+          2. Geradeaus zügig auf 15–20 km/h anfahren, kräftig bis zum Stillstand bremsen. Nicht lenken, nicht rückwärts.
+          3. Schritt 2 gern 1–2 Mal wiederholen, ohne zu beenden.
+          4. Im Stand *Beenden* drücken. Im Status muss bei „Fahrtrichtung entspricht“ eine Achse stehen und keine Warnung.
+
+          **Am Stellplatz:** *Nivellierung* einschalten, Empfehlung ablesen, Blöcke unterlegen. Schaltet nach 15 min von selbst ab. Zum Kalibrieren muss sie nicht an sein.
+
+          Radstand, Spurweite, Blockhöhe: [VAN PI CORE › Zahnrad am Eintrag Nivellierung](/config/integrations/integration/vanpi_core) · [Ausführliche Anleitung](https://github.com/maxlin1/PekawayVANPICORE_homeassistant/blob/main/docs/nivellierung.md)
+      - type: tile
+        entity: button.nivellierung_kalibrierung_zurucksetzen
+        name: Kalibrierung zurücksetzen
+        icon: mdi:restore-alert
+        color: red
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target: {entity_id: button.nivellierung_kalibrierung_zurucksetzen}
+          confirmation:
+            text: Ebene und Fahrtrichtung löschen?
+        grid_options: {columns: 12}
