@@ -192,6 +192,30 @@ class BlockPlan:
             "left": -self.residual_roll,
         }.get(head or "", 0.0)
 
+    def residual_text(self, head: str | None = None) -> str:
+        """Restneigung mit Richtung, z. B. "vorne 0,9° tiefer, rechts 0,4° tiefer"."""
+
+        def part(value: float, high: str, low: str) -> str | None:
+            if abs(value) < 0.05:
+                return None
+            return f"{low if value > 0 else high} {abs(value):.1f}° tiefer".replace(".", ",")
+
+        parts = [
+            p
+            for p in (
+                part(self.residual_pitch, "vorne", "hinten"),
+                part(self.residual_roll, "rechts", "links"),
+            )
+            if p
+        ]
+        text = ", ".join(parts) if parts else "eben"
+        if head and parts:
+            tilt = self.head_tilt(head)
+            if abs(tilt) >= 0.05:
+                word = "höher" if tilt > 0 else "tiefer"
+                text += f" (Kopf {abs(tilt):.1f}° {word})".replace(".", ",")
+        return text
+
     @property
     def total_blocks(self) -> int:
         return sum(self.blocks.values())
@@ -233,7 +257,8 @@ def _air_adjust(vehicle: Vehicle, heights: dict[str, float]) -> tuple[float, flo
 
 
 # Die Schlafrichtung entscheidet nur zwischen Varianten, deren Restneigung
-# höchstens so viel schlechter ist als die beste (Grad).
+# höchstens so viel schlechter ist als die beste (Grad), und nur wenn der Kopf
+# dadurch mindestens so viel höher liegt.
 HEAD_MARGIN = 0.2
 
 
@@ -245,9 +270,10 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
     Höhe hinten links/rechts im Federweg berechnet. Bei gleicher Restneigung
     (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken.
 
-    Ist eine Schlafrichtung gesetzt, wird unter allen Varianten, die höchstens
-    HEAD_MARGIN schlechter sind als die beste, die mit dem Kopf am wenigsten
-    tief gewählt. Ziel bleibt also immer möglichst gerade.
+    Ist eine Schlafrichtung gesetzt, wird statt der besten eine Variante
+    gewählt, die höchstens HEAD_MARGIN schlechter ist und den Kopf mindestens
+    HEAD_MARGIN höher legt. Ziel bleibt also immer möglichst gerade, und fast
+    gleiche Varianten springen nicht hin und her.
     """
     base = wheel_heights(vehicle, pitch, roll)
     stacks = max(0, min(vehicle.stacks, len(WHEELS)))
@@ -273,12 +299,15 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
     best = min(plans, key=lambda p: (round(p.residual, 2), p.total_blocks))
     if not vehicle.head:
         return best
-    near = [p for p in plans if p.residual <= best.residual + HEAD_MARGIN]
-    return min(
-        near,
-        key=lambda p: (
-            round(max(0.0, -p.head_tilt(vehicle.head)), 1),
-            round(p.residual, 2),
-            p.total_blocks,
-        ),
-    )
+    def head_low(p: BlockPlan) -> float:
+        return max(0.0, -p.head_tilt(vehicle.head))
+
+    near = [
+        p
+        for p in plans
+        if p.residual <= best.residual + HEAD_MARGIN
+        and head_low(p) <= head_low(best) - HEAD_MARGIN
+    ]
+    if not near:
+        return best
+    return min(near, key=lambda p: (round(head_low(p), 1), round(p.residual, 2), p.total_blocks))

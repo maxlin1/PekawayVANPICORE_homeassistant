@@ -352,14 +352,16 @@ def test_head_direction_prefers_head_high():
 
 def test_head_direction_never_much_worse():
     """Fall von Max: Kopf rechts darf die Restneigung nicht deutlich verschlechtern."""
-    pitch = math.degrees(math.atan(-(17.8 + 23.4) / 2 / 403.5))
-    roll = math.degrees(math.atan((-23.4 - 5.6 + 17.8) / 2 / 180))
-    van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=3, air_down=2)
+    # fehlt vorne links 17,8 cm, vorne rechts 23,4 cm, hinten rechts 5,6 cm
+    pitch = math.degrees(math.atan(-(17.8 + 23.4 - 5.6) / 2 / 403.5))
+    roll = math.degrees(math.atan(-(23.4 + 5.6 - 17.8) / 2 / 180))
+    van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=2, air_down=2)
     neutral = best_block_plan(van, pitch, roll)
     head = best_block_plan(Vehicle(**{**van.__dict__, "head": "right"}), pitch, roll)
     assert head.residual <= neutral.residual + 0.2
     assert head.head_tilt("right") >= neutral.head_tilt("right")
-    assert head.blocks["vl"] >= 1
+    assert head.blocks["vl"] == 2  # VL1 legt den Kopf nur 0,08° höher: kein Grund zu wechseln
+    assert head.residual_text("right") == "vorne 0,9° tiefer, rechts 0,4° tiefer (Kopf 0,4° tiefer)"
 
 
 @pytest.mark.parametrize("mount_name", list(MOUNTS))
