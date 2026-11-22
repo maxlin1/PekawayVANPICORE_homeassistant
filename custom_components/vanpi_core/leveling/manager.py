@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import math
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -180,8 +181,12 @@ class LevelingManager:
         if self.auto_off_at is not None:
             info["automatisch_aus_um"] = self.auto_off_at.isoformat()
         if self.drive_runs:
-            _, spread = average_directions(self.drive_runs)
+            fwd, spread = average_directions(self.drive_runs)
             info["streuung_grad"] = round(spread, 1)
+            # Welche Board-Achse entspricht der Fahrtrichtung? Hilft beim Prüfen.
+            axis, vec = max(AXIS_VECTORS.items(), key=lambda kv: dot(kv[1], fwd))
+            angle = math.degrees(math.acos(max(-1.0, min(1.0, dot(vec, fwd)))))
+            info["fahrtrichtung_entspricht"] = f"{axis} (Abweichung {angle:.0f}°)"
         if self.recorder is not None:
             info["signal_g"] = round(self.recorder.signal_g, 2)
             info["spitze_g"] = round(self.recorder.peak_g, 2)

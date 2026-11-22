@@ -49,7 +49,6 @@ BUTTONS = (
         key="reset_calibration",
         icon="mdi:restore",
         entity_category=EntityCategory.CONFIG,
-        entity_registry_enabled_default=False,
         press=lambda m: m.async_reset_calibration(),
     ),
 )

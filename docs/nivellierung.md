@@ -23,7 +23,7 @@ Alle Werte lassen sich später über **Konfigurieren** ändern, z. B. bei neuen 
      2. Zügig auf etwa 20 km/h anfahren, dann kräftig bis zum Stillstand bremsen. Nicht lenken.
      3. **„Fahrt-Kalibrierung beenden“** drücken.
      4. Am besten 2–3 Mal wiederholen. Die letzten 3 Fahrten werden gemittelt, die Streuung steht im Status-Sensor. Widerspricht eine neue Fahrt den bisherigen deutlich (über 60°), werden die alten verworfen.
-2. Van auf ebenen Boden stellen und **„Als eben speichern“** drücken (3 Sekunden nicht bewegen).
+2. Van auf **wirklich ebenen** Boden stellen (z. B. mit Wasserwaage prüfen) und **„Als eben speichern“** drücken (3 Sekunden nicht bewegen). Wichtig: Wer am schrägen Stellplatz speichert, macht diese Schräglage zur Null, alle späteren Werte sind dann falsch. Ohne Nullung nimmt die Integration an, dass das Board gerade eingebaut ist. Eine falsche Nullung entfernt **„Kalibrierung zurücksetzen“**.
 
 Die Kalibrierung liegt im Home-Assistant-Speicher (`.storage`) und übersteht Updates und Neustarts.
 
@@ -50,7 +50,7 @@ Ist die Nivellierung aus, wird der Sensor nicht gelesen (MPU6050 im Schlafmodus)
 | `binary_sensor.nivellierung_eben` | an = eben (innerhalb der Toleranz) |
 | `button.nivellierung_als_eben_speichern` | Nullung |
 | `button.nivellierung_fahrt_kalibrierung_*` | starten, beenden, abbrechen |
-| `sensor.nivellierung_status` | Status und Kalibrier-Infos |
+| `sensor.nivellierung_status` | Status und Kalibrier-Infos, u. a. `fahrtrichtung_entspricht` (welche Board-Achse die Fahrt-Kalibrierung ergeben hat) |
 
 Die genauen Entity-IDs hängen von der Sprache bei der Einrichtung ab.
 
