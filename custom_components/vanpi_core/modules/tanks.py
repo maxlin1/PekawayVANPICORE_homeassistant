@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import time
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -44,7 +43,6 @@ from .curve import interpolate, parse_curve
 from .gpio import GpioError, set_pullup
 
 _LOGGER = logging.getLogger(__name__)
-PULLUP_REFRESH = 60  # s: Pull-up regelmäßig neu setzen (z. B. nach fremden Skripten)
 
 
 class TankModule(BoardModule):
@@ -67,7 +65,6 @@ class TankModule(BoardModule):
         self.voltage: float | None = None
         self.pullup_on: bool | None = None  # tatsächlich gesetzter Zustand
         self.pullup_error: str | None = None
-        self._pullup_set_at = 0.0
         self._task: asyncio.Task | None = None
 
     @property
@@ -116,16 +113,13 @@ class TankModule(BoardModule):
                 _LOGGER.debug("%s: Pull-up %s (sysfs %s)", self.subentry.title, want, pin)
             self.pullup_error = None
             self.pullup_on = want
-        self._pullup_set_at = time.monotonic()
 
     async def _run(self) -> None:
+        # Pull-up einmal beim Start setzen (HA-Start oder geänderter Tank).
+        # Den Schalter gibt es nur für den ADS1115 auf dem Board.
+        if self.onboard:
+            await self._apply_pullup()
         while True:
-            # Pull-up-Schalter gibt es nur für den ADS1115 auf dem Board
-            if self.onboard and (
-                not self._pullup_set_at
-                or time.monotonic() - self._pullup_set_at >= PULLUP_REFRESH
-            ):
-                await self._apply_pullup()
             try:
                 v_adc = await self.hass.async_add_executor_job(
                     self.ads.read_voltage, self.channel - 1
