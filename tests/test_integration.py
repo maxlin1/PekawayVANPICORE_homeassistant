@@ -27,30 +27,46 @@ def set_accel(hass: HomeAssistant, x: float, y: float, z: float) -> None:
         hass.states.async_set(f"sensor.acc_{axis}", str(value), {"unit_of_measurement": "g"})
 
 
-async def setup_entry(hass: HomeAssistant):
+async def setup_entry(hass: HomeAssistant, leveling: bool = True):
+    """Haupteintrag (Board) anlegen und Nivellierung als eigenen Eintrag einrichten."""
     set_accel(hass, 0.0, 0.0, 1.0)
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
     assert result["type"] is FlowResultType.FORM
     result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"pair_12": "voltage", "pair_34": "voltage"}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    entry = result["result"]
+    await hass.async_block_till_done()
+    if not leveling:
+        return entry
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, "leveling"), context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.subentries.async_configure(
         result["flow_id"], {"source": "entities"}
     )
     assert result["step_id"] == "entities"
-    result = await hass.config_entries.flow.async_configure(
+    result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
         {"entity_x": "sensor.acc_x", "entity_y": "sensor.acc_y", "entity_z": "sensor.acc_z"},
     )
     assert result["step_id"] == "vehicle"
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], VEHICLE)
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], VEHICLE)
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await hass.async_block_till_done()
-    return result["result"]
+    return entry
+
+
+def leveling_subentry_id(entry) -> str:
+    return next(s.subentry_id for s in entry.subentries.values() if s.subentry_type == "leveling")
 
 
 async def test_leveling_flow(hass: HomeAssistant) -> None:
     entry = await setup_entry(hass)
-    assert entry.options["stacks"] == 2
+    assert entry.subentries[leveling_subentry_id(entry)].data["stacks"] == 2
 
     pitch = "sensor.leveling_pitch"
     # Aus: nicht verfügbar
@@ -81,19 +97,23 @@ async def test_leveling_flow(hass: HomeAssistant) -> None:
     assert await hass.config_entries.async_unload(entry.entry_id)
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_reconfigure_leveling(hass: HomeAssistant) -> None:
     entry = await setup_entry(hass)
     await hass.services.async_call(
         "switch", "turn_on", {"entity_id": "switch.leveling_active"}, blocking=True
     )
-    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, "leveling"),
+        context={"source": config_entries.SOURCE_RECONFIGURE,
+                 "subentry_id": leveling_subentry_id(entry)},
+    )
     assert result["type"] is FlowResultType.FORM
-    result = await hass.config_entries.options.async_configure(
+    result = await hass.config_entries.subentries.async_configure(
         result["flow_id"], {**VEHICLE, "block_height": 3.0}
     )
-    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["reason"] == "reconfigure_successful"
     await hass.async_block_till_done()
-    assert entry.options["block_height"] == 3.0
+    assert entry.subentries[leveling_subentry_id(entry)].data["block_height"] == 3.0
     assert entry.runtime_data.leveling.vehicle.block_height == 3.0
     # Einstellungen ändern schaltet die Nivellierung nicht aus
     assert hass.states.get("switch.leveling_active").state == "on"
@@ -133,3 +153,72 @@ async def test_reset_button_reenabled_after_update(hass: HomeAssistant) -> None:
     await hass.config_entries.async_reload(entry.entry_id)
     await hass.async_block_till_done()
     assert registry.async_get(entity_id).disabled_by is None
+
+
+async def test_board_options_and_single_leveling(hass: HomeAssistant) -> None:
+    entry = await setup_entry(hass)
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"pair_12": "resistive", "pair_34": "voltage"}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.options["pair_12"] == "resistive"
+    again = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, "leveling"), context={"source": config_entries.SOURCE_USER}
+    )
+    assert again["type"] is FlowResultType.ABORT
+
+
+async def test_without_leveling(hass: HomeAssistant) -> None:
+    entry = await setup_entry(hass, leveling=False)
+    assert entry.runtime_data.leveling is None
+    assert hass.states.get("switch.leveling_active") is None
+
+
+async def test_migration_v1(hass: HomeAssistant) -> None:
+    """Alte Einrichtung: Nivellierung im Haupteintrag, Tankeingänge als eigener Eintrag."""
+    from homeassistant.config_entries import ConfigSubentryData
+    from homeassistant.helpers import device_registry as dr
+    from homeassistant.helpers import entity_registry as er
+    from pytest_homeassistant_custom_component.common import MockConfigEntry
+
+    set_accel(hass, 0.0, 0.0, 1.0)
+    entry = MockConfigEntry(
+        domain=DOMAIN, version=1, title="VAN PI CORE",
+        data={"source": "entities", "entity_x": "sensor.acc_x",
+              "entity_y": "sensor.acc_y", "entity_z": "sensor.acc_z"},
+        options={**VEHICLE, "auto_off_minutes": 1},
+        subentries_data=[ConfigSubentryData(
+            data={"pair_12": "resistive", "pair_34": "voltage"},
+            subentry_type="tank_inputs", title="Tankeingänge", unique_id=None,
+        )],
+    )
+    entry.add_to_hass(hass)
+    ent_reg = er.async_get(hass)
+    dev_reg = dr.async_get(hass)
+    device = dev_reg.async_get_or_create(
+        config_entry_id=entry.entry_id, identifiers={(DOMAIN, f"{entry.entry_id}_leveling")}
+    )
+    old = ent_reg.async_get_or_create(
+        "switch", DOMAIN, f"{entry.entry_id}_leveling_active",
+        config_entry=entry, device_id=device.id, suggested_object_id="aussen_nivellierung_aktiv",
+    )
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert entry.version == 2
+    assert entry.data == {}
+    assert entry.options == {"pair_12": "resistive", "pair_34": "voltage"}
+    types = [s.subentry_type for s in entry.subentries.values()]
+    assert types == ["leveling"]
+    sub_id = leveling_subentry_id(entry)
+    data = entry.subentries[sub_id].data
+    assert data["wheelbase"] == VEHICLE["wheelbase"] and data["source"] == "entities"
+    assert "auto_off_minutes" not in data
+    # Entity-ID bleibt, hängt jetzt am Eintrag Nivellierung
+    reg = ent_reg.async_get(old.entity_id)
+    assert reg.config_subentry_id == sub_id
+    assert hass.states.get("switch.aussen_nivellierung_aktiv") is not None
+    dev = dev_reg.async_get(device.id)
+    assert dev.config_entries_subentries[entry.entry_id] == {sub_id}

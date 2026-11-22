@@ -70,8 +70,9 @@ ZERO_SECONDS = 3.0
 MAX_RECORD_SECONDS = 120
 
 
-def _merged(entry: ConfigEntry) -> dict[str, Any]:
-    return {**DEFAULTS, **entry.data, **entry.options}
+def _merged(entry: ConfigEntry, subentry_id: str) -> dict[str, Any]:
+    subentry = entry.subentries.get(subentry_id)
+    return {**DEFAULTS, **(subentry.data if subentry else {})}
 
 
 @dataclass
@@ -86,10 +87,11 @@ class LevelState:
 class LevelingManager:
     """Zustand und Ablauf der Nivellierung für einen Config-Eintrag."""
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, subentry_id: str) -> None:
         self.hass = hass
         self.entry = entry
-        self.config = _merged(entry)
+        self.subentry_id = subentry_id
+        self.config = _merged(entry, subentry_id)
         self._store: Store[dict[str, Any]] = Store(
             hass, STORAGE_VERSION, f"{DOMAIN}.{entry.entry_id}.leveling"
         )
@@ -115,7 +117,7 @@ class LevelingManager:
     @callback
     def apply_options(self) -> None:
         """Einstellungen übernehmen, ohne die Nivellierung neu zu starten."""
-        self.config = _merged(self.entry)
+        self.config = _merged(self.entry, self.subentry_id)
         self.vehicle = Vehicle(
             wheelbase=float(self.config[CONF_WHEELBASE]),
             track=float(self.config[CONF_TRACK]),

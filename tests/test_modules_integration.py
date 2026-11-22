@@ -176,7 +176,7 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     assert bad["errors"] == {"curve": "invalid_curve"}
 
     # Ändern: Kennlinie linear bis 0.98 V = 100 L
-    subentry_id = next(iter(entry.subentries))
+    subentry_id = next(k for k, s in entry.subentries.items() if s.subentry_type == "tank")
     result = await hass.config_entries.subentries.async_init(
         (entry.entry_id, "tank"),
         context={"source": config_entries.SOURCE_RECONFIGURE, "subentry_id": subentry_id},
@@ -195,9 +195,10 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     assert state.attributes["unit_of_measurement"] == "%"
     assert hass.states.get("sensor.abwasser_widerstand") is None
 
-    # Sensortyp je Kanalpaar über "Tankeingänge": 1+2 auf Widerstandsgeber
-    result = await add_subentry(
-        hass, entry, "tank_inputs", [{"pair_12": "resistive", "pair_34": "voltage"}]
+    # Sensortyp je Kanalpaar über das Zahnrad am Haupteintrag: 1+2 auf Widerstandsgeber
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"pair_12": "resistive", "pair_34": "voltage"}
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await asyncio.sleep(0.05)
@@ -205,12 +206,6 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     assert hass.states.get("sensor.abwasser_widerstand") is not None
     assert (1, True) in hardware[1].pullups and (3, False) in hardware[1].pullups
     assert hass.states.get("sensor.abwasser_spannung").attributes["pull_up"] == "an"
-
-    # nur ein Eintrag "Tankeingänge"
-    again = await hass.config_entries.subentries.async_init(
-        (entry.entry_id, "tank_inputs"), context={"source": config_entries.SOURCE_USER}
-    )
-    assert again["type"] is FlowResultType.ABORT
 
     # Löschen entfernt die Entitäten
     hass.config_entries.async_remove_subentry(entry, subentry_id)

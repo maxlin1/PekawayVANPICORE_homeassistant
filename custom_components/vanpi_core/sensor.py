@@ -104,8 +104,10 @@ async def async_setup_entry(
     entry: VanPiConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    manager = entry.runtime_data.leveling
-    async_add_entities(LevelingSensor(manager, d) for d in SENSORS)
+    if (manager := entry.runtime_data.leveling) is not None:
+        async_add_entities(
+            [LevelingSensor(manager, d) for d in SENSORS], config_subentry_id=manager.subentry_id
+        )
     entry.runtime_data.modules.register_platform(Platform.SENSOR, async_add_entities)
 
 

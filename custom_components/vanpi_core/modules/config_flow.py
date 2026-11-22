@@ -28,21 +28,16 @@ from .const import (
     CONF_MOUNT_DIR,
     CONF_NAME,
     CONF_PORT,
-    CONF_PAIR_12,
-    CONF_PAIR_34,
     CONF_SCAN_INTERVAL,
     CONF_UNIT,
     DEVICE_MPPT,
     DEVICE_SHUNT,
     MCP_DEFAULT_ADDRESS,
-    MODE_RESISTIVE,
-    MODE_VOLTAGE,
     ONEWIRE_DEFAULT_DIR,
     ONEWIRE_DEFAULT_INTERVAL,
     SUBENTRY_IO,
     SUBENTRY_ONEWIRE,
     SUBENTRY_TANK,
-    SUBENTRY_TANK_INPUTS,
     SUBENTRY_VICTRON,
     TANK_DEFAULT_CURVE,
     TANK_DEFAULT_INTERVAL,
@@ -55,7 +50,6 @@ from .const import (
 from .curve import CurveError, format_curve, parse_curve
 from .i2c import probe
 from .io import input_key, relay_key
-from .tanks import pair_modes
 
 MCP_ADDRESSES = [f"0x{a:02x}" for a in range(0x20, 0x28)]
 ADS_ADDRESSES = [f"0x{a:02x}" for a in range(0x48, 0x4C)]
@@ -271,34 +265,6 @@ class TankSubentryFlow(_BaseSubentryFlow):
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
 
-# --- Tankeingänge (Sensortyp je Kanalpaar) ---------------------------------
-
-
-class TankInputsSubentryFlow(_BaseSubentryFlow):
-    subentry_type = SUBENTRY_TANK_INPUTS
-
-    async def async_step_user(self, user_input: dict[str, Any] | None = None):
-        if self.source != SOURCE_RECONFIGURE and self._others():
-            return self.async_abort(reason="already_configured")
-        if user_input is not None:
-            return self._finish(
-                "Tankeingänge",
-                {CONF_PAIR_12: user_input[CONF_PAIR_12], CONF_PAIR_34: user_input[CONF_PAIR_34]},
-            )
-        modes = pair_modes(self._get_entry())
-        schema = vol.Schema(
-            {
-                vol.Required(CONF_PAIR_12, default=modes[1]): _select(
-                    [MODE_VOLTAGE, MODE_RESISTIVE], "tank_mode"
-                ),
-                vol.Required(CONF_PAIR_34, default=modes[3]): _select(
-                    [MODE_VOLTAGE, MODE_RESISTIVE], "tank_mode"
-                ),
-            }
-        )
-        return self.async_show_form(step_id="user", data_schema=schema)
-
-
 # --- 1-Wire ------------------------------------------------------------------
 
 
@@ -404,6 +370,5 @@ SUBENTRY_FLOWS: dict[str, type[ConfigSubentryFlow]] = {
     SUBENTRY_IO: IoSubentryFlow,
     SUBENTRY_TANK: TankSubentryFlow,
     SUBENTRY_ONEWIRE: OneWireSubentryFlow,
-    SUBENTRY_TANK_INPUTS: TankInputsSubentryFlow,
     SUBENTRY_VICTRON: VictronSubentryFlow,
 }

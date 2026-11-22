@@ -56,10 +56,15 @@ _LOGGER = logging.getLogger(__name__)
 def pair_modes(entry: ConfigEntry) -> dict[int, str]:
     """Sensortyp je Kanalpaar {1: ..., 3: ...}.
 
-    Quelle ist der Eintrag "Tankeingänge". Fehlt er, gilt der alte Sensortyp
-    eines Tanks im Paar (Einrichtungen vor 0.1.8), sonst Spannung.
+    Quelle sind die Grundeinstellungen des Boards (Zahnrad am Haupteintrag).
+    Ältere Einrichtungen: Eintrag "Tankeingänge" (bis 0.1.7) oder der
+    Sensortyp eines Tanks im Paar (vor 0.1.7). Sonst Spannung.
     """
     modes = {1: MODE_VOLTAGE, 3: MODE_VOLTAGE}
+    if CONF_PAIR_12 in entry.options or CONF_PAIR_34 in entry.options:
+        modes[1] = entry.options.get(CONF_PAIR_12, MODE_VOLTAGE)
+        modes[3] = entry.options.get(CONF_PAIR_34, MODE_VOLTAGE)
+        return modes
     subs = list(entry.subentries.values())
     inputs = next((s for s in subs if s.subentry_type == SUBENTRY_TANK_INPUTS), None)
     if inputs is not None:
@@ -90,17 +95,11 @@ async def async_apply_pullup(hass, channel: int, on: bool, title: str) -> str | 
     return None
 
 
-class TankInputsModule(BoardModule):
-    """Eintrag "Tankeingänge": setzt beim Start die Pull-ups beider Kanalpaare."""
-
-    model = "VAN PI CORE Tankeingänge"
-
-    async def async_start(self) -> None:
-        modes = pair_modes(self.entry)
-        for channel in (1, 3):
-            await async_apply_pullup(
-                self.hass, channel, modes[channel] == MODE_RESISTIVE, self.subentry.title
-            )
+async def async_apply_pair_pullups(hass, entry: ConfigEntry) -> None:
+    """Pull-ups beider Kanalpaare passend zum eingestellten Sensortyp setzen."""
+    modes = pair_modes(entry)
+    for channel in (1, 3):
+        await async_apply_pullup(hass, channel, modes[channel] == MODE_RESISTIVE, entry.title)
 
 
 class TankModule(BoardModule):

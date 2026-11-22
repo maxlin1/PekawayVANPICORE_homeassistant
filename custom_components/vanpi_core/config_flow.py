@@ -1,4 +1,11 @@
-"""Einrichtung über die Oberfläche: Sensorquelle, Fahrzeug und Blöcke."""
+"""Einrichtung über die Oberfläche.
+
+Haupteintrag "VAN PI CORE" (Zahnrad): Grundeinstellungen des Boards, also der
+Sensortyp der Tankeingänge (Pull-ups je Kanalpaar).
+
+Jede Funktion ist ein eigener Eintrag darunter (Subentry): Nivellierung,
+Relais/Eingänge, Tanks, 1-Wire, Victron.
+"""
 
 from __future__ import annotations
 
@@ -11,6 +18,7 @@ from homeassistant.config_entries import (
     ConfigFlowResult,
     ConfigSubentryFlow,
     OptionsFlow,
+    SubentryFlowResult,
 )
 from homeassistant.core import callback
 from homeassistant.helpers import selector
@@ -35,11 +43,15 @@ from .const import (
     FORWARD_DRIVE,
     SOURCE_ENTITIES,
     SOURCE_MPU6050,
+    SUBENTRY_LEVELING,
 )
 from .leveling.mpu6050 import MPU6050
 from .modules.config_flow import SUBENTRY_FLOWS
+from .modules.const import CONF_PAIR_12, CONF_PAIR_34, MODE_RESISTIVE, MODE_VOLTAGE
+from .modules.tanks import pair_modes
 
 MPU_ADDRESSES = {"0x68": 0x68, "0x69": 0x69}
+LEVELING_TITLE = "Nivellierung"
 
 
 def _cm(min_v: float, max_v: float, step: float) -> selector.NumberSelector:
@@ -58,6 +70,23 @@ def _int(min_v: int, max_v: int, unit: str | None = None) -> selector.NumberSele
     if unit:
         config["unit_of_measurement"] = unit
     return selector.NumberSelector(config)
+
+
+def board_schema(modes: dict[int, str]) -> vol.Schema:
+    """Grundeinstellungen des Boards: Sensortyp je Tank-Kanalpaar."""
+    mode = selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=[MODE_VOLTAGE, MODE_RESISTIVE],
+            translation_key="tank_mode",
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
+    )
+    return vol.Schema(
+        {
+            vol.Required(CONF_PAIR_12, default=modes[1]): mode,
+            vol.Required(CONF_PAIR_34, default=modes[3]): mode,
+        }
+    )
 
 
 def vehicle_schema(values: dict[str, Any]) -> vol.Schema:
@@ -106,12 +135,54 @@ def _normalize_numbers(data: dict[str, Any]) -> dict[str, Any]:
 
 
 class VanPiConfigFlow(ConfigFlow, domain=DOMAIN):
-    VERSION = 1
+    VERSION = 2
+
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            return self.async_create_entry(title="VAN PI CORE", data={}, options=user_input)
+        return self.async_show_form(
+            step_id="user", data_schema=board_schema({1: MODE_VOLTAGE, 3: MODE_VOLTAGE})
+        )
+
+    @classmethod
+    @callback
+    def async_get_supported_subentry_types(
+        cls, config_entry: ConfigEntry
+    ) -> dict[str, type[ConfigSubentryFlow]]:
+        """Funktionen des Boards: Nivellierung plus Module (siehe modules/)."""
+        return {SUBENTRY_LEVELING: LevelingSubentryFlow, **SUBENTRY_FLOWS}
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        return VanPiOptionsFlow()
+
+
+class VanPiOptionsFlow(OptionsFlow):
+    """Zahnrad am Haupteintrag: Grundeinstellungen des Boards."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            return self.async_create_entry(data={**self.config_entry.options, **user_input})
+        return self.async_show_form(
+            step_id="init", data_schema=board_schema(pair_modes(self.config_entry))
+        )
+
+
+class LevelingSubentryFlow(ConfigSubentryFlow):
+    """Eintrag "Nivellierung": Sensorquelle, Fahrzeug und Blöcke."""
 
     def __init__(self) -> None:
         self._data: dict[str, Any] = {}
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    def _exists(self) -> bool:
+        return any(
+            s.subentry_type == SUBENTRY_LEVELING for s in self._get_entry().subentries.values()
+        )
+
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> SubentryFlowResult:
+        if self._exists():
+            return self.async_abort(reason="already_configured")
         if user_input is not None:
             self._data[CONF_SOURCE] = user_input[CONF_SOURCE]
             if user_input[CONF_SOURCE] == SOURCE_MPU6050:
@@ -131,7 +202,9 @@ class VanPiConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
         )
 
-    async def async_step_mpu6050(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    async def async_step_mpu6050(
+        self, user_input: dict[str, Any] | None = None
+    ) -> SubentryFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             bus = int(user_input[CONF_I2C_BUS])
@@ -156,41 +229,35 @@ class VanPiConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_entities(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    async def async_step_entities(
+        self, user_input: dict[str, Any] | None = None
+    ) -> SubentryFlowResult:
         if user_input is not None:
             self._data.update(user_input)
             return await self.async_step_vehicle()
         return self.async_show_form(step_id="entities", data_schema=entities_schema({}))
 
-    async def async_step_vehicle(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    async def async_step_vehicle(
+        self, user_input: dict[str, Any] | None = None
+    ) -> SubentryFlowResult:
         if user_input is not None:
             return self.async_create_entry(
-                title="VAN PI CORE",
-                data=self._data,
-                options=_normalize_numbers(user_input),
+                title=LEVELING_TITLE, data={**self._data, **_normalize_numbers(user_input)}
             )
         return self.async_show_form(step_id="vehicle", data_schema=vehicle_schema({}))
 
-    @classmethod
-    @callback
-    def async_get_supported_subentry_types(
-        cls, config_entry: ConfigEntry
-    ) -> dict[str, type[ConfigSubentryFlow]]:
-        """Board-Module (Relais, Tanks, 1-Wire, Victron), siehe modules/."""
-        return SUBENTRY_FLOWS
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
-        return VanPiOptionsFlow()
-
-
-class VanPiOptionsFlow(OptionsFlow):
-    """Fahrzeug, Blöcke und Ausrichtung jederzeit änderbar."""
-
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> SubentryFlowResult:
+        """Zahnrad am Eintrag Nivellierung: Fahrzeug, Blöcke, Ausrichtung."""
+        subentry = self._get_reconfigure_subentry()
         if user_input is not None:
-            return self.async_create_entry(data=_normalize_numbers(user_input))
+            return self.async_update_and_abort(
+                self._get_entry(),
+                subentry,
+                data={**subentry.data, **_normalize_numbers(user_input)},
+            )
         return self.async_show_form(
-            step_id="init", data_schema=vehicle_schema(dict(self.config_entry.options))
+            step_id="reconfigure", data_schema=vehicle_schema(dict(subentry.data))
         )
+

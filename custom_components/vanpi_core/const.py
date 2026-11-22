@@ -18,6 +18,9 @@ PLATFORMS = [
     Platform.SWITCH,
 ]
 
+# Nivellierung ist ein eigener Eintrag (Subentry) unter VAN PI CORE
+SUBENTRY_LEVELING = "leveling"
+
 # Nivellierung: Winkelquelle
 CONF_SOURCE = "source"
 SOURCE_MPU6050 = "mpu6050"
@@ -53,6 +56,14 @@ DEFAULTS = {
     CONF_BLOCKS_PER_STACK: 3,
     CONF_TOLERANCE: 1.0,
 }
+
+# Nur diese Schlüssel gehören zur Nivellierung (alte Optionen wie
+# auto_off_minutes werden bei der Migration verworfen)
+LEVELING_KEYS = (
+    CONF_SOURCE, CONF_I2C_BUS, CONF_MPU_ADDRESS, CONF_ENTITY_X, CONF_ENTITY_Y,
+    CONF_ENTITY_Z, CONF_FORWARD, CONF_WHEELBASE, CONF_TRACK, CONF_BLOCK_HEIGHT,
+    CONF_STACKS, CONF_BLOCKS_PER_STACK, CONF_TOLERANCE,
+)
 
 AUTO_OFF_MINUTES = 15  # fest, Nivellierung schaltet sich danach selbst ab
 SAMPLE_INTERVAL = 0.05  # 20 Hz

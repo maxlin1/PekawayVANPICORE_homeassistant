@@ -3,50 +3,16 @@
     "step": {
       "user": {
         "title": "VAN PI CORE einrichten",
-        "description": "Woher sollen die Neigungswerte kommen?",
+        "description": "Grundeinstellungen des Boards. Die Funktionen (Nivellierung, Relais, Tanks, 1-Wire, Victron) richtest du danach unten als eigene Einträge ein.",
         "data": {
-          "source": "Neigungssensor"
-        }
-      },
-      "mpu6050": {
-        "title": "MPU6050",
-        "description": "Der MPU6050 sitzt auf dem VAN PI CORE meist an Adresse 0x69 auf I2C-Bus 1.",
-        "data": {
-          "i2c_bus": "I2C-Bus",
-          "mpu_address": "I2C-Adresse"
-        }
-      },
-      "entities": {
-        "title": "Beschleunigungs-Entitäten",
-        "description": "Drei Sensoren mit Beschleunigung X, Y und Z, z. B. von einem RuuviTag. Einheit g, mg oder m/s².",
-        "data": {
-          "entity_x": "Beschleunigung X",
-          "entity_y": "Beschleunigung Y",
-          "entity_z": "Beschleunigung Z"
-        }
-      },
-      "vehicle": {
-        "title": "Fahrzeug und Blöcke",
-        "description": "Alles lässt sich später unter 'Konfigurieren' ändern.",
-        "data": {
-          "forward": "Vorwärtsrichtung des Boards",
-          "wheelbase": "Radstand",
-          "track": "Spurweite",
-          "block_height": "Höhe eines Blocks",
-          "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
-          "blocks_per_stack": "Blöcke pro Stapel",
-          "tolerance": "Gilt als eben bis"
+          "pair_12": "Tankeingang 1 + 2",
+          "pair_34": "Tankeingang 3 + 4"
         },
         "data_description": {
-          "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
-          "wheelbase": "Abstand Vorderachse zu Hinterachse",
-          "track": "Abstand linkes zu rechtem Rad",
-          "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
+          "pair_12": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde oder Stabsonde mit Widerstandsplatine (Pull-up aus). Widerstandsgeber: Schwimmer-/Hebelgeber gegen Masse (Pull-up an).",
+          "pair_34": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde oder Stabsonde mit Widerstandsplatine (Pull-up aus). Widerstandsgeber: Schwimmer-/Hebelgeber gegen Masse (Pull-up an)."
         }
       }
-    },
-    "error": {
-      "mpu_not_found": "Kein MPU6050 gefunden. I2C aktiviert? Adresse richtig?"
     },
     "abort": {
       "single_instance_allowed": "VAN PI CORE ist bereits eingerichtet."
@@ -55,23 +21,16 @@
   "options": {
     "step": {
       "init": {
-        "title": "Fahrzeug und Blöcke",
+        "title": "VAN PI CORE",
+        "description": "Grundeinstellungen des Boards. Die Funktionen (Nivellierung, Relais, Tanks, 1-Wire, Victron) richtest du danach unten als eigene Einträge ein.",
         "data": {
-          "forward": "Vorwärtsrichtung des Boards",
-          "wheelbase": "Radstand",
-          "track": "Spurweite",
-          "block_height": "Höhe eines Blocks",
-          "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
-          "blocks_per_stack": "Blöcke pro Stapel",
-          "tolerance": "Gilt als eben bis"
+          "pair_12": "Tankeingang 1 + 2",
+          "pair_34": "Tankeingang 3 + 4"
         },
         "data_description": {
-          "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
-          "wheelbase": "Abstand Vorderachse zu Hinterachse",
-          "track": "Abstand linkes zu rechtem Rad",
-          "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
-        },
-        "description": "Kurzanleitung: 1) Vorwärtsrichtung: die Board-Achse wählen, die nach vorne zeigt, oder 'Aus Fahrt-Kalibrierung'. 2) Auf wirklich ebenem Boden 'Als eben speichern' drücken (jederzeit wiederholbar, ändert nur die Ebene). 3) Fahrt-Kalibrierung (nur bei 'Aus Fahrt-Kalibrierung' nötig): Starten, 2 s stehen, 1 bis 3 Mal geradeaus anfahren und bis zum Stillstand bremsen, dann Beenden. Den Schalter 'Aktiv' braucht man zum Kalibrieren nicht. Ausführliche Anleitung: Link 'Besuchen' auf der Geräteseite."
+          "pair_12": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde oder Stabsonde mit Widerstandsplatine (Pull-up aus). Widerstandsgeber: Schwimmer-/Hebelgeber gegen Masse (Pull-up an).",
+          "pair_34": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde oder Stabsonde mit Widerstandsplatine (Pull-up aus). Widerstandsgeber: Schwimmer-/Hebelgeber gegen Masse (Pull-up an)."
+        }
       }
     }
   },
@@ -182,6 +141,84 @@
     }
   },
   "config_subentries": {
+    "leveling": {
+      "entry_type": "Nivellierung",
+      "initiate_flow": {
+        "user": "Nivellierung einrichten",
+        "reconfigure": "Nivellierung ändern"
+      },
+      "step": {
+        "user": {
+          "title": "Nivellierung einrichten",
+          "description": "Woher sollen die Neigungswerte kommen?",
+          "data": {
+            "source": "Neigungssensor"
+          }
+        },
+        "mpu6050": {
+          "title": "MPU6050",
+          "description": "Der MPU6050 sitzt auf dem VAN PI CORE meist an Adresse 0x69 auf I2C-Bus 1.",
+          "data": {
+            "i2c_bus": "I2C-Bus",
+            "mpu_address": "I2C-Adresse"
+          }
+        },
+        "entities": {
+          "title": "Beschleunigungs-Entitäten",
+          "description": "Drei Sensoren mit Beschleunigung X, Y und Z, z. B. von einem RuuviTag. Einheit g, mg oder m/s².",
+          "data": {
+            "entity_x": "Beschleunigung X",
+            "entity_y": "Beschleunigung Y",
+            "entity_z": "Beschleunigung Z"
+          }
+        },
+        "vehicle": {
+          "title": "Fahrzeug und Blöcke",
+          "description": "Alles lässt sich später über das Zahnrad am Eintrag Nivellierung ändern.",
+          "data": {
+            "forward": "Vorwärtsrichtung des Boards",
+            "wheelbase": "Radstand",
+            "track": "Spurweite",
+            "block_height": "Höhe eines Blocks",
+            "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
+            "blocks_per_stack": "Blöcke pro Stapel",
+            "tolerance": "Gilt als eben bis"
+          },
+          "data_description": {
+            "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
+            "wheelbase": "Abstand Vorderachse zu Hinterachse",
+            "track": "Abstand linkes zu rechtem Rad",
+            "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
+          }
+        },
+        "reconfigure": {
+          "title": "Fahrzeug und Blöcke",
+          "description": "Kurzanleitung: 1) Vorwärtsrichtung: die Board-Achse wählen, die nach vorne zeigt, oder 'Aus Fahrt-Kalibrierung'. 2) Auf wirklich ebenem Boden 'Als eben speichern' drücken (jederzeit wiederholbar, ändert nur die Ebene). 3) Fahrt-Kalibrierung (nur bei 'Aus Fahrt-Kalibrierung' nötig): Starten, 2 s stehen, 1 bis 3 Mal geradeaus anfahren und bis zum Stillstand bremsen, dann Beenden. Den Schalter 'Aktiv' braucht man zum Kalibrieren nicht. Ausführliche Anleitung: Link 'Besuchen' auf der Geräteseite.",
+          "data": {
+            "forward": "Vorwärtsrichtung des Boards",
+            "wheelbase": "Radstand",
+            "track": "Spurweite",
+            "block_height": "Höhe eines Blocks",
+            "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
+            "blocks_per_stack": "Blöcke pro Stapel",
+            "tolerance": "Gilt als eben bis"
+          },
+          "data_description": {
+            "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
+            "wheelbase": "Abstand Vorderachse zu Hinterachse",
+            "track": "Abstand linkes zu rechtem Rad",
+            "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
+          }
+        }
+      },
+      "error": {
+        "mpu_not_found": "Kein MPU6050 gefunden. I2C aktiviert? Adresse richtig?"
+      },
+      "abort": {
+        "already_configured": "Die Nivellierung ist schon eingerichtet. Ändern über das Zahnrad am Eintrag Nivellierung.",
+        "reconfigure_successful": "Gespeichert."
+      }
+    },
     "io": {
       "entry_type": "Relais & Eingänge (MCP23017)",
       "initiate_flow": {
@@ -318,31 +355,6 @@
         "already_configured": "Diese Schnittstelle ist schon eingerichtet."
       },
       "abort": {
-        "reconfigure_successful": "Gespeichert."
-      }
-    },
-    "tank_inputs": {
-      "entry_type": "Tankeingänge (Sensortyp)",
-      "initiate_flow": {
-        "user": "Tankeingänge einrichten",
-        "reconfigure": "Tankeingänge ändern"
-      },
-      "step": {
-        "user": {
-          "title": "Tankeingänge",
-          "description": "Das Board schaltet den 47-kΩ-Pull-up immer für zwei Eingänge gemeinsam. Wähle deshalb den Sensortyp je Kanalpaar. Er wird bei jedem Start von Home Assistant gesetzt.",
-          "data": {
-            "pair_12": "Tankeingang 1 + 2",
-            "pair_34": "Tankeingang 3 + 4"
-          },
-          "data_description": {
-            "pair_12": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde oder Stabsonde mit Widerstandsplatine (Pull-up aus). Widerstandsgeber: Schwimmer-/Hebelgeber gegen Masse (Pull-up an).",
-            "pair_34": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde oder Stabsonde mit Widerstandsplatine (Pull-up aus). Widerstandsgeber: Schwimmer-/Hebelgeber gegen Masse (Pull-up an)."
-          }
-        }
-      },
-      "abort": {
-        "already_configured": "Die Tankeingänge sind schon eingerichtet. Ändern über das Zahnrad.",
         "reconfigure_successful": "Gespeichert."
       }
     }

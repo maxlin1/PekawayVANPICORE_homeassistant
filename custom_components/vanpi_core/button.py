@@ -59,8 +59,10 @@ async def async_setup_entry(
     entry: VanPiConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    manager = entry.runtime_data.leveling
-    async_add_entities(LevelingButton(manager, d) for d in BUTTONS)
+    if (manager := entry.runtime_data.leveling) is not None:
+        async_add_entities(
+            [LevelingButton(manager, d) for d in BUTTONS], config_subentry_id=manager.subentry_id
+        )
 
 
 class LevelingButton(LevelingEntity, ButtonEntity):

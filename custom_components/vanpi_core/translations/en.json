@@ -3,50 +3,16 @@
     "step": {
       "user": {
         "title": "Set up VAN PI CORE",
-        "description": "Where should the tilt values come from?",
+        "description": "Basic board settings. Set up the functions (leveling, relays, tanks, 1-Wire, Victron) afterwards as separate entries below.",
         "data": {
-          "source": "Tilt sensor"
-        }
-      },
-      "mpu6050": {
-        "title": "MPU6050",
-        "description": "On the VAN PI CORE the MPU6050 is usually at address 0x69 on I2C bus 1.",
-        "data": {
-          "i2c_bus": "I2C-Bus",
-          "mpu_address": "I2C address"
-        }
-      },
-      "entities": {
-        "title": "Acceleration entities",
-        "description": "Three sensors with acceleration X, Y and Z, e.g. from a RuuviTag. Unit g, mg or m/s².",
-        "data": {
-          "entity_x": "Acceleration X",
-          "entity_y": "Acceleration Y",
-          "entity_z": "Acceleration Z"
-        }
-      },
-      "vehicle": {
-        "title": "Vehicle and blocks",
-        "description": "Everything can be changed later via 'Configure'.",
-        "data": {
-          "forward": "Board forward direction",
-          "wheelbase": "Wheelbase",
-          "track": "Track width",
-          "block_height": "Height of one block",
-          "stacks": "Number of stacks (wheels that can get blocks)",
-          "blocks_per_stack": "Blocks per stack",
-          "tolerance": "Considered level up to"
+          "pair_12": "Tank input 1 + 2",
+          "pair_34": "Tank input 3 + 4"
         },
         "data_description": {
-          "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
-          "wheelbase": "Distance front axle to rear axle",
-          "track": "Distance left to right wheel",
-          "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps"
+          "pair_12": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on).",
+          "pair_34": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on)."
         }
       }
-    },
-    "error": {
-      "mpu_not_found": "No MPU6050 found. Is I2C enabled? Is the address correct?"
     },
     "abort": {
       "single_instance_allowed": "VAN PI CORE is already configured."
@@ -55,23 +21,16 @@
   "options": {
     "step": {
       "init": {
-        "title": "Vehicle and blocks",
+        "title": "VAN PI CORE",
+        "description": "Basic board settings. Set up the functions (leveling, relays, tanks, 1-Wire, Victron) afterwards as separate entries below.",
         "data": {
-          "forward": "Board forward direction",
-          "wheelbase": "Wheelbase",
-          "track": "Track width",
-          "block_height": "Height of one block",
-          "stacks": "Number of stacks (wheels that can get blocks)",
-          "blocks_per_stack": "Blocks per stack",
-          "tolerance": "Considered level up to"
+          "pair_12": "Tank input 1 + 2",
+          "pair_34": "Tank input 3 + 4"
         },
         "data_description": {
-          "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
-          "wheelbase": "Distance front axle to rear axle",
-          "track": "Distance left to right wheel",
-          "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps"
-        },
-        "description": "Quick guide: 1) Forward direction: pick the board axis that points to the front, or 'From drive calibration'. 2) Park on truly level ground and press 'Save as level' (can be repeated anytime, only changes the level reference). 3) Drive calibration (only needed for 'From drive calibration'): press start, wait 2 s, accelerate straight 1 to 3 times and brake to a full stop, then press stop. The switch 'Active' is not needed for calibrating. Full guide: link 'Visit' on the device page."
+          "pair_12": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on).",
+          "pair_34": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on)."
+        }
       }
     }
   },
@@ -182,6 +141,84 @@
     }
   },
   "config_subentries": {
+    "leveling": {
+      "entry_type": "Leveling",
+      "initiate_flow": {
+        "user": "Set up leveling",
+        "reconfigure": "Change leveling"
+      },
+      "step": {
+        "user": {
+          "title": "Set up leveling",
+          "description": "Where should the tilt values come from?",
+          "data": {
+            "source": "Tilt sensor"
+          }
+        },
+        "mpu6050": {
+          "title": "MPU6050",
+          "description": "On the VAN PI CORE the MPU6050 is usually at address 0x69 on I2C bus 1.",
+          "data": {
+            "i2c_bus": "I2C-Bus",
+            "mpu_address": "I2C address"
+          }
+        },
+        "entities": {
+          "title": "Acceleration entities",
+          "description": "Three sensors with acceleration X, Y and Z, e.g. from a RuuviTag. Unit g, mg or m/s².",
+          "data": {
+            "entity_x": "Acceleration X",
+            "entity_y": "Acceleration Y",
+            "entity_z": "Acceleration Z"
+          }
+        },
+        "vehicle": {
+          "title": "Vehicle and blocks",
+          "description": "Everything can be changed later via the gear icon of the leveling entry.",
+          "data": {
+            "forward": "Board forward direction",
+            "wheelbase": "Wheelbase",
+            "track": "Track width",
+            "block_height": "Height of one block",
+            "stacks": "Number of stacks (wheels that can get blocks)",
+            "blocks_per_stack": "Blocks per stack",
+            "tolerance": "Considered level up to"
+          },
+          "data_description": {
+            "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
+            "wheelbase": "Distance front axle to rear axle",
+            "track": "Distance left to right wheel",
+            "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps"
+          }
+        },
+        "reconfigure": {
+          "title": "Vehicle and blocks",
+          "description": "Quick guide: 1) Forward direction: pick the board axis that points to the front, or 'From drive calibration'. 2) Park on truly level ground and press 'Save as level' (can be repeated anytime, only changes the level reference). 3) Drive calibration (only needed for 'From drive calibration'): press start, wait 2 s, accelerate straight 1 to 3 times and brake to a full stop, then press stop. The switch 'Active' is not needed for calibrating. Full guide: link 'Visit' on the device page.",
+          "data": {
+            "forward": "Board forward direction",
+            "wheelbase": "Wheelbase",
+            "track": "Track width",
+            "block_height": "Height of one block",
+            "stacks": "Number of stacks (wheels that can get blocks)",
+            "blocks_per_stack": "Blocks per stack",
+            "tolerance": "Considered level up to"
+          },
+          "data_description": {
+            "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
+            "wheelbase": "Distance front axle to rear axle",
+            "track": "Distance left to right wheel",
+            "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps"
+          }
+        }
+      },
+      "error": {
+        "mpu_not_found": "No MPU6050 found. Is I2C enabled? Is the address correct?"
+      },
+      "abort": {
+        "already_configured": "Leveling is already set up. Change it via the gear icon of the leveling entry.",
+        "reconfigure_successful": "Saved."
+      }
+    },
     "io": {
       "entry_type": "Relays & inputs (MCP23017)",
       "initiate_flow": {
@@ -318,31 +355,6 @@
         "already_configured": "This port is already set up."
       },
       "abort": {
-        "reconfigure_successful": "Saved."
-      }
-    },
-    "tank_inputs": {
-      "entry_type": "Tank inputs (sensor type)",
-      "initiate_flow": {
-        "user": "Set up tank inputs",
-        "reconfigure": "Change tank inputs"
-      },
-      "step": {
-        "user": {
-          "title": "Tank inputs",
-          "description": "The board switches the 47 kΩ pull-up for two inputs together, so choose the sensor type per channel pair. It is applied on every Home Assistant start.",
-          "data": {
-            "pair_12": "Tank input 1 + 2",
-            "pair_34": "Tank input 3 + 4"
-          },
-          "data_description": {
-            "pair_12": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on).",
-            "pair_34": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on)."
-          }
-        }
-      },
-      "abort": {
-        "already_configured": "Tank inputs are already set up. Change them with the gear icon.",
         "reconfigure_successful": "Saved."
       }
     }

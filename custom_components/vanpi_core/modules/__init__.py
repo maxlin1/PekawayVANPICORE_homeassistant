@@ -16,8 +16,10 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from ..const import SUBENTRY_LEVELING
 from .base import BoardModule
 from .const import (
+    MODE_RESISTIVE,
     SUBENTRY_IO,
     SUBENTRY_ONEWIRE,
     SUBENTRY_TANK,
@@ -26,7 +28,7 @@ from .const import (
 )
 from .io import IoModule
 from .onewire import OneWireModule
-from .tanks import TankInputsModule, TankModule, pair_modes
+from .tanks import TankModule, async_apply_pair_pullups, pair_modes
 from .victron import VictronModule
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,13 +38,14 @@ MODULE_TYPES: dict[str, type[BoardModule]] = {
     SUBENTRY_TANK: TankModule,
     SUBENTRY_ONEWIRE: OneWireModule,
     SUBENTRY_VICTRON: VictronModule,
-    SUBENTRY_TANK_INPUTS: TankInputsModule,
 }
+# Eigene Logik außerhalb der Module (Nivellierung) bzw. nur noch für die Migration
+IGNORED_TYPES = {SUBENTRY_LEVELING, SUBENTRY_TANK_INPUTS}
 
 
 def _fingerprint(entry: ConfigEntry, subentry: ConfigSubentry) -> tuple:
     extra: tuple = ()
-    if subentry.subentry_type in (SUBENTRY_TANK, SUBENTRY_TANK_INPUTS):
+    if subentry.subentry_type == SUBENTRY_TANK:
         # Tanks hängen am Sensortyp ihres Kanalpaars
         extra = tuple(sorted(pair_modes(entry).items()))
     return (subentry.title, repr(sorted(subentry.data.items())), extra)
@@ -56,10 +59,23 @@ class ModuleManager:
         self._fingerprints: dict[str, tuple] = {}
         self._adders: dict[Platform, AddConfigEntryEntitiesCallback] = {}
         self._entities: dict[str, list[Entity]] = {}
+        self._pair_modes: dict[int, str] | None = None
 
     async def async_setup(self) -> None:
+        await self._async_apply_pullups()
         for subentry in self.entry.subentries.values():
             await self._async_start(subentry)
+
+    async def _async_apply_pullups(self) -> None:
+        """Pull-ups der Tankeingänge setzen, wenn sich der Sensortyp geändert hat."""
+        modes = pair_modes(self.entry)
+        if modes == self._pair_modes:
+            return
+        self._pair_modes = modes
+        if any(
+            s.subentry_type == SUBENTRY_TANK for s in self.entry.subentries.values()
+        ) or MODE_RESISTIVE in modes.values():
+            await async_apply_pair_pullups(self.hass, self.entry)
 
     async def async_shutdown(self) -> None:
         for subentry_id in list(self.modules):
@@ -87,6 +103,8 @@ class ModuleManager:
         return add
 
     async def _async_start(self, subentry: ConfigSubentry) -> None:
+        if subentry.subentry_type in IGNORED_TYPES:
+            return
         cls = MODULE_TYPES.get(subentry.subentry_type)
         if cls is None:
             _LOGGER.warning("Unbekannter Modultyp %s", subentry.subentry_type)
@@ -117,12 +135,15 @@ class ModuleManager:
 
     async def async_sync(self) -> None:
         """Nach Änderungen an den Subentries: hinzugefügte starten, geänderte neu starten."""
+        await self._async_apply_pullups()
         current = self.entry.subentries
         for subentry_id in list(self.modules):
             if subentry_id not in current:
                 # Entitäten entfernt HA beim Löschen des Subentries selbst
                 await self._async_stop(subentry_id)
         for subentry_id, subentry in current.items():
+            if subentry.subentry_type in IGNORED_TYPES:
+                continue
             if subentry_id not in self.modules:
                 await self._async_start(subentry)
             elif self._fingerprints.get(subentry_id) != _fingerprint(self.entry, subentry):

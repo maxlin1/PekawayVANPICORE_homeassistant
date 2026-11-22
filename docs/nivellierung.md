@@ -6,13 +6,15 @@ Die Integration **VAN PI CORE** (`custom_components/vanpi_core`) berechnet am St
 
 1. Ordner `custom_components/vanpi_core` nach `/config/custom_components/` kopieren (später per HACS).
 2. Home Assistant neu starten.
-3. **Einstellungen → Geräte & Dienste → Integration hinzufügen → VAN PI CORE**.
-4. Neigungssensor wählen:
+3. **Einstellungen → Geräte & Dienste → Integration hinzufügen → VAN PI CORE**. Abgefragt werden nur die Grundeinstellungen des Boards (Sensortyp der Tankeingänge).
+4. Auf der Integrationsseite **„Nivellierung einrichten“** wählen und den Neigungssensor angeben:
    - **MPU6050 auf dem Board** (Standard: I2C-Bus 1, Adresse 0x69), oder
    - **andere Entitäten** mit Beschleunigung X/Y/Z, z. B. ein RuuviTag (Einheit g, mg oder m/s²).
-5. Fahrzeug und Blöcke eintragen: Radstand, Spurweite, Blockhöhe, Anzahl Stapel, Blöcke pro Stapel, Toleranz „eben“.
+5. Fahrzeug und Blöcke eintragen: Radstand, Spurweite, Blockhöhe (Höhe einer Keilstufe), Anzahl Stapel (wie viele Keile), Blöcke pro Stapel (Stufen je Keil), Toleranz „eben“.
 
-Alle Werte lassen sich später über **Konfigurieren** ändern, z. B. bei neuen Keilen oder anderer Einbaulage.
+Fahrzeug und Blöcke ändert man später über das **Zahnrad am Eintrag „Nivellierung“**. Das Zahnrad oben bei VAN PI CORE gehört zu den Grundeinstellungen des Boards.
+
+Beispiel Fiat Ducato L3 (5,99 m): Radstand 403,5 cm, Spurweite rund 180 cm (am besten nachmessen, Mitte Reifen zu Mitte Reifen).
 
 ## Einmalige Kalibrierung
 
@@ -66,13 +68,16 @@ Federung, Reifen und Untergrund werden nicht modelliert. Die Live-Anzeige nach d
 
 ## Dashboard
 
-Die `van-tilt-level-card` funktioniert direkt mit den neuen Sensoren:
+Die Integration bringt eine runde Wasserwaage mit, ohne dass eine Ressource eingetragen werden muss:
 
 ```yaml
-type: custom:van-tilt-level-card
+type: custom:vanpi-level-card
 entity_pitch: sensor.nivellierung_neigung_langs
 entity_roll: sensor.nivellierung_neigung_quer
-tolerance: 1.5
+tolerance: 1.5   # grüner Kreis
+max_angle: 5     # Rand der Libelle
 ```
+
+Wie bei einer echten Libelle wandert die Blase zur höheren Seite. Oben ist vorne, rechts ist rechts in Fahrtrichtung. Neigung längs ist positiv, wenn vorne höher ist, quer positiv, wenn rechts höher ist.
 
 In der Draufsicht (picture-elements) einfach `sensor.ruuvitag_lift_*` und die Block-Templates durch `sensor.nivellierung_hubhohe_*` und `sensor.nivellierung_blocke_*` ersetzen, `input_boolean.leveling_aktiv` durch `switch.nivellierung_aktiv` und `binary_sensor.ruuvitag_van_level` durch `binary_sensor.nivellierung_eben` (Achtung: dort ist **an = eben**).

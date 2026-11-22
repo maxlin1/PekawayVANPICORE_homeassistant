@@ -1,13 +1,22 @@
 {
   "domain": "vanpi_core",
   "name": "VAN PI CORE",
-  "codeowners": ["@maxlin1"],
+  "after_dependencies": [
+    "frontend",
+    "http"
+  ],
+  "codeowners": [
+    "@maxlin1"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/maxlin1/PekawayVANPICORE_homeassistant",
   "integration_type": "hub",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/maxlin1/PekawayVANPICORE_homeassistant/issues",
-  "requirements": ["smbus2>=0.4.2", "pyserial>=3.5"],
+  "requirements": [
+    "smbus2>=0.4.2",
+    "pyserial>=3.5"
+  ],
   "single_config_entry": true,
-  "version": "0.1.7"
+  "version": "0.2.0"
 }

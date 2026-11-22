@@ -18,7 +18,10 @@ async def async_setup_entry(
     entry: VanPiConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    async_add_entities([LevelingSwitch(entry.runtime_data.leveling, "active")])
+    if (manager := entry.runtime_data.leveling) is not None:
+        async_add_entities(
+            [LevelingSwitch(manager, "active")], config_subentry_id=manager.subentry_id
+        )
     entry.runtime_data.modules.register_platform(Platform.SWITCH, async_add_entities)
 
 
