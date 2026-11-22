@@ -49,6 +49,7 @@ def _plan_attrs(m: LevelingManager) -> dict[str, Any] | None:
         "bloecke": plan.blocks,
         "restneigung_laengs": round(plan.residual_pitch, 2),
         "restneigung_quer": round(plan.residual_roll, 2),
+        "restneigung_text": plan.residual_text(m.vehicle.head),
         "blockhoehe_cm": m.vehicle.block_height,
         "luftfederung_cm": plan.air or None,
         "hubhoehe_cm": {w: round(v, 1) for w, v in (m.state.lift or {}).items()},
@@ -88,6 +89,7 @@ SENSORS: list[LevelingSensorDescription] = [
         key="residual",
         icon="mdi:angle-acute",
         value=lambda m: None if m.state.plan is None else round(m.state.plan.residual, 2),
+        attrs=_plan_attrs,
         **ANGLE,
     ),
     LevelingSensorDescription(
