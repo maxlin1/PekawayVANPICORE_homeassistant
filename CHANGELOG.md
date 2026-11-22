@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt. Format angelehnt an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [2.0.1] - 2026-11-22
+
+### Korrigiert
+- hassfest-Prüfung: `pyserial` nicht mehr als Abhängigkeit im Manifest (bringt Home Assistant selbst mit).
+- Interne Werte der Vorwärtsrichtung heißen jetzt `pos_x`/`neg_x` usw.; gespeicherte Einstellungen werden automatisch umgestellt.
+- Beschreibungstexte ohne HTML-ähnliche Platzhalter.
+
 ## [2.0.0] - 2026-11-22
 
 Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bisherigen Einzel-Komponenten ersetzt.
@@ -36,5 +43,6 @@ Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bish
 Erste Veröffentlichung mit den Einzel-Komponenten (YAML-Konfiguration): Relais und Eingänge (MCP23017), Wasserstand
 (ADS1115), MPU6050, 1-Wire, Victron MPPT und SmartShunt.
 
-[2.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/v2.0.0
+[2.0.1]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/v2.0.1
+[2.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/compare/V1.0.0...v2.0.1
 [1.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/V1.0.0
