@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
-import json
-import aiofiles
 import logging
-import os
 import time
 from typing import List, Tuple, Optional, Dict, Any
 
@@ -21,14 +18,11 @@ ADS_ADDR_DEFAULT = 0x48
 REG_CONV   = 0x00
 REG_CONFIG = 0x01
 
-# Single-ended MUX AINx vs GND
 MUX_MAP = {0: 0x4000, 1: 0x5000, 2: 0x6000, 3: 0x7000}
 
-# PGA ±4.096 V → passt gut für 0–3.3V Signale
 PGA_BITS    = 0x0200
 PGA_RANGE_V = 4.096
 
-# Single-shot, 128 SPS, Comparator disabled
 OS_START     = 0x8000
 MODE_SINGLE  = 0x0100
 DR_128SPS    = 0x0080
@@ -39,21 +33,14 @@ def _build_cfg(channel: int) -> int:
 
 # ---- Hilfen ----------------------------------------------------------------
 def ch_human_to_ain(ch: int) -> int:
-    """
-    Erlaubt channel: 1..4 (Board-Beschriftung) oder 0..3 (AIN direkt).
-    """
     ch = int(ch)
     if 1 <= ch <= 4:
-        return ch - 1         # 1→0, 2→1, 3→2, 4→3
+        return ch - 1
     if 0 <= ch <= 3:
         return ch
     raise ValueError(f"Ungültiger channel: {ch}")
 
 def build_linear_mapping(v_max: float, invert: bool, steps: int = 10) -> List[Tuple[float, float]]:
-    """
-    Baut eine lineare (V→L)-Kurve von 0..v_max → 0..100 L (oder invertiert).
-    steps = Anzahl Intervalle (10 → 11 Stützpunkte).
-    """
     pts: List[Tuple[float, float]] = []
     for i in range(steps + 1):
         v = round(v_max * i / steps, 3)
@@ -64,17 +51,12 @@ def build_linear_mapping(v_max: float, invert: bool, steps: int = 10) -> List[Tu
     return pts
 
 def normalize_mapping_points(items: List[Dict[str, Any]], v_max: float, invert: bool) -> List[Tuple[float, float]]:
-    """
-    Erwartet Liste von {v: <volt>, l: <liter>} und sortiert diese.
-    Ergänzt ggf. (0→0/100) und (v_max→100/0).
-    """
     pts = []
     for it in items:
         v = float(it["v"]); l = float(it["l"])
         pts.append((v, l))
     pts.sort(key=lambda x: x[0])
 
-    # Start/Ende erzwingen, falls nicht vorhanden
     have0 = any(abs(v) < 1e-6 for v, _ in pts)
     haveMax = any(abs(v - v_max) < 1e-6 for v, _ in pts)
     if not have0:
@@ -84,9 +66,6 @@ def normalize_mapping_points(items: List[Dict[str, Any]], v_max: float, invert: 
     return pts
 
 def interp(points: List[Tuple[float, float]], x: float) -> float:
-    """
-    Lineare Interpolation über sortierte (x→y)-Punkte.
-    """
     if not points:
         return 0.0
     if x <= points[0][0]:
@@ -130,11 +109,11 @@ class ADSVoltageSensor(SensorEntity):
         try:
             cfg = _build_cfg(self._ain)
             self._bus.write_i2c_block_data(self._addr, REG_CONFIG, [(cfg >> 8) & 0xFF, cfg & 0xFF])
-            time.sleep(0.009)  # ~8 ms @128 SPS
+            time.sleep(0.009)
             raw = self._bus.read_i2c_block_data(self._addr, REG_CONV, 2)
             val = (raw[0] << 8) | raw[1]
             if val > 0x7FFF:
-                val -= 0x10000  # signed 16-bit
+                val -= 0x10000
 
             v_adc = (val * PGA_RANGE_V) / 32768.0
             if v_adc < 0: v_adc = 0.0
@@ -174,7 +153,6 @@ class ADSLevelSensor(SensorEntity):
         self._attr_native_value = round(liters, 1)
 
 class ADSResistanceSensor(SensorEntity):
-    """Nur bei mode: resistive – R aus Pull-Up berechnen."""
     _attr_native_unit_of_measurement = "Ω"
     _attr_state_class = "measurement"
     _attr_should_poll = True
@@ -202,26 +180,22 @@ class ADSResistanceSensor(SensorEntity):
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     entities: List[SensorEntity] = []
 
-    # Pair-Defaults (pro „1-2“ & „3-4“)
     pair_cfg: Dict[str, Dict[str, Any]] = config.get("pair_config", {})
     def defaults_for_channel_human(ch_human: int) -> Dict[str, Any]:
         pair_key = "1-2" if ch_human in (1,2) else "3-4"
-        # Standardwerte:
         d = {
-            "mode": "voltage",   # voltage | capacitive | resistive
+            "mode": "voltage",
             "v_max": 3.3,
             "invert": False,
-            # "r_pullup_ohm": 47000, "v_ref": 3.3
         }
         d.update(pair_cfg.get(pair_key, {}))
         return d
 
     for s in config.get("sensors", []):
         name = s["name"]
-        ch_human = int(s["channel"])  # 1..4 erlaubt
+        ch_human = int(s["channel"])
         ain = ch_human_to_ain(ch_human)
 
-        # Pair-Defaults + Sensor-Overrides zusammenführen
         dfl = defaults_for_channel_human(ch_human)
         mode = s.get("mode", dfl["mode"])
         v_max = float(s.get("v_max", dfl.get("v_max", 3.3)))
@@ -230,14 +204,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         r_pullup = float(s.get("r_pullup_ohm", dfl.get("r_pullup_ohm", 47000)))
         v_ref = float(s.get("v_ref", dfl.get("v_ref", 3.3)))
 
-        # Mapping-Punkte: entweder explizit aus YAML oder linear generieren
         mp_items = s.get("mapping_points")
         if mp_items:
             mapping = normalize_mapping_points(mp_items, v_max=v_max, invert=invert)
         else:
             mapping = build_linear_mapping(v_max=v_max, invert=invert, steps=10)
 
-        # Entitäten erstellen
         v_ent = ADSVoltageSensor(name, ain, divider_ratio)
         l_ent = ADSLevelSensor(name, v_ent, mapping)
         entities.extend([v_ent, l_ent])
