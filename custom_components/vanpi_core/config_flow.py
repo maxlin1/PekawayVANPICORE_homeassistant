@@ -33,6 +33,7 @@ from .const import (
     CONF_ENTITY_Y,
     CONF_ENTITY_Z,
     CONF_FORWARD,
+    CONF_HEAD,
     CONF_I2C_BUS,
     CONF_MPU_ADDRESS,
     CONF_SOURCE,
@@ -44,6 +45,7 @@ from .const import (
     DOMAIN,
     FORWARD_AXES,
     FORWARD_DRIVE,
+    HEAD_DIRECTIONS,
     SOURCE_ENTITIES,
     SOURCE_MPU6050,
     SUBENTRY_LEVELING,
@@ -119,6 +121,13 @@ def vehicle_schema(values: dict[str, Any]) -> vol.Schema:
             ): selector.BooleanSelector(),
             vol.Required(CONF_AIR_UP, default=v[CONF_AIR_UP]): _cm(0, 20, 0.5),
             vol.Required(CONF_AIR_DOWN, default=v[CONF_AIR_DOWN]): _cm(0, 20, 0.5),
+            vol.Required(CONF_HEAD, default=v[CONF_HEAD]): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=HEAD_DIRECTIONS,
+                    translation_key="head_direction",
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
         }
     )
 

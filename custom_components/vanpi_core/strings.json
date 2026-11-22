@@ -63,6 +63,15 @@
         "shunt": "SmartShunt / BMV",
         "mppt": "MPPT solar charger"
       }
+    },
+    "head_direction": {
+      "options": {
+        "none": "No preference",
+        "front": "Front (cab)",
+        "rear": "Rear (back door)",
+        "left": "Left (driver side)",
+        "right": "Right (sliding door)"
+      }
     }
   },
   "entity": {
@@ -185,7 +194,8 @@
             "tolerance": "Considered level up to",
             "air_suspension": "Air suspension on rear axle",
             "air_up": "Air suspension: max. raise",
-            "air_down": "Air suspension: max. lower"
+            "air_down": "Air suspension: max. lower",
+            "head_direction": "Sleeping direction (head points to)"
           },
           "data_description": {
             "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
@@ -195,7 +205,8 @@
             "air_suspension": "Left and right adjustable separately. The recommendation then also says how much each side should go up or down.",
             "air_up": "Per side, from normal ride height",
             "air_down": "Per side, from normal ride height",
-            "block_height": "Height of one step or layer of the ramp"
+            "block_height": "Height of one step or layer of the ramp",
+            "head_direction": "If the van cannot be levelled completely, a variant with the head higher than the feet is preferred."
           }
         },
         "reconfigure": {
@@ -211,7 +222,8 @@
             "tolerance": "Considered level up to",
             "air_suspension": "Air suspension on rear axle",
             "air_up": "Air suspension: max. raise",
-            "air_down": "Air suspension: max. lower"
+            "air_down": "Air suspension: max. lower",
+            "head_direction": "Sleeping direction (head points to)"
           },
           "data_description": {
             "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
@@ -221,7 +233,8 @@
             "air_suspension": "Left and right adjustable separately. The recommendation then also says how much each side should go up or down.",
             "air_up": "Per side, from normal ride height",
             "air_down": "Per side, from normal ride height",
-            "block_height": "Height of one step or layer of the ramp"
+            "block_height": "Height of one step or layer of the ramp",
+            "head_direction": "If the van cannot be levelled completely, a variant with the head higher than the feet is preferred."
           }
         }
       },
