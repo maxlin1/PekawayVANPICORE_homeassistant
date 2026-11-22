@@ -244,6 +244,8 @@ async def test_onewire_module(hass: HomeAssistant, hardware, tmp_path) -> None:
     await hass.async_block_till_done()
     state = hass.states.get("sensor.1_wire_aussen")
     assert state is not None and float(state.state) == pytest.approx(8.1, abs=0.05)
+    # Der Name ist dauerhaft gespeichert, auch ohne die alte Komponente
+    assert registry.async_get("sensor.1_wire_aussen").name == "Außen"
 
     again = await hass.config_entries.subentries.async_init(
         (entry.entry_id, "onewire"), context={"source": config_entries.SOURCE_USER}
