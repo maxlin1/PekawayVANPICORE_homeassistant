@@ -1,0 +1,63 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie beschrieben
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke fürs Melden! Bitte keine persönlichen Daten (IP-Adressen, Standorte, Passwörter, Tokens) in Logs oder Screenshots posten.
+  - type: textarea
+    id: beschreibung
+    attributes:
+      label: Was passiert?
+      description: Was hast du gemacht, was hast du erwartet, was ist stattdessen passiert?
+    validations:
+      required: true
+  - type: dropdown
+    id: funktion
+    attributes:
+      label: Betroffene Funktion
+      multiple: true
+      options:
+        - Installation / Board freischalten
+        - Hauptgerät / Tankeingänge (Pull-ups)
+        - Relais & Eingänge
+        - Tank
+        - 1-Wire
+        - Victron VE.Direct
+        - Nivellierung
+        - Dashboard-Karten
+        - Sonstiges
+    validations:
+      required: true
+  - type: input
+    id: version_integration
+    attributes:
+      label: Version von VAN PI CORE
+      description: Einstellungen → Geräte & Dienste → VAN PI CORE
+      placeholder: z. B. 0.2.2
+    validations:
+      required: true
+  - type: input
+    id: version_ha
+    attributes:
+      label: Version von Home Assistant und Home Assistant OS
+      description: Einstellungen → Info
+      placeholder: z. B. Core 2026.11.2, OS 17.0
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware
+      placeholder: z. B. Raspberry Pi 4 (4 GB), VAN PI CORE, SmartShunt an UART5
+  - type: textarea
+    id: logs
+    attributes:
+      label: Protokoll
+      description: Einstellungen → System → Protokolle, nach „vanpi_core“ filtern. Für mehr Details Debug-Logging aktivieren (siehe docs/einrichtung.md).
+      render: text
+  - type: textarea
+    id: diagnose
+    attributes:
+      label: Weitere Infos / Screenshots

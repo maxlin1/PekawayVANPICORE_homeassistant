@@ -1,0 +1,20 @@
+name: Wunsch / Idee
+description: Vorschlag für eine neue Funktion oder Verbesserung
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: wunsch
+    attributes:
+      label: Was wünschst du dir?
+      description: Beschreibe das Problem oder den Anwendungsfall, nicht nur die Lösung.
+    validations:
+      required: true
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Betroffene Hardware
+      description: z. B. weiteres Victron-Gerät, anderer Tankgeber, zusätzlicher Sensor
+  - type: textarea
+    id: sonstiges
+    attributes:
+      label: Weitere Infos

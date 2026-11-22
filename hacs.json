@@ -1,15 +1,7 @@
 {
-    "name": "PekawayVANPICORE Component",
-    "content_in_root": false,
-    "render_readme": true,
-    "image": "images/assets.png",
-    "domains": [
-    "ads_waterlevel",
-    "mcp23017",
-    "mpu650",
-    "onewire_sysbus",
-    "smartshunt",
-    "victron_component"
-  ],
+  "name": "VAN PI CORE",
+  "content_in_root": false,
+  "render_readme": true,
+  "homeassistant": "2026.2.0",
   "country": "DE"
 }

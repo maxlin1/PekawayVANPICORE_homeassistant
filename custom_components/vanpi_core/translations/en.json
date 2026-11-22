@@ -1,0 +1,389 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up VAN PI CORE",
+        "description": "Basic board settings. Set up the functions (leveling, relays, tanks, 1-Wire, Victron) afterwards as separate entries below.",
+        "data": {
+          "pair_12": "Tank input 1 + 2",
+          "pair_34": "Tank input 3 + 4"
+        },
+        "data_description": {
+          "pair_12": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on).",
+          "pair_34": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on)."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "VAN PI CORE is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "VAN PI CORE",
+        "description": "Basic board settings. Set up the functions (leveling, relays, tanks, 1-Wire, Victron) afterwards as separate entries below.",
+        "data": {
+          "pair_12": "Tank input 1 + 2",
+          "pair_34": "Tank input 3 + 4"
+        },
+        "data_description": {
+          "pair_12": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on).",
+          "pair_34": "Voltage: sender with its own output voltage, e.g. capacitive Votronic probe or rod probe with resistor board (pull-up off). Resistive: float/lever sender to ground (pull-up on)."
+        }
+      }
+    }
+  },
+  "selector": {
+    "source": {
+      "options": {
+        "mpu6050": "MPU6050 on the board",
+        "entities": "Other entities (e.g. RuuviTag)"
+      }
+    },
+    "forward": {
+      "options": {
+        "drive": "From drive calibration",
+        "+x": "+X (printed X arrow)",
+        "-x": "-X",
+        "+y": "+Y (printed Y arrow)",
+        "-y": "-Y",
+        "+z": "+Z (out of the chip)",
+        "-z": "-Z"
+      }
+    },
+    "tank_mode": {
+      "options": {
+        "voltage": "Voltage / capacitive sender (pull-up off)",
+        "resistive": "Resistive sender (47 kΩ pull-up on)"
+      }
+    },
+    "victron_type": {
+      "options": {
+        "shunt": "SmartShunt / BMV",
+        "mppt": "MPPT solar charger"
+      }
+    },
+    "head_direction": {
+      "options": {
+        "none": "No preference",
+        "front": "Front (cab)",
+        "rear": "Rear (back door)",
+        "left": "Left (driver side)",
+        "right": "Right (sliding door)"
+      }
+    }
+  },
+  "entity": {
+    "switch": {
+      "active": {
+        "name": "Active"
+      }
+    },
+    "binary_sensor": {
+      "level": {
+        "name": "Level"
+      }
+    },
+    "button": {
+      "zero": {
+        "name": "Save as level"
+      },
+      "drive_start": {
+        "name": "Start drive calibration"
+      },
+      "drive_stop": {
+        "name": "Finish drive calibration"
+      },
+      "drive_cancel": {
+        "name": "Cancel drive calibration"
+      },
+      "reset_calibration": {
+        "name": "Reset calibration"
+      }
+    },
+    "sensor": {
+      "pitch": {
+        "name": "Pitch"
+      },
+      "roll": {
+        "name": "Roll"
+      },
+      "lift_vl": {
+        "name": "Lift front left"
+      },
+      "lift_vr": {
+        "name": "Lift front right"
+      },
+      "lift_hl": {
+        "name": "Lift rear left"
+      },
+      "lift_hr": {
+        "name": "Lift rear right"
+      },
+      "blocks_vl": {
+        "name": "Blocks front left"
+      },
+      "blocks_vr": {
+        "name": "Blocks front right"
+      },
+      "blocks_hl": {
+        "name": "Blocks rear left"
+      },
+      "blocks_hr": {
+        "name": "Blocks rear right"
+      },
+      "recommendation": {
+        "name": "Block recommendation"
+      },
+      "residual": {
+        "name": "Residual tilt"
+      },
+      "status": {
+        "name": "Status"
+      }
+    }
+  },
+  "device": {
+    "leveling": {
+      "name": "Leveling"
+    }
+  },
+  "config_subentries": {
+    "leveling": {
+      "entry_type": "Leveling",
+      "initiate_flow": {
+        "user": "Set up leveling",
+        "reconfigure": "Change leveling"
+      },
+      "step": {
+        "user": {
+          "title": "Set up leveling",
+          "description": "Where should the tilt values come from?",
+          "data": {
+            "source": "Tilt sensor"
+          }
+        },
+        "mpu6050": {
+          "title": "MPU6050",
+          "description": "On the VAN PI CORE the MPU6050 is usually at address 0x69 on I2C bus 1.",
+          "data": {
+            "i2c_bus": "I2C-Bus",
+            "mpu_address": "I2C address"
+          }
+        },
+        "entities": {
+          "title": "Acceleration entities",
+          "description": "Three sensors with acceleration X, Y and Z, e.g. from a RuuviTag. Unit g, mg or m/s².",
+          "data": {
+            "entity_x": "Acceleration X",
+            "entity_y": "Acceleration Y",
+            "entity_z": "Acceleration Z"
+          }
+        },
+        "vehicle": {
+          "title": "Vehicle and blocks",
+          "description": "Everything can be changed later via the gear icon of the leveling entry. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/<file>.",
+          "data": {
+            "forward": "Board forward direction",
+            "wheelbase": "Wheelbase",
+            "track": "Track width",
+            "block_height": "Height of one block",
+            "stacks": "Number of stacks (wheels that can get blocks)",
+            "blocks_per_stack": "Blocks per stack",
+            "tolerance": "Considered level up to",
+            "air_suspension": "Air suspension on rear axle",
+            "air_up": "Air suspension: max. raise",
+            "air_down": "Air suspension: max. lower",
+            "head_direction": "Sleeping direction (head points to)"
+          },
+          "data_description": {
+            "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
+            "wheelbase": "Distance front axle to rear axle",
+            "track": "Distance left to right wheel",
+            "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps",
+            "air_suspension": "Left and right adjustable separately. The recommendation then also says how much each side should go up or down.",
+            "air_up": "Per side, from normal ride height",
+            "air_down": "Per side, from normal ride height",
+            "block_height": "Height of one step or layer of the ramp",
+            "head_direction": "If the van cannot be levelled completely, this only chooses between variants that are at most 0.2° less level than the best one; the one with the head higher wins. Level (0.0°) always comes first."
+          }
+        },
+        "reconfigure": {
+          "title": "Vehicle and blocks",
+          "description": "Quick guide: 1) Forward direction: pick the board axis that points to the front, or 'From drive calibration'. 2) Park on truly level ground and press 'Save as level' (can be repeated anytime, only changes the level reference). 3) Drive calibration (only needed for 'From drive calibration'): press start, wait 2 s, accelerate straight 1 to 3 times and brake to a full stop, then press stop. The switch 'Active' is not needed for calibrating. Full guide: link 'Visit' on the device page. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/<file>. Safety: only perform the drive calibration on a quiet, straight and clear stretch (e.g. an empty car park, at least 50 m). Read all steps beforehand. Do not look at the display while driving and obey traffic rules. Use at your own risk.",
+          "data": {
+            "forward": "Board forward direction",
+            "wheelbase": "Wheelbase",
+            "track": "Track width",
+            "block_height": "Height of one block",
+            "stacks": "Number of stacks (wheels that can get blocks)",
+            "blocks_per_stack": "Blocks per stack",
+            "tolerance": "Considered level up to",
+            "air_suspension": "Air suspension on rear axle",
+            "air_up": "Air suspension: max. raise",
+            "air_down": "Air suspension: max. lower",
+            "head_direction": "Sleeping direction (head points to)"
+          },
+          "data_description": {
+            "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
+            "wheelbase": "Distance front axle to rear axle",
+            "track": "Distance left to right wheel",
+            "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps",
+            "air_suspension": "Left and right adjustable separately. The recommendation then also says how much each side should go up or down.",
+            "air_up": "Per side, from normal ride height",
+            "air_down": "Per side, from normal ride height",
+            "block_height": "Height of one step or layer of the ramp",
+            "head_direction": "If the van cannot be levelled completely, this only chooses between variants that are at most 0.2° less level than the best one; the one with the head higher wins. Level (0.0°) always comes first."
+          }
+        }
+      },
+      "error": {
+        "mpu_not_found": "No MPU6050 found. Is I2C enabled? Is the address correct?"
+      },
+      "abort": {
+        "already_configured": "Leveling is already set up. Change it via the gear icon of the leveling entry.",
+        "reconfigure_successful": "Saved."
+      }
+    },
+    "io": {
+      "entry_type": "Relays & inputs (MCP23017)",
+      "initiate_flow": {
+        "user": "Add relays & inputs",
+        "reconfigure": "Change relays & inputs"
+      },
+      "step": {
+        "user": {
+          "title": "Relays & inputs",
+          "description": "On the VAN PI CORE the MCP23017 sits at 0x20 on I2C bus 1: GPA0-7 = inputs 1-8, GPB0-7 = relays 1-8.",
+          "data": {
+            "name": "Name",
+            "i2c_bus": "I2C bus",
+            "address": "I2C address",
+            "invert_inputs": "Invert inputs",
+            "invert_relays": "Invert relays",
+            "keep_state": "Keep relay state on restart"
+          },
+          "data_description": {
+            "invert_inputs": "On means input pulled to ground (default for the VAN PI CORE).",
+            "keep_state": "On: relays keep their state when Home Assistant restarts. Off: all relays are switched off on start."
+          }
+        },
+        "names": {
+          "title": "Names",
+          "description": "Names for relays and inputs. Names from the old mcp23017 component are pre-filled. Empty = 'Relais n' / 'Eingang n'.",
+          "data": {
+            "relay_1": "Relay 1",
+            "relay_2": "Relay 2",
+            "relay_3": "Relay 3",
+            "relay_4": "Relay 4",
+            "relay_5": "Relay 5",
+            "relay_6": "Relay 6",
+            "relay_7": "Relay 7",
+            "relay_8": "Relay 8",
+            "input_1": "Input 1",
+            "input_2": "Input 2",
+            "input_3": "Input 3",
+            "input_4": "Input 4",
+            "input_5": "Input 5",
+            "input_6": "Input 6",
+            "input_7": "Input 7",
+            "input_8": "Input 8"
+          }
+        }
+      },
+      "error": {
+        "not_found": "No MCP23017 answers at this address.",
+        "already_configured": "This address is already set up."
+      },
+      "abort": {
+        "reconfigure_successful": "Saved."
+      }
+    },
+    "tank": {
+      "entry_type": "Tank (ADS1115)",
+      "initiate_flow": {
+        "user": "Add tank",
+        "reconfigure": "Change tank"
+      },
+      "step": {
+        "user": {
+          "title": "Tank",
+          "description": "Tank input 1-4 of the VAN PI CORE. The sensor type (voltage or resistive) is set per channel pair 1+2 and 3+4 in the \"Tank inputs\" entry.",
+          "data": {
+            "name": "Name",
+            "channel": "Board channel",
+            "unit": "Level unit",
+            "curve": "Curve (volts : level)",
+            "divider_ratio": "Voltage divider factor",
+            "scan_interval": "Read every",
+            "address": "ADS1115 address"
+          },
+          "data_description": {
+            "curve": "Points as \"voltage in volts : level\", separated by commas. Example 100 L tank: 0:0, 0.49:50, 1.6:100 means 0 V = 0 L, 0.49 V = 50 L, 1.6 V = 100 L. Values in between are interpolated linearly; below the first and above the last point that point's level applies. The tank's \"Voltage\" sensor shows the current voltage.",
+            "divider_ratio": "1 if the sensor is connected directly."
+          }
+        }
+      },
+      "error": {
+        "invalid_curve": "Curve not readable. Example: 0:0, 1.6:100",
+        "not_found": "No ADS1115 answers at this address.",
+        "already_configured": "This channel is already set up."
+      },
+      "abort": {
+        "reconfigure_successful": "Saved."
+      }
+    },
+    "onewire": {
+      "entry_type": "1-Wire temperature sensors",
+      "initiate_flow": {
+        "user": "Add 1-Wire",
+        "reconfigure": "Change 1-Wire"
+      },
+      "step": {
+        "user": {
+          "title": "1-Wire",
+          "description": "All temperature sensors on the 1-Wire bus are found automatically. Names from the old onewire_sysbus component are taken over.",
+          "data": {
+            "name": "Name",
+            "mount_dir": "Sysfs directory",
+            "scan_interval": "Read every"
+          }
+        }
+      },
+      "error": {
+        "invalid_path": "Directory not found. Is dtoverlay=w1-gpio set in config.txt?"
+      },
+      "abort": {
+        "already_configured": "1-Wire is already set up.",
+        "reconfigure_successful": "Saved."
+      }
+    },
+    "victron": {
+      "entry_type": "Victron VE.Direct",
+      "initiate_flow": {
+        "user": "Add Victron device",
+        "reconfigure": "Change Victron device"
+      },
+      "step": {
+        "user": {
+          "title": "Victron VE.Direct",
+          "description": "VAN PI CORE: UART4 (/dev/ttyAMA4) = MPPT, UART5 (/dev/ttyAMA5) = SmartShunt. Important: remove the old YAML entry for the same port first, two readers on one port disturb each other.",
+          "data": {
+            "device_type": "Device type",
+            "port": "Serial port",
+            "name": "Name",
+            "scan_interval": "Update at most every"
+          }
+        }
+      },
+      "error": {
+        "port_not_found": "Port does not exist.",
+        "already_configured": "This port is already set up."
+      },
+      "abort": {
+        "reconfigure_successful": "Saved."
+      }
+    }
+  }
+}
