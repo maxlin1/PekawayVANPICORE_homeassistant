@@ -18,12 +18,20 @@ from homeassistant.const import (
     UnitOfElectricPotential,
     UnitOfVolume,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import Entity
 
 from .ads1115 import ADS1115
 from .base import BoardModule, ModuleEntity
 from .const import (
     ADS_DEFAULT_ADDRESS,
+    BOARD_PULLUP_OHM,
+    BOARD_VREF,
+    CONF_PAIR_12,
+    CONF_PAIR_34,
+    MODE_VOLTAGE,
+    SUBENTRY_TANK,
+    SUBENTRY_TANK_INPUTS,
     CONF_ADDRESS,
     CONF_CHANNEL,
     CONF_CURVE,
@@ -40,9 +48,59 @@ from .const import (
     UNIT_LITERS,
 )
 from .curve import interpolate, parse_curve
-from .gpio import GpioError, set_pullup
+from .gpio import GpioError, pair_of, set_pullup
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def pair_modes(entry: ConfigEntry) -> dict[int, str]:
+    """Sensortyp je Kanalpaar {1: ..., 3: ...}.
+
+    Quelle ist der Eintrag "Tankeingänge". Fehlt er, gilt der alte Sensortyp
+    eines Tanks im Paar (Einrichtungen vor 0.1.8), sonst Spannung.
+    """
+    modes = {1: MODE_VOLTAGE, 3: MODE_VOLTAGE}
+    subs = list(entry.subentries.values())
+    inputs = next((s for s in subs if s.subentry_type == SUBENTRY_TANK_INPUTS), None)
+    if inputs is not None:
+        modes[1] = inputs.data.get(CONF_PAIR_12, MODE_VOLTAGE)
+        modes[3] = inputs.data.get(CONF_PAIR_34, MODE_VOLTAGE)
+        return modes
+    for sub in subs:
+        if sub.subentry_type == SUBENTRY_TANK and sub.data.get(CONF_MODE) == MODE_RESISTIVE:
+            modes[pair_of(int(sub.data[CONF_CHANNEL]))[0]] = MODE_RESISTIVE
+    return modes
+
+
+def pair_mode(entry: ConfigEntry, channel: int) -> str:
+    return pair_modes(entry)[pair_of(channel)[0]]
+
+
+async def async_apply_pullup(hass, channel: int, on: bool, title: str) -> str | None:
+    """Pull-up eines Paars setzen. Gibt den Fehlertext zurück oder None."""
+    try:
+        await hass.async_add_executor_job(set_pullup, channel, on)
+    except GpioError as err:
+        _LOGGER.warning(
+            "%s: Pull-up für Tankeingang %s+%s konnte nicht %sgeschaltet werden (%s). "
+            "Messwerte können verfälscht sein.",
+            title, *pair_of(channel), "ein" if on else "aus", err,
+        )
+        return str(err)
+    return None
+
+
+class TankInputsModule(BoardModule):
+    """Eintrag "Tankeingänge": setzt beim Start die Pull-ups beider Kanalpaare."""
+
+    model = "VAN PI CORE Tankeingänge"
+
+    async def async_start(self) -> None:
+        modes = pair_modes(self.entry)
+        for channel in (1, 3):
+            await async_apply_pullup(
+                self.hass, channel, modes[channel] == MODE_RESISTIVE, self.subentry.title
+            )
 
 
 class TankModule(BoardModule):
@@ -58,9 +116,9 @@ class TankModule(BoardModule):
         self.channel = int(self.data[CONF_CHANNEL])  # 1-4 wie auf dem Board
         self.curve = parse_curve(self.data.get(CONF_CURVE) or TANK_DEFAULT_CURVE)
         self.divider = float(self.data.get(CONF_DIVIDER, 1.0)) or 1.0
-        self.resistive = self.data.get(CONF_MODE) == MODE_RESISTIVE
-        self.pullup = float(self.data.get(CONF_PULLUP, 47000))
-        self.vref = float(self.data.get(CONF_VREF, 3.3))
+        self.resistive = pair_mode(self.entry, self.channel) == MODE_RESISTIVE
+        self.pullup = float(self.data.get(CONF_PULLUP, BOARD_PULLUP_OHM))
+        self.vref = float(self.data.get(CONF_VREF, BOARD_VREF))
         self.interval = max(1, int(self.data.get(CONF_SCAN_INTERVAL, TANK_DEFAULT_INTERVAL)))
         self.voltage: float | None = None
         self.pullup_on: bool | None = None  # tatsächlich gesetzter Zustand
@@ -97,22 +155,10 @@ class TankModule(BoardModule):
     async def _apply_pullup(self) -> None:
         """Pull-up des Kanalpaars passend zum Sensortyp schalten."""
         want = self.resistive
-        try:
-            pin = await self.hass.async_add_executor_job(set_pullup, self.channel, want)
-        except GpioError as err:
-            if str(err) != self.pullup_error:
-                _LOGGER.warning(
-                    "%s: Pull-up konnte nicht %sgeschaltet werden (%s). "
-                    "Messwerte können verfälscht sein.",
-                    self.subentry.title, "ein" if want else "aus", err,
-                )
-            self.pullup_error = str(err)
-            self.pullup_on = None
-        else:
-            if self.pullup_on is None:
-                _LOGGER.debug("%s: Pull-up %s (sysfs %s)", self.subentry.title, want, pin)
-            self.pullup_error = None
-            self.pullup_on = want
+        self.pullup_error = await async_apply_pullup(
+            self.hass, self.channel, want, self.subentry.title
+        )
+        self.pullup_on = None if self.pullup_error else want
 
     async def _run(self) -> None:
         # Pull-up einmal beim Start setzen (HA-Start oder geänderter Tank).

@@ -149,9 +149,9 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     entry = await setup_entry(hass)
     result = await add_subentry(
         hass, entry, "tank",
-        [{"name": "Abwasser", "channel": "1", "mode": "voltage", "unit": "L",
-          "curve": "0:0, 0.49:50, 1.6:100", "divider_ratio": 1, "r_pullup_ohm": 47000,
-          "v_ref": 3.3, "scan_interval": 5, "address": "0x48"}],
+        [{"name": "Abwasser", "channel": "1", "unit": "L",
+          "curve": "0:0, 0.49:50, 1.6:100", "divider_ratio": 1,
+          "scan_interval": 5, "address": "0x48"}],
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await asyncio.sleep(0.05)
@@ -169,8 +169,8 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     )
     bad = await hass.config_entries.subentries.async_configure(
         bad["flow_id"],
-        {"name": "x", "channel": "2", "mode": "voltage", "unit": "L", "curve": "kaputt",
-         "divider_ratio": 1, "r_pullup_ohm": 47000, "v_ref": 3.3, "scan_interval": 5,
+        {"name": "x", "channel": "2", "unit": "L", "curve": "kaputt",
+         "divider_ratio": 1, "scan_interval": 5,
          "address": "0x48"},
     )
     assert bad["errors"] == {"curve": "invalid_curve"}
@@ -183,9 +183,9 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     )
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        {"name": "Abwasser", "channel": "1", "mode": "resistive", "unit": "%",
-         "curve": "0:0, 0.98:100", "divider_ratio": 1, "r_pullup_ohm": 47000,
-         "v_ref": 3.3, "scan_interval": 5, "address": "0x48"},
+        {"name": "Abwasser", "channel": "1", "unit": "%",
+         "curve": "0:0, 0.98:100", "divider_ratio": 1,
+         "scan_interval": 5, "address": "0x48"},
     )
     assert result["reason"] == "reconfigure_successful"
     await asyncio.sleep(0.05)
@@ -193,26 +193,30 @@ async def test_tank_module_and_reconfigure(hass: HomeAssistant, hardware) -> Non
     state = hass.states.get(level)
     assert float(state.state) == pytest.approx(50, abs=0.5)
     assert state.attributes["unit_of_measurement"] == "%"
-    assert hass.states.get("sensor.abwasser_widerstand") is not None
-    assert hardware[1].pullups[-1] == (1, True)
+    assert hass.states.get("sensor.abwasser_widerstand") is None
 
-    # Kanal 2 teilt sich den Pull-up mit Kanal 1: anderer Sensortyp geht nicht
-    pair = await hass.config_entries.subentries.async_init(
-        (entry.entry_id, "tank"), context={"source": config_entries.SOURCE_USER}
+    # Sensortyp je Kanalpaar über "Tankeingänge": 1+2 auf Widerstandsgeber
+    result = await add_subentry(
+        hass, entry, "tank_inputs", [{"pair_12": "resistive", "pair_34": "voltage"}]
     )
-    pair = await hass.config_entries.subentries.async_configure(
-        pair["flow_id"],
-        {"name": "Frisch", "channel": "2", "mode": "voltage", "unit": "L", "curve": "0:0, 2.4:100",
-         "divider_ratio": 1, "r_pullup_ohm": 47000, "v_ref": 3.3, "scan_interval": 5,
-         "address": "0x48"},
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    await asyncio.sleep(0.05)
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.abwasser_widerstand") is not None
+    assert (1, True) in hardware[1].pullups and (3, False) in hardware[1].pullups
+    assert hass.states.get("sensor.abwasser_spannung").attributes["pull_up"] == "an"
+
+    # nur ein Eintrag "Tankeingänge"
+    again = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, "tank_inputs"), context={"source": config_entries.SOURCE_USER}
     )
-    assert pair["errors"] == {"mode": "pair_conflict"}
+    assert again["type"] is FlowResultType.ABORT
 
     # Löschen entfernt die Entitäten
     hass.config_entries.async_remove_subentry(entry, subentry_id)
     await hass.async_block_till_done()
     assert hass.states.get(level) is None
-    assert not entry.runtime_data.modules.modules
+    assert subentry_id not in entry.runtime_data.modules.modules
     assert await hass.config_entries.async_unload(entry.entry_id)
 
 
@@ -311,9 +315,9 @@ async def test_modules_survive_restart(hass: HomeAssistant, hardware) -> None:
     entry = await setup_entry(hass)
     await add_subentry(
         hass, entry, "tank",
-        [{"name": "Frischwasser", "channel": "2", "mode": "voltage", "unit": "L",
-          "curve": "0:0, 2.5:100", "divider_ratio": 1, "r_pullup_ohm": 47000,
-          "v_ref": 3.3, "scan_interval": 5, "address": "0x48"}],
+        [{"name": "Frischwasser", "channel": "2", "unit": "L",
+          "curve": "0:0, 2.5:100", "divider_ratio": 1,
+          "scan_interval": 5, "address": "0x48"}],
     )
     assert await hass.config_entries.async_reload(entry.entry_id)
     await asyncio.sleep(0.05)

@@ -17,10 +17,16 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .base import BoardModule
-from .const import SUBENTRY_IO, SUBENTRY_ONEWIRE, SUBENTRY_TANK, SUBENTRY_VICTRON
+from .const import (
+    SUBENTRY_IO,
+    SUBENTRY_ONEWIRE,
+    SUBENTRY_TANK,
+    SUBENTRY_TANK_INPUTS,
+    SUBENTRY_VICTRON,
+)
 from .io import IoModule
 from .onewire import OneWireModule
-from .tanks import TankModule
+from .tanks import TankInputsModule, TankModule, pair_modes
 from .victron import VictronModule
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,11 +36,16 @@ MODULE_TYPES: dict[str, type[BoardModule]] = {
     SUBENTRY_TANK: TankModule,
     SUBENTRY_ONEWIRE: OneWireModule,
     SUBENTRY_VICTRON: VictronModule,
+    SUBENTRY_TANK_INPUTS: TankInputsModule,
 }
 
 
-def _fingerprint(subentry: ConfigSubentry) -> tuple:
-    return (subentry.title, repr(sorted(subentry.data.items())))
+def _fingerprint(entry: ConfigEntry, subentry: ConfigSubentry) -> tuple:
+    extra: tuple = ()
+    if subentry.subentry_type in (SUBENTRY_TANK, SUBENTRY_TANK_INPUTS):
+        # Tanks hängen am Sensortyp ihres Kanalpaars
+        extra = tuple(sorted(pair_modes(entry).items()))
+    return (subentry.title, repr(sorted(subentry.data.items())), extra)
 
 
 class ModuleManager:
@@ -88,7 +99,7 @@ class ModuleManager:
             return
         module.add_entities_later = self._later_adder(subentry.subentry_id)
         self.modules[subentry.subentry_id] = module
-        self._fingerprints[subentry.subentry_id] = _fingerprint(subentry)
+        self._fingerprints[subentry.subentry_id] = _fingerprint(self.entry, subentry)
         await module.async_start()
         for platform in self._adders:
             self._add(subentry.subentry_id, platform, module.create_entities().get(platform, []))
@@ -114,6 +125,6 @@ class ModuleManager:
         for subentry_id, subentry in current.items():
             if subentry_id not in self.modules:
                 await self._async_start(subentry)
-            elif self._fingerprints.get(subentry_id) != _fingerprint(subentry):
+            elif self._fingerprints.get(subentry_id) != _fingerprint(self.entry, subentry):
                 await self._async_stop(subentry_id, remove_entities=True)
                 await self._async_start(subentry)

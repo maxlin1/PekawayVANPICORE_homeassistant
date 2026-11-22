@@ -245,32 +245,26 @@
       "step": {
         "user": {
           "title": "Tank",
-          "description": "Tankeingang 1-4 des VAN PI CORE. Der Sensortyp schaltet den Pull-up am Board, und zwar immer für das Kanalpaar 1+2 bzw. 3+4. Beide Kanäle eines Paars brauchen deshalb denselben Sensortyp. Die Kennlinie rechnet die gemessene Spannung in den Füllstand um.",
+          "description": "Tankeingang 1-4 des VAN PI CORE. Den Sensortyp (Spannung oder Widerstandsgeber) stellst du im Eintrag „Tankeingänge“ ein, je Kanalpaar 1+2 und 3+4.",
           "data": {
             "name": "Name",
             "channel": "Board-Kanal",
-            "mode": "Sensortyp",
-            "unit": "Einheit",
-            "curve": "Kennlinie Spannung:Füllstand",
+            "unit": "Einheit des Füllstands",
+            "curve": "Kennlinie (Volt : Füllstand)",
             "divider_ratio": "Faktor Spannungsteiler",
-            "r_pullup_ohm": "Pull-up-Widerstand",
-            "v_ref": "Referenzspannung",
             "scan_interval": "Lesen alle",
             "address": "ADS1115-Adresse"
           },
           "data_description": {
-            "curve": "Paare Spannung:Füllstand mit Komma getrennt, z. B. 0:0, 0.49:50, 1.6:100. Unter dem ersten / über dem letzten Punkt gilt der Endwert.",
-            "divider_ratio": "1, wenn der Geber direkt angeschlossen ist.",
-            "r_pullup_ohm": "Nur für Widerstandsgeber (ca. 47 kΩ auf dem Board).",
-            "mode": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde (ca. 0-2,4 V) oder Stabsonde mit Widerstandsplatine. Widerstandsgeber: klassischer Schwimmer-/Hebelgeber gegen Masse."
+            "curve": "Messpunkte als „Spannung in Volt : Füllstand“, mehrere Punkte mit Komma getrennt, Dezimalpunkt oder -komma. Beispiel 100-L-Tank: 0:0, 0.49:50, 1.6:100 heißt 0 V = 0 L, 0,49 V = 50 L, 1,6 V = 100 L. Dazwischen wird linear gerechnet, unter dem ersten und über dem letzten Punkt gilt dessen Füllstand. Die aktuelle Spannung zeigt der Sensor „Spannung“ des Tanks.",
+            "divider_ratio": "1, wenn der Geber direkt angeschlossen ist."
           }
         }
       },
       "error": {
         "invalid_curve": "Kennlinie nicht lesbar. Beispiel: 0:0, 1.6:100",
         "not_found": "Unter dieser Adresse antwortet kein ADS1115.",
-        "already_configured": "Dieser Kanal ist schon eingerichtet.",
-        "pair_conflict": "Kanal 1+2 bzw. 3+4 teilen sich einen Pull-up. Der andere Kanal dieses Paars nutzt schon den anderen Sensortyp."
+        "already_configured": "Dieser Kanal ist schon eingerichtet."
       },
       "abort": {
         "reconfigure_successful": "Gespeichert."
@@ -324,6 +318,31 @@
         "already_configured": "Diese Schnittstelle ist schon eingerichtet."
       },
       "abort": {
+        "reconfigure_successful": "Gespeichert."
+      }
+    },
+    "tank_inputs": {
+      "entry_type": "Tankeingänge (Sensortyp)",
+      "initiate_flow": {
+        "user": "Tankeingänge einrichten",
+        "reconfigure": "Tankeingänge ändern"
+      },
+      "step": {
+        "user": {
+          "title": "Tankeingänge",
+          "description": "Das Board schaltet den 47-kΩ-Pull-up immer für zwei Eingänge gemeinsam. Wähle deshalb den Sensortyp je Kanalpaar. Er wird bei jedem Start von Home Assistant gesetzt.",
+          "data": {
+            "pair_12": "Tankeingang 1 + 2",
+            "pair_34": "Tankeingang 3 + 4"
+          },
+          "data_description": {
+            "pair_12": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde oder Stabsonde mit Widerstandsplatine (Pull-up aus). Widerstandsgeber: Schwimmer-/Hebelgeber gegen Masse (Pull-up an).",
+            "pair_34": "Spannung: Geber mit eigener Ausgangsspannung, z. B. kapazitive Votronic-Sonde oder Stabsonde mit Widerstandsplatine (Pull-up aus). Widerstandsgeber: Schwimmer-/Hebelgeber gegen Masse (Pull-up an)."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Die Tankeingänge sind schon eingerichtet. Ändern über das Zahnrad.",
         "reconfigure_successful": "Gespeichert."
       }
     }

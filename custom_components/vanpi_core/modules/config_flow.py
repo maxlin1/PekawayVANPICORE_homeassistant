@@ -25,14 +25,13 @@ from .const import (
     CONF_INVERT_INPUTS,
     CONF_INVERT_RELAYS,
     CONF_KEEP_STATE,
-    CONF_MODE,
     CONF_MOUNT_DIR,
     CONF_NAME,
     CONF_PORT,
-    CONF_PULLUP,
+    CONF_PAIR_12,
+    CONF_PAIR_34,
     CONF_SCAN_INTERVAL,
     CONF_UNIT,
-    CONF_VREF,
     DEVICE_MPPT,
     DEVICE_SHUNT,
     MCP_DEFAULT_ADDRESS,
@@ -43,6 +42,7 @@ from .const import (
     SUBENTRY_IO,
     SUBENTRY_ONEWIRE,
     SUBENTRY_TANK,
+    SUBENTRY_TANK_INPUTS,
     SUBENTRY_VICTRON,
     TANK_DEFAULT_CURVE,
     TANK_DEFAULT_INTERVAL,
@@ -53,9 +53,9 @@ from .const import (
     VICTRON_DEFAULT_INTERVAL,
 )
 from .curve import CurveError, format_curve, parse_curve
-from .gpio import pair_of
 from .i2c import probe
 from .io import input_key, relay_key
+from .tanks import pair_modes
 
 MCP_ADDRESSES = [f"0x{a:02x}" for a in range(0x20, 0x28)]
 ADS_ADDRESSES = [f"0x{a:02x}" for a in range(0x48, 0x4C)]
@@ -222,14 +222,6 @@ class TankSubentryFlow(_BaseSubentryFlow):
                     for o in self._others()
                 ):
                     errors[CONF_CHANNEL] = "already_configured"
-                elif address == ADS_DEFAULT_ADDRESS and any(
-                    int(o[CONF_ADDRESS]) == address
-                    and int(o[CONF_CHANNEL]) in pair_of(channel)
-                    and o.get(CONF_MODE, MODE_VOLTAGE) != user_input[CONF_MODE]
-                    for o in self._others()
-                ):
-                    # ein Pull-up-Schalter für Kanal 1+2 bzw. 3+4
-                    errors[CONF_MODE] = "pair_conflict"
                 elif not await self.hass.async_add_executor_job(probe, 1, address):
                     errors["base"] = "not_found"
             if not errors:
@@ -237,12 +229,9 @@ class TankSubentryFlow(_BaseSubentryFlow):
                     CONF_I2C_BUS: 1,
                     CONF_ADDRESS: address,
                     CONF_CHANNEL: channel,
-                    CONF_MODE: user_input[CONF_MODE],
                     CONF_UNIT: user_input[CONF_UNIT],
                     CONF_CURVE: curve,
                     CONF_DIVIDER: float(user_input[CONF_DIVIDER]),
-                    CONF_PULLUP: float(user_input[CONF_PULLUP]),
-                    CONF_VREF: float(user_input[CONF_VREF]),
                     CONF_SCAN_INTERVAL: int(user_input[CONF_SCAN_INTERVAL]),
                 }
                 title = user_input.get(CONF_NAME, "").strip() or f"Tank {channel}"
@@ -253,12 +242,9 @@ class TankSubentryFlow(_BaseSubentryFlow):
             CONF_NAME: "",
             CONF_ADDRESS: ADS_DEFAULT_ADDRESS,
             CONF_CHANNEL: free,
-            CONF_MODE: MODE_VOLTAGE,
             CONF_UNIT: UNIT_LITERS,
             CONF_CURVE: TANK_DEFAULT_CURVE,
             CONF_DIVIDER: 1.0,
-            CONF_PULLUP: 47000,
-            CONF_VREF: 3.3,
             CONF_SCAN_INTERVAL: TANK_DEFAULT_INTERVAL,
             **current,
         }
@@ -271,16 +257,11 @@ class TankSubentryFlow(_BaseSubentryFlow):
                 vol.Required(CONF_CHANNEL, default=str(v[CONF_CHANNEL])): _select(
                     ["1", "2", "3", "4"]
                 ),
-                vol.Required(CONF_MODE, default=v[CONF_MODE]): _select(
-                    [MODE_VOLTAGE, MODE_RESISTIVE], "tank_mode"
-                ),
                 vol.Required(CONF_UNIT, default=v[CONF_UNIT]): _select([UNIT_LITERS, UNIT_PERCENT]),
                 vol.Required(CONF_CURVE, default=v[CONF_CURVE]): selector.TextSelector(
                     selector.TextSelectorConfig(multiline=True)
                 ),
                 vol.Required(CONF_DIVIDER, default=v[CONF_DIVIDER]): _number(0.1, 20, 0.001),
-                vol.Required(CONF_PULLUP, default=v[CONF_PULLUP]): _number(100, 1000000, 1, "Ω"),
-                vol.Required(CONF_VREF, default=v[CONF_VREF]): _number(1, 5, 0.01, "V"),
                 vol.Required(CONF_SCAN_INTERVAL, default=v[CONF_SCAN_INTERVAL]): _number(1, 300, 1, "s"),
                 vol.Required(CONF_ADDRESS, default=f"0x{int(v[CONF_ADDRESS]):02x}"): _select(
                     ADS_ADDRESSES
@@ -288,6 +269,34 @@ class TankSubentryFlow(_BaseSubentryFlow):
             }
         )
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
+
+
+# --- Tankeingänge (Sensortyp je Kanalpaar) ---------------------------------
+
+
+class TankInputsSubentryFlow(_BaseSubentryFlow):
+    subentry_type = SUBENTRY_TANK_INPUTS
+
+    async def async_step_user(self, user_input: dict[str, Any] | None = None):
+        if self.source != SOURCE_RECONFIGURE and self._others():
+            return self.async_abort(reason="already_configured")
+        if user_input is not None:
+            return self._finish(
+                "Tankeingänge",
+                {CONF_PAIR_12: user_input[CONF_PAIR_12], CONF_PAIR_34: user_input[CONF_PAIR_34]},
+            )
+        modes = pair_modes(self._get_entry())
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_PAIR_12, default=modes[1]): _select(
+                    [MODE_VOLTAGE, MODE_RESISTIVE], "tank_mode"
+                ),
+                vol.Required(CONF_PAIR_34, default=modes[3]): _select(
+                    [MODE_VOLTAGE, MODE_RESISTIVE], "tank_mode"
+                ),
+            }
+        )
+        return self.async_show_form(step_id="user", data_schema=schema)
 
 
 # --- 1-Wire ------------------------------------------------------------------
@@ -395,5 +404,6 @@ SUBENTRY_FLOWS: dict[str, type[ConfigSubentryFlow]] = {
     SUBENTRY_IO: IoSubentryFlow,
     SUBENTRY_TANK: TankSubentryFlow,
     SUBENTRY_ONEWIRE: OneWireSubentryFlow,
+    SUBENTRY_TANK_INPUTS: TankInputsSubentryFlow,
     SUBENTRY_VICTRON: VictronSubentryFlow,
 }

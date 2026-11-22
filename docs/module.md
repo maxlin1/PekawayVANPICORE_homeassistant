@@ -25,10 +25,17 @@ Die Nivellierung läuft dabei weiter.
 
 ## Tank (ADS1115)
 
-- Board-Kanal 1-4, Sensortyp Spannung oder Widerstandsgeber.
-- **Kennlinie** als Paare `Spannung:Füllstand`, z. B. für deinen Abwassertank
-  `0:0, 0.49:50, 0.6:60, 0.81:70, 1.12:80, 1.25:87, 1.33:90, 1.44:95, 1.6:100`.
-  Für 0-100 % einfach Einheit „%“ wählen.
+- Je Tank: Board-Kanal 1-4, Kennlinie, Einheit (L oder %).
+- **Kennlinie** als Punkte `Spannung in Volt : Füllstand`, mit Komma getrennt.
+  Beispiel 100-L-Tank: `0:0, 0.49:50, 1.6:100` heißt 0 V = 0 L, 0,49 V = 50 L,
+  1,6 V = 100 L. Dazwischen wird linear gerechnet. Die aktuelle Spannung zeigt
+  der Sensor „Spannung“ des Tanks. Ändern jederzeit über das Zahnrad am Tank.
+- **Tankeingänge (Sensortyp):** Das Board schaltet den 47-kΩ-Pull-up immer für
+  zwei Eingänge gemeinsam (GPIO19 für 1+2, GPIO16 für 3+4). Deshalb gibt es einen
+  eigenen Eintrag „Tankeingänge“ mit je einer Auswahl für 1+2 und 3+4:
+  *Spannung* (kapazitive Sonde, Stabsonde mit Platine; Pull-up aus) oder
+  *Widerstandsgeber* (Schwimmer gegen Masse; Pull-up an). Ohne diesen Eintrag
+  gilt *Spannung*. Gesetzt wird bei jedem Start von Home Assistant.
 - Jede Messung ist der Median aus 3 Einzelmessungen. Liest die alte Komponente
   gleichzeitig, werden vermischte Messungen erkannt und wiederholt.
 
