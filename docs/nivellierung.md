@@ -23,6 +23,9 @@ Beispiel Fiat Ducato L3 (5,99 m): Radstand 403,5 cm, Spurweite rund 180 cm (am b
 1. **Vorwärtsrichtung** festlegen (in den Einstellungen, Standard ist „Aus Fahrt-Kalibrierung“):
    - Board parallel zum Fahrzeug verbaut: die Achse wählen, die nach vorne zeigt (+X, −X, …).
    - Board schräg oder unbekannt: **„Aus Fahrt-Kalibrierung“** wählen und dann:
+
+     > ⚠️ **Sicherheit:** Die Fahrt-Kalibrierung nur auf einer verkehrsberuhigten, geraden und freien Strecke durchführen, z. B. auf einem leeren Parkplatz (mindestens 50 m, ohne Kurven, ohne Ausparken). Alle Schritte vorher in Ruhe lesen, dann starten. Während der Fahrt nicht auf Handy oder Display schauen und die StVO beachten. Nutzung auf eigene Gefahr.
+
      1. Auf gerader Strecke anhalten, **„Fahrt-Kalibrierung starten“** drücken, 2 Sekunden stehen bleiben.
      2. Zügig auf etwa 15–20 km/h anfahren, dann kräftig bis zum Stillstand bremsen. Nicht lenken, nicht rückwärts.
      3. Für ein genaueres Ergebnis Schritt 2 noch ein- bis zweimal wiederholen, **ohne** zwischendurch zu beenden.
@@ -92,4 +95,4 @@ image: /local/van_top.png   # optional
 
 Ohne `image` zeichnet die Karte einen schlichten Van. Für ein eigenes Foto ein Bild des eigenen Fahrzeugs von oben (Front zeigt nach oben, möglichst freigestellt, PNG) per Studio Code Server, Samba oder File Editor unter `/config/www/` ablegen, z. B. `/config/www/van_top.png`, und in der Karte als `/local/van_top.png` angeben. Nach dem ersten Anlegen von `/config/www` Home Assistant einmal neu starten.
 
-In der Draufsicht (picture-elements) einfach `sensor.ruuvitag_lift_*` und die Block-Templates durch `sensor.nivellierung_hubhohe_*` und `sensor.nivellierung_blocke_*` ersetzen, `input_boolean.leveling_aktiv` durch `switch.nivellierung_aktiv` und `binary_sensor.ruuvitag_van_level` durch `binary_sensor.nivellierung_eben` (Achtung: dort ist **an = eben**).
+Ein vollständiges Beispiel-Dashboard steht unter [beispiele/dashboard-nivellierung.yaml](beispiele/dashboard-nivellierung.yaml). Den Umstieg von RuuviTag-Vorlagen oder anderen Nivellier-Lösungen beschreibt [migration.md](migration.md).

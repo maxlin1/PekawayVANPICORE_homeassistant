@@ -188,7 +188,7 @@
             "air_down": "Air suspension: max. lower"
           },
           "data_description": {
-            "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
+            "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
             "wheelbase": "Distance front axle to rear axle",
             "track": "Distance left to right wheel",
             "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps",
@@ -200,7 +200,7 @@
         },
         "reconfigure": {
           "title": "Vehicle and blocks",
-          "description": "Quick guide: 1) Forward direction: pick the board axis that points to the front, or 'From drive calibration'. 2) Park on truly level ground and press 'Save as level' (can be repeated anytime, only changes the level reference). 3) Drive calibration (only needed for 'From drive calibration'): press start, wait 2 s, accelerate straight 1 to 3 times and brake to a full stop, then press stop. The switch 'Active' is not needed for calibrating. Full guide: link 'Visit' on the device page. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/<file>.",
+          "description": "Quick guide: 1) Forward direction: pick the board axis that points to the front, or 'From drive calibration'. 2) Park on truly level ground and press 'Save as level' (can be repeated anytime, only changes the level reference). 3) Drive calibration (only needed for 'From drive calibration'): press start, wait 2 s, accelerate straight 1 to 3 times and brake to a full stop, then press stop. The switch 'Active' is not needed for calibrating. Full guide: link 'Visit' on the device page. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/<file>. Safety: only perform the drive calibration on a quiet, straight and clear stretch (e.g. an empty car park, at least 50 m). Read all steps beforehand. Do not look at the display while driving and obey traffic rules. Use at your own risk.",
           "data": {
             "forward": "Board forward direction",
             "wheelbase": "Wheelbase",
@@ -214,7 +214,7 @@
             "air_down": "Air suspension: max. lower"
           },
           "data_description": {
-            "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
+            "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
             "wheelbase": "Distance front axle to rear axle",
             "track": "Distance left to right wheel",
             "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps",
