@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt. Format angelehnt an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
-## [Unveröffentlicht]
+## [2.0.0] - 2026-11-22
 
 Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bisherigen Einzel-Komponenten ersetzt.
 
@@ -14,6 +14,7 @@ Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bish
   Victron VE.Direct (MPPT, SmartShunt/BMV) je Port.
 - Nivellierung mit MPU6050 oder beliebigem X/Y/Z-Sensor: Neigung, Blockempfehlung je Rad, optional Luftfederung,
   Fahrt-Kalibrierung, Dashboard-Karten `vanpi-level-card` (Wasserwaage) und `vanpi-van-card` (Draufsicht).
+- Schlafrichtung: Keil-Empfehlung bevorzugt Varianten mit Kopf höher.
 - Neue Dokumentation: Installation, Einrichtung, Umstieg, Beispiel-Dashboard, Haftungs- und Sicherheitshinweise.
 - Installation über Marketplace/HACS möglich (nur noch eine Integration im Repository).
 
@@ -33,5 +34,5 @@ Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bish
 Erste Veröffentlichung mit den Einzel-Komponenten (YAML-Konfiguration): Relais und Eingänge (MCP23017), Wasserstand
 (ADS1115), MPU6050, 1-Wire, Victron MPPT und SmartShunt.
 
-[Unveröffentlicht]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/compare/V1.0.0...HEAD
+[2.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/v2.0.0
 [1.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/V1.0.0
