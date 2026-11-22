@@ -92,7 +92,7 @@ async def test_io_module(hass: HomeAssistant, hardware) -> None:
     # alte Komponente mit Namen
     MockConfigEntry(
         domain="mcp23017",
-        data={"i2c_address": 0x20, "pin_number": 8, "pin_name": "Trittstufe rein",
+        data={"i2c_address": 0x20, "pin_number": 8, "pin_name": "Wasserpumpe",
               "platform": "switch"},
     ).add_to_hass(hass)
     entry = await setup_entry(hass)
@@ -101,7 +101,7 @@ async def test_io_module(hass: HomeAssistant, hardware) -> None:
         [
             {"name": "VAN PI", "i2c_bus": 1, "address": "0x20", "invert_inputs": True,
              "invert_relays": False, "keep_state": True},
-            {"relay_1": "Trittstufe rein", "input_7": "Zündung ein"},
+            {"relay_1": "Wasserpumpe", "input_7": "Tür offen"},
         ],
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -109,14 +109,14 @@ async def test_io_module(hass: HomeAssistant, hardware) -> None:
     await hass.async_block_till_done()
 
     relay = entity_id(hass, "_relay_1", "switch")
-    assert relay == "switch.van_pi_trittstufe_rein"
+    assert relay == "switch.van_pi_wasserpumpe"
     assert hass.states.get(relay).state == "off"
     await hass.services.async_call("switch", "turn_on", {"entity_id": relay}, blocking=True)
     assert mcp_bus.regs[0x1A] == 0x01
     assert hass.states.get(relay).state == "on"
 
     ign = entity_id(hass, "_input_7", "binary_sensor")
-    assert ign == "binary_sensor.van_pi_zundung_ein"
+    assert ign == "binary_sensor.van_pi_tur_offen"
     assert hass.states.get(ign).state == "off"
     mcp_bus.pins_in = 0xBF  # Eingang 7 gegen Masse
     await asyncio.sleep(0.05)

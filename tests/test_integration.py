@@ -201,7 +201,7 @@ async def test_migration_v1(hass: HomeAssistant) -> None:
     )
     old = ent_reg.async_get_or_create(
         "switch", DOMAIN, f"{entry.entry_id}_leveling_active",
-        config_entry=entry, device_id=device.id, suggested_object_id="aussen_nivellierung_aktiv",
+        config_entry=entry, device_id=device.id, suggested_object_id="camper_nivellierung_aktiv",
     )
 
     assert await hass.config_entries.async_setup(entry.entry_id)
@@ -219,6 +219,6 @@ async def test_migration_v1(hass: HomeAssistant) -> None:
     # Entity-ID bleibt, hängt jetzt am Eintrag Nivellierung
     reg = ent_reg.async_get(old.entity_id)
     assert reg.config_subentry_id == sub_id
-    assert hass.states.get("switch.aussen_nivellierung_aktiv") is not None
+    assert hass.states.get("switch.camper_nivellierung_aktiv") is not None
     dev = dev_reg.async_get(device.id)
     assert dev.config_entries_subentries[entry.entry_id] == {sub_id}
