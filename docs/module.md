@@ -65,7 +65,7 @@ Die Nivellierung läuft dabei weiter.
     H15/H16 = min./max. Spannung Starterbatterie in V (vorher in mV angezeigt).
 - Gesamtertrag, geladene und entladene Energie sind für das Energie-Dashboard geeignet.
 
-Victron-Geräte per **Bluetooth** (z. B. dein „Solar Grid“) laufen über die in Home Assistant
+Victron-Geräte per **Bluetooth** (z. B. ein SmartSolar-Laderegler) laufen über die in Home Assistant
 eingebaute Integration *Victron BLE* und brauchen hier nichts.
 
 ## Umstieg von den alten Komponenten
