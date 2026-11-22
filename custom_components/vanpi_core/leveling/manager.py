@@ -185,10 +185,27 @@ class LevelingManager:
             axis, vec = max(AXIS_VECTORS.items(), key=lambda kv: dot(kv[1], fwd))
             angle = math.degrees(math.acos(max(-1.0, min(1.0, dot(vec, fwd)))))
             info["fahrtrichtung_entspricht"] = f"{axis} (Abweichung {angle:.0f}°)"
+            warning = self._axis_warning(fwd)
+            if warning:
+                info["warnung"] = warning
         if self.recorder is not None:
             info["signal_g"] = round(self.recorder.signal_g, 2)
             info["spitze_g"] = round(self.recorder.peak_g, 2)
         return info
+
+    def _axis_warning(self, drive_forward: Vector) -> str | None:
+        """Hinweis, wenn die eingestellte Achse der gefahrenen Richtung widerspricht."""
+        forward_cfg = self.config[CONF_FORWARD]
+        if forward_cfg == FORWARD_DRIVE:
+            return None
+        if dot(AXIS_VECTORS[forward_cfg], drive_forward) > math.cos(math.radians(45)):
+            return None
+        axis = max(AXIS_VECTORS, key=lambda k: dot(AXIS_VECTORS[k], drive_forward))
+        return (
+            f"Die Fahrt zeigt {axis} als vorne, eingestellt ist {forward_cfg}. "
+            "Bitte unter Konfigurieren die Vorwärtsrichtung auf "
+            "'Aus Fahrt-Kalibrierung' stellen."
+        )
 
     # ------------------------------------------------------------ orientation
 
@@ -287,12 +304,13 @@ class LevelingManager:
         # die alte Fahrtrichtung komplett. Die Ebene ("Als eben") bleibt.
         self._stored["forward_runs"] = [list(forward)]
         await self._store.async_save(self._stored)
-        self.status = (
-            "Fahrtrichtung gespeichert. Unter Einstellungen 'Vorwärtsrichtung: "
-            "aus Fahrt-Kalibrierung' wählen, falls noch nicht geschehen."
-            if self.config[CONF_FORWARD] != FORWARD_DRIVE
-            else "Fahrtrichtung gespeichert"
-        )
+        warning = self._axis_warning(forward)
+        if warning:
+            self.status = f"Fahrtrichtung gespeichert. Achtung: {warning}"
+        elif self.config[CONF_FORWARD] != FORWARD_DRIVE:
+            self.status = "Fahrtrichtung gespeichert, sie passt zur eingestellten Achse"
+        else:
+            self.status = "Fahrtrichtung gespeichert"
         self._notify()
 
     async def async_drive_cancel(self) -> None:

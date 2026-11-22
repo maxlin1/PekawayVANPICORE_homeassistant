@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
 
-from .const import DOMAIN, MANUFACTURER, MODEL
+from .const import DOCS_URL, DOMAIN, MANUFACTURER, MODEL
 from .leveling.manager import LevelingManager
 
 
@@ -25,6 +25,7 @@ class LevelingEntity(Entity):
             translation_key="leveling",
             manufacturer=MANUFACTURER,
             model=f"{MODEL} Nivellierung",
+            configuration_url=DOCS_URL,
         )
 
     async def async_added_to_hass(self) -> None:

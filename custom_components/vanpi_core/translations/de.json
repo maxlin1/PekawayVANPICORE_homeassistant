@@ -70,7 +70,8 @@
           "wheelbase": "Abstand Vorderachse zu Hinterachse",
           "track": "Abstand linkes zu rechtem Rad",
           "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
-        }
+        },
+        "description": "Kurzanleitung: 1) Vorwärtsrichtung: die Board-Achse wählen, die nach vorne zeigt, oder 'Aus Fahrt-Kalibrierung'. 2) Auf wirklich ebenem Boden 'Als eben speichern' drücken (jederzeit wiederholbar, ändert nur die Ebene). 3) Fahrt-Kalibrierung (nur bei 'Aus Fahrt-Kalibrierung' nötig): Starten, 2 s stehen, 1 bis 3 Mal geradeaus anfahren und bis zum Stillstand bremsen, dann Beenden. Den Schalter 'Aktiv' braucht man zum Kalibrieren nicht. Ausführliche Anleitung: Link 'Besuchen' auf der Geräteseite."
       }
     }
   },

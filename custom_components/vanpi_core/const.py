@@ -5,6 +5,9 @@ from __future__ import annotations
 from homeassistant.const import Platform
 
 DOMAIN = "vanpi_core"
+DOCS_URL = (
+    "https://github.com/maxlin1/PekawayVANPICORE_homeassistant/blob/vanpi-core-nivellierung/docs/nivellierung.md"
+)
 MANUFACTURER = "Pekaway"
 MODEL = "VAN PI CORE"
 
