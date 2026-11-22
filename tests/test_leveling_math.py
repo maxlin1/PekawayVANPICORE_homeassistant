@@ -277,3 +277,28 @@ def test_drive_calibration_several_cycles_one_recording(mount_name):
     cycle = [(2.5, 0.25, 0.0), (2.0, 0.0, 0.0), (1.6, -0.4, 0.0), (2.0, 0.0, 0.0)]
     phases = [(1.5, 0.0, 0.0), *cycle, *cycle, *cycle]
     assert _angle_to_forward(_simulate(mount, phases).result(), mount) < 5.0
+
+
+# Echte Werte aus Max' Van: Board hochkant, X zeigt nach unten, Z nach vorne
+MAX_UP = (-0.9737, -0.0071, -0.2277)
+MAX_FORWARD = (-0.2278, -0.0161, 0.9736)
+
+
+def test_max_van_x_axis_rejected():
+    """+X liegt 77° gegen die Waagerechte, die Projektion zeigte nach hinten."""
+    with pytest.raises(OrientationError):
+        Orientation.from_vectors(MAX_UP, AXIS_VECTORS["+x"])
+
+
+def test_max_van_front_low_recommends_front():
+    ori = Orientation.from_vectors(MAX_UP, MAX_FORWARD)
+    # Front 2° tiefer: "oben" kippt in Fahrzeugsicht nach hinten
+    t = math.radians(-2.0)
+    measured = tuple(
+        math.cos(t) * u + math.sin(t) * f for u, f in zip(ori.up, ori.forward, strict=True)
+    )
+    pitch, roll = ori.angles(measured)
+    assert pitch == pytest.approx(-2.0, abs=0.05)
+    plan = best_block_plan(MAX_VAN, pitch, roll)
+    assert plan.blocks["vl"] > 0 and plan.blocks["vr"] > 0
+    assert plan.blocks["hl"] == 0 and plan.blocks["hr"] == 0

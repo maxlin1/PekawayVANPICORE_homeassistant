@@ -97,9 +97,13 @@ class Orientation:
         """
         u = normalize(up)
         f_h = horizontal(forward_hint, u)
-        if norm(f_h) < 0.2 * norm(forward_hint):
+        # Mehr als 45° geneigt: die Achse ist eher "oben/unten" als "vorne".
+        # Eine Projektion wäre dann reiner Zufall und kann vorne/hinten vertauschen.
+        if norm(f_h) < 0.7 * norm(forward_hint):
             raise OrientationError(
-                "Vorwärtsachse zeigt fast senkrecht, bitte andere Achse wählen"
+                "Die eingestellte Vorwärtsachse zeigt eher nach oben oder unten. "
+                "Bitte unter Konfigurieren eine andere Achse oder "
+                "'Aus Fahrt-Kalibrierung' wählen."
             )
         f = normalize(f_h)
         r = cross(f, u)  # rechtshändig: vorne x oben = rechts
