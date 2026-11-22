@@ -12,6 +12,8 @@ Die Integration **VAN PI CORE** (`custom_components/vanpi_core`) berechnet am St
    - **andere Entitäten** mit Beschleunigung X/Y/Z, z. B. ein RuuviTag (Einheit g, mg oder m/s²).
 5. Fahrzeug und Blöcke eintragen: Radstand, Spurweite, Blockhöhe (Höhe einer Keilstufe), Anzahl Stapel (wie viele Keile), Blöcke pro Stapel (Stufen je Keil), Toleranz „eben“.
 
+Mit **Luftfederung an der Hinterachse** (z. B. Goldschmidt) den Schalter einschalten und eintragen, wie weit jede Seite maximal angehoben und abgesenkt werden kann. Die Empfehlung kombiniert dann Keile und Luftfederung und nennt z. B. „Vorne rechts: 2 Blöcke (9.0 cm), Luftfederung hinten links +1.2 cm, Luftfederung hinten rechts −0.4 cm“.
+
 Fahrzeug und Blöcke ändert man später über das **Zahnrad am Eintrag „Nivellierung“**. Das Zahnrad oben bei VAN PI CORE gehört zu den Grundeinstellungen des Boards.
 
 Beispiel Fiat Ducato L3 (5,99 m): Radstand 403,5 cm, Spurweite rund 180 cm (am besten nachmessen, Mitte Reifen zu Mitte Reifen).

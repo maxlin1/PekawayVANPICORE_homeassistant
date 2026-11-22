@@ -25,6 +25,9 @@ from homeassistant.util import dt as dt_util
 
 from ..const import (
     AUTO_OFF_MINUTES,
+    CONF_AIR_DOWN,
+    CONF_AIR_SUSPENSION,
+    CONF_AIR_UP,
     CONF_BLOCK_HEIGHT,
     CONF_BLOCKS_PER_STACK,
     CONF_ENTITY_X,
@@ -124,6 +127,8 @@ class LevelingManager:
             block_height=float(self.config[CONF_BLOCK_HEIGHT]),
             stacks=int(self.config[CONF_STACKS]),
             blocks_per_stack=int(self.config[CONF_BLOCKS_PER_STACK]),
+            air_up=float(self.config[CONF_AIR_UP]) if self.config[CONF_AIR_SUSPENSION] else 0.0,
+            air_down=float(self.config[CONF_AIR_DOWN]) if self.config[CONF_AIR_SUSPENSION] else 0.0,
         )
         self.tolerance = float(self.config[CONF_TOLERANCE])
         self._published = None  # nächsten Wert sofort mit neuen Daten berechnen

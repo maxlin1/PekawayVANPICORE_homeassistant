@@ -302,3 +302,29 @@ def test_max_van_front_low_recommends_front():
     plan = best_block_plan(MAX_VAN, pitch, roll)
     assert plan.blocks["vl"] > 0 and plan.blocks["vr"] > 0
     assert plan.blocks["hl"] == 0 and plan.blocks["hr"] == 0
+
+
+def test_air_suspension_levels_rear_without_blocks():
+    """Hinten rechts 1,5 cm tiefer: Luftfederung gleicht das allein aus."""
+    van = Vehicle(wheelbase=403.5, track=180, block_height=4.5, stacks=2,
+                  blocks_per_stack=3, air_up=2.5, air_down=2.5)
+    # Ebene mit nur HR tiefer gibt es nicht; nehme hinten 1,5 cm tiefer (längs)
+    pitch = math.degrees(math.atan(1.5 / van.wheelbase))  # vorne höher
+    plan = best_block_plan(van, pitch, 0.0)
+    assert plan.total_blocks == 0
+    assert plan.air["hl"] == pytest.approx(1.5, abs=0.1)
+    assert plan.air["hr"] == pytest.approx(1.5, abs=0.1)
+    assert plan.residual < 0.02
+    assert "Luftfederung hinten links +1.5 cm" in plan.text(4.5)
+
+
+def test_air_suspension_limited_and_combined_with_blocks():
+    van = Vehicle(wheelbase=403.5, track=180, block_height=4.5, stacks=2,
+                  blocks_per_stack=3, air_up=2.0, air_down=2.0)
+    no_air = Vehicle(wheelbase=403.5, track=180, block_height=4.5, stacks=2, blocks_per_stack=3)
+    # Max' Hang: vorne tiefer, rechts tiefer
+    pitch = -math.degrees(math.atan(11.5 / 403.5))
+    roll = -math.degrees(math.atan(5.8 / 180))
+    plan = best_block_plan(van, pitch, roll)
+    assert all(-2.0 <= v <= 2.0 for v in plan.air.values())
+    assert plan.residual < best_block_plan(no_air, pitch, roll).residual

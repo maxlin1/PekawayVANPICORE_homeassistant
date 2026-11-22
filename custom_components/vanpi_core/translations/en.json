@@ -182,13 +182,20 @@
             "block_height": "Height of one block",
             "stacks": "Number of stacks (wheels that can get blocks)",
             "blocks_per_stack": "Blocks per stack",
-            "tolerance": "Considered level up to"
+            "tolerance": "Considered level up to",
+            "air_suspension": "Air suspension on rear axle",
+            "air_up": "Air suspension: max. raise",
+            "air_down": "Air suspension: max. lower"
           },
           "data_description": {
             "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
             "wheelbase": "Distance front axle to rear axle",
             "track": "Distance left to right wheel",
-            "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps"
+            "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps",
+            "air_suspension": "Left and right adjustable separately. The recommendation then also says how much each side should go up or down.",
+            "air_up": "Per side, from normal ride height",
+            "air_down": "Per side, from normal ride height",
+            "block_height": "Height of one step or layer of the ramp"
           }
         },
         "reconfigure": {
@@ -201,13 +208,20 @@
             "block_height": "Height of one block",
             "stacks": "Number of stacks (wheels that can get blocks)",
             "blocks_per_stack": "Blocks per stack",
-            "tolerance": "Considered level up to"
+            "tolerance": "Considered level up to",
+            "air_suspension": "Air suspension on rear axle",
+            "air_up": "Air suspension: max. raise",
+            "air_down": "Air suspension: max. lower"
           },
           "data_description": {
             "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once.",
             "wheelbase": "Distance front axle to rear axle",
             "track": "Distance left to right wheel",
-            "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps"
+            "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps",
+            "air_suspension": "Left and right adjustable separately. The recommendation then also says how much each side should go up or down.",
+            "air_up": "Per side, from normal ride height",
+            "air_down": "Per side, from normal ride height",
+            "block_height": "Height of one step or layer of the ramp"
           }
         }
       },

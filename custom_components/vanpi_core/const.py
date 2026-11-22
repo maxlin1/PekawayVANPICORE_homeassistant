@@ -43,6 +43,10 @@ CONF_BLOCK_HEIGHT = "block_height"
 CONF_STACKS = "stacks"
 CONF_BLOCKS_PER_STACK = "blocks_per_stack"
 CONF_TOLERANCE = "tolerance"
+# Luftfederung hinten (links/rechts getrennt verstellbar)
+CONF_AIR_SUSPENSION = "air_suspension"
+CONF_AIR_UP = "air_up"
+CONF_AIR_DOWN = "air_down"
 
 DEFAULTS = {
     CONF_SOURCE: SOURCE_MPU6050,
@@ -55,6 +59,9 @@ DEFAULTS = {
     CONF_STACKS: 2,
     CONF_BLOCKS_PER_STACK: 3,
     CONF_TOLERANCE: 1.0,
+    CONF_AIR_SUSPENSION: False,
+    CONF_AIR_UP: 2.0,
+    CONF_AIR_DOWN: 2.0,
 }
 
 # Nur diese Schlüssel gehören zur Nivellierung (alte Optionen wie
@@ -63,6 +70,7 @@ LEVELING_KEYS = (
     CONF_SOURCE, CONF_I2C_BUS, CONF_MPU_ADDRESS, CONF_ENTITY_X, CONF_ENTITY_Y,
     CONF_ENTITY_Z, CONF_FORWARD, CONF_WHEELBASE, CONF_TRACK, CONF_BLOCK_HEIGHT,
     CONF_STACKS, CONF_BLOCKS_PER_STACK, CONF_TOLERANCE,
+    CONF_AIR_SUSPENSION, CONF_AIR_UP, CONF_AIR_DOWN,
 )
 
 AUTO_OFF_MINUTES = 15  # fest, Nivellierung schaltet sich danach selbst ab

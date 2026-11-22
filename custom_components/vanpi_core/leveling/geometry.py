@@ -13,7 +13,7 @@ rechtshändiges Achsensystem gebaut. Damit funktioniert jede Einbaulage.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import combinations, product
 
 Vector = tuple[float, float, float]
@@ -128,6 +128,13 @@ class Vehicle:
     block_height: float
     stacks: int  # wie viele Räder gleichzeitig Blöcke bekommen können
     blocks_per_stack: int
+    # Luftfederung hinten: jede Seite um bis zu air_up cm heben, air_down cm senken
+    air_up: float = 0.0
+    air_down: float = 0.0
+
+    @property
+    def has_air(self) -> bool:
+        return self.air_up > 0 or self.air_down > 0
 
     def wheel_positions(self) -> dict[str, tuple[float, float]]:
         lx, ly = self.wheelbase / 2.0, self.track / 2.0
@@ -168,6 +175,7 @@ class BlockPlan:
     blocks: dict[str, int]
     residual_pitch: float
     residual_roll: float
+    air: dict[str, float] = field(default_factory=dict)  # Luftfederung hl/hr in cm
 
     @property
     def residual(self) -> float:
@@ -183,17 +191,43 @@ class BlockPlan:
             for w, n in self.blocks.items()
             if n > 0
         ]
-        if not parts:
+        air = [
+            f"Luftfederung {WHEEL_NAMES[w].lower()} {v:+.1f} cm"
+            for w, v in self.air.items()
+            if abs(v) >= 0.05
+        ]
+        if not parts and not air:
             return "Keine Blöcke nötig"
-        return ", ".join(parts)
+        return ", ".join([*parts, *air]) if parts else "Keine Blöcke, " + ", ".join(air)
+
+
+def _air_adjust(vehicle: Vehicle, heights: dict[str, float]) -> tuple[float, float]:
+    """Beste Höhenänderung der Luftfederung hinten links/rechts (cm).
+
+    Die Ausgleichsebene hängt linear von den beiden Werten ab, die Restneigung
+    ist also eine konvexe Funktion. Koordinatenabstieg mit Begrenzung auf den
+    Federweg findet das Minimum in wenigen Schritten.
+    """
+    lo, hi = -vehicle.air_down, vehicle.air_up
+    front = (heights["vl"] + heights["vr"]) / 2.0
+    p0 = front - (heights["hl"] + heights["hr"]) / 2.0  # >0: vorne höher
+    r0 = (heights["vr"] + heights["hr"] - heights["vl"] - heights["hl"]) / 2.0  # >0: rechts höher
+    wp, wr = 1.0 / vehicle.wheelbase**2, 1.0 / vehicle.track**2
+    a = b = 0.0  # a = hinten links, b = hinten rechts
+    for _ in range(30):
+        # f = wp*(p0 - (a+b)/2)^2 + wr*(r0 + (b-a)/2)^2, jeweils nach a bzw. b minimiert
+        a = min(hi, max(lo, (wp * (2 * p0 - b) + wr * (2 * r0 + b)) / (wp + wr)))
+        b = min(hi, max(lo, (wp * (2 * p0 - a) - wr * (2 * r0 - a)) / (wp + wr)))
+    return a, b
 
 
 def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
     """Sucht die Blockverteilung mit der kleinsten Restneigung.
 
     Probiert jede Auswahl von bis zu ``stacks`` Rädern mit 0..blocks_per_stack
-    Blöcken. Bei gleicher Restneigung (Toleranz 0,01°) gewinnt die Variante
-    mit weniger Blöcken.
+    Blöcken. Mit Luftfederung wird für jede Verteilung zusätzlich die beste
+    Höhe hinten links/rechts im Federweg berechnet. Bei gleicher Restneigung
+    (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken.
     """
     base = wheel_heights(vehicle, pitch, roll)
     stacks = max(0, min(vehicle.stacks, len(WHEELS)))
@@ -202,16 +236,20 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
     for wheels in combinations(WHEELS, stacks):
         for counts in product(range(vehicle.blocks_per_stack + 1), repeat=stacks):
             blocks = {w: 0 for w in WHEELS}
-            for w, n in zip(wheels, counts):
+            for w, n in zip(wheels, counts, strict=True):
                 blocks[w] = n
             heights = {
                 w: base[w] + blocks[w] * vehicle.block_height for w in WHEELS
             }
+            air: dict[str, float] = {}
+            if vehicle.has_air:
+                a, b = _air_adjust(vehicle, heights)
+                heights["hl"] += a
+                heights["hr"] += b
+                air = {"hl": round(a, 1), "hr": round(b, 1)}
             rp, rr = plane_tilt(vehicle, heights)
             plan = BlockPlan(
-                blocks={w: n for w, n in blocks.items()},
-                residual_pitch=rp,
-                residual_roll=rr,
+                blocks=dict(blocks), residual_pitch=rp, residual_roll=rr, air=air
             )
             key = (round(plan.residual, 2), plan.total_blocks)
             if best_key is None or key < best_key:

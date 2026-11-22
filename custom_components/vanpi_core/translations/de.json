@@ -182,13 +182,20 @@
             "block_height": "Höhe eines Blocks",
             "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
             "blocks_per_stack": "Blöcke pro Stapel",
-            "tolerance": "Gilt als eben bis"
+            "tolerance": "Gilt als eben bis",
+            "air_suspension": "Luftfederung an der Hinterachse",
+            "air_up": "Luftfederung: max. anheben",
+            "air_down": "Luftfederung: max. absenken"
           },
           "data_description": {
             "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
             "wheelbase": "Abstand Vorderachse zu Hinterachse",
             "track": "Abstand linkes zu rechtem Rad",
-            "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
+            "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen",
+            "air_suspension": "Links und rechts getrennt verstellbar. Die Empfehlung nennt dann zusätzlich, um wie viel jede Seite hoch oder runter soll.",
+            "air_up": "Je Seite, ab normaler Fahrhöhe",
+            "air_down": "Je Seite, ab normaler Fahrhöhe",
+            "block_height": "Höhe einer Stufe bzw. Lage des Keils"
           }
         },
         "reconfigure": {
@@ -201,13 +208,20 @@
             "block_height": "Höhe eines Blocks",
             "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
             "blocks_per_stack": "Blöcke pro Stapel",
-            "tolerance": "Gilt als eben bis"
+            "tolerance": "Gilt als eben bis",
+            "air_suspension": "Luftfederung an der Hinterachse",
+            "air_up": "Luftfederung: max. anheben",
+            "air_down": "Luftfederung: max. absenken"
           },
           "data_description": {
             "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
             "wheelbase": "Abstand Vorderachse zu Hinterachse",
             "track": "Abstand linkes zu rechtem Rad",
-            "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
+            "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen",
+            "air_suspension": "Links und rechts getrennt verstellbar. Die Empfehlung nennt dann zusätzlich, um wie viel jede Seite hoch oder runter soll.",
+            "air_up": "Je Seite, ab normaler Fahrhöhe",
+            "air_down": "Je Seite, ab normaler Fahrhöhe",
+            "block_height": "Höhe einer Stufe bzw. Lage des Keils"
           }
         }
       },

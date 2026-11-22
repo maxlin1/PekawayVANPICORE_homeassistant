@@ -24,6 +24,9 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .const import (
+    CONF_AIR_DOWN,
+    CONF_AIR_SUSPENSION,
+    CONF_AIR_UP,
     CONF_BLOCK_HEIGHT,
     CONF_BLOCKS_PER_STACK,
     CONF_ENTITY_X,
@@ -111,6 +114,11 @@ def vehicle_schema(values: dict[str, Any]) -> vol.Schema:
                     mode=selector.NumberSelectorMode.BOX,
                 )
             ),
+            vol.Required(
+                CONF_AIR_SUSPENSION, default=v[CONF_AIR_SUSPENSION]
+            ): selector.BooleanSelector(),
+            vol.Required(CONF_AIR_UP, default=v[CONF_AIR_UP]): _cm(0, 20, 0.5),
+            vol.Required(CONF_AIR_DOWN, default=v[CONF_AIR_DOWN]): _cm(0, 20, 0.5),
         }
     )
 
