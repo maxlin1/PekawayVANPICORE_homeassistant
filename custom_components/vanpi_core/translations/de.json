@@ -1,0 +1,173 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "VAN PI CORE einrichten",
+        "description": "Woher sollen die Neigungswerte kommen?",
+        "data": {
+          "source": "Neigungssensor"
+        }
+      },
+      "mpu6050": {
+        "title": "MPU6050",
+        "description": "Der MPU6050 sitzt auf dem VAN PI CORE meist an Adresse 0x69 auf I2C-Bus 1.",
+        "data": {
+          "i2c_bus": "I2C-Bus",
+          "mpu_address": "I2C-Adresse"
+        }
+      },
+      "entities": {
+        "title": "Beschleunigungs-Entitäten",
+        "description": "Drei Sensoren mit Beschleunigung X, Y und Z, z. B. von einem RuuviTag. Einheit g, mg oder m/s².",
+        "data": {
+          "entity_x": "Beschleunigung X",
+          "entity_y": "Beschleunigung Y",
+          "entity_z": "Beschleunigung Z"
+        }
+      },
+      "vehicle": {
+        "title": "Fahrzeug und Blöcke",
+        "description": "Alles lässt sich später unter 'Konfigurieren' ändern.",
+        "data": {
+          "forward": "Vorwärtsrichtung des Boards",
+          "wheelbase": "Radstand",
+          "track": "Spurweite",
+          "block_height": "Höhe eines Blocks",
+          "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
+          "blocks_per_stack": "Blöcke pro Stapel",
+          "tolerance": "Gilt als eben bis",
+          "auto_off_minutes": "Automatisch aus nach (0 = nie)"
+        },
+        "data_description": {
+          "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
+          "wheelbase": "Abstand Vorderachse zu Hinterachse",
+          "track": "Abstand linkes zu rechtem Rad",
+          "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
+        }
+      }
+    },
+    "error": {
+      "mpu_not_found": "Kein MPU6050 gefunden. I2C aktiviert? Adresse richtig?"
+    },
+    "abort": {
+      "single_instance_allowed": "VAN PI CORE ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Fahrzeug und Blöcke",
+        "data": {
+          "forward": "Vorwärtsrichtung des Boards",
+          "wheelbase": "Radstand",
+          "track": "Spurweite",
+          "block_height": "Höhe eines Blocks",
+          "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
+          "blocks_per_stack": "Blöcke pro Stapel",
+          "tolerance": "Gilt als eben bis",
+          "auto_off_minutes": "Automatisch aus nach (0 = nie)"
+        },
+        "data_description": {
+          "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen.",
+          "wheelbase": "Abstand Vorderachse zu Hinterachse",
+          "track": "Abstand linkes zu rechtem Rad",
+          "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen"
+        }
+      }
+    }
+  },
+  "selector": {
+    "source": {
+      "options": {
+        "mpu6050": "MPU6050 auf dem Board",
+        "entities": "Andere Entitäten (z. B. RuuviTag)"
+      }
+    },
+    "forward": {
+      "options": {
+        "drive": "Aus Fahrt-Kalibrierung",
+        "+x": "+X (aufgedruckter Pfeil X)",
+        "-x": "-X",
+        "+y": "+Y (aufgedruckter Pfeil Y)",
+        "-y": "-Y",
+        "+z": "+Z (nach oben aus dem Chip)",
+        "-z": "-Z"
+      }
+    }
+  },
+  "entity": {
+    "switch": {
+      "active": {
+        "name": "Aktiv"
+      }
+    },
+    "binary_sensor": {
+      "level": {
+        "name": "Eben"
+      }
+    },
+    "button": {
+      "zero": {
+        "name": "Als eben speichern"
+      },
+      "drive_start": {
+        "name": "Fahrt-Kalibrierung starten"
+      },
+      "drive_stop": {
+        "name": "Fahrt-Kalibrierung beenden"
+      },
+      "drive_cancel": {
+        "name": "Fahrt-Kalibrierung abbrechen"
+      },
+      "reset_calibration": {
+        "name": "Kalibrierung zurücksetzen"
+      }
+    },
+    "sensor": {
+      "pitch": {
+        "name": "Neigung längs"
+      },
+      "roll": {
+        "name": "Neigung quer"
+      },
+      "lift_vl": {
+        "name": "Hubhöhe vorne links"
+      },
+      "lift_vr": {
+        "name": "Hubhöhe vorne rechts"
+      },
+      "lift_hl": {
+        "name": "Hubhöhe hinten links"
+      },
+      "lift_hr": {
+        "name": "Hubhöhe hinten rechts"
+      },
+      "blocks_vl": {
+        "name": "Blöcke vorne links"
+      },
+      "blocks_vr": {
+        "name": "Blöcke vorne rechts"
+      },
+      "blocks_hl": {
+        "name": "Blöcke hinten links"
+      },
+      "blocks_hr": {
+        "name": "Blöcke hinten rechts"
+      },
+      "recommendation": {
+        "name": "Blockempfehlung"
+      },
+      "residual": {
+        "name": "Restneigung"
+      },
+      "status": {
+        "name": "Status"
+      }
+    }
+  },
+  "device": {
+    "leveling": {
+      "name": "Nivellierung"
+    }
+  }
+}

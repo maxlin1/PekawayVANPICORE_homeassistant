@@ -30,6 +30,10 @@ Eine Antwort kann jedoch auch mal mehrere Tage dauern.
 
 INFO: UART3 gibt es nicht auf dem Pin lauscht der 1-Wire Sensor!
 
+## Neu: Integration VAN PI CORE (Beta)
+
+Die neue Integration `custom_components/vanpi_core` wird über die Oberfläche eingerichtet und soll nach und nach alle Board-Funktionen bündeln. Als erstes Modul ist die **Nivellierung** enthalten (MPU6050 auf dem Board oder RuuviTag, Fahrt-Kalibrierung, Blockempfehlung für 2 Stapel). Anleitung: [docs/nivellierung.md](./docs/nivellierung.md).
+
 ## 1. Installation von Homeassistant
 
 Wer noch nie Homeassistant selbst installiert hat findet in der [installHA.md](./installHA.md) die Anleitung Stand November 2025.
