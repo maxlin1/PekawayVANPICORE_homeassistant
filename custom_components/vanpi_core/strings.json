@@ -186,8 +186,8 @@
           "description": "Everything can be changed later via the gear icon of the leveling entry. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/van_top.png (example file name).",
           "data": {
             "forward": "Board forward direction",
-            "wheelbase": "Wheelbase",
-            "track": "Track width",
+            "wheelbase": "Wheelbase (axle centre to axle centre)",
+            "track": "Track width (tyre centre to tyre centre)",
             "block_height": "Height of one block",
             "stacks": "Number of stacks (wheels that can get blocks)",
             "blocks_per_stack": "Blocks per stack",
@@ -199,8 +199,8 @@
           },
           "data_description": {
             "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
-            "wheelbase": "Distance front axle to rear axle",
-            "track": "Distance left to right wheel",
+            "wheelbase": "Distance from the centre of the front wheel to the centre of the rear wheel, not the vehicle length. Ducato 6 m (L4): 403.5 cm.",
+            "track": "Distance from the centre of the left tyre to the centre of the right tyre.",
             "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps",
             "air_suspension": "Left and right adjustable separately. The recommendation then also says how much each side should go up or down.",
             "air_up": "Per side, from normal ride height",
@@ -214,8 +214,8 @@
           "description": "Quick guide: 1) Forward direction: pick the board axis that points to the front, or 'From drive calibration'. 2) Park on truly level ground and press 'Save as level' (can be repeated anytime, only changes the level reference). 3) Drive calibration (only needed for 'From drive calibration'): press start, wait 2 s, accelerate straight 1 to 3 times and brake to a full stop, then press stop. The switch 'Active' is not needed for calibrating. Full guide: link 'Visit' on the device page. Dashboard: cards custom:vanpi-level-card (spirit level) and custom:vanpi-van-card (top view). Put your own top-view photo into /config/www/ and set image: /local/van_top.png (example file name). Safety: only perform the drive calibration on a quiet, straight and clear stretch (e.g. an empty car park, at least 50 m). Read all steps beforehand. Do not look at the display while driving and obey traffic rules. Use at your own risk.",
           "data": {
             "forward": "Board forward direction",
-            "wheelbase": "Wheelbase",
-            "track": "Track width",
+            "wheelbase": "Wheelbase (axle centre to axle centre)",
+            "track": "Track width (tyre centre to tyre centre)",
             "block_height": "Height of one block",
             "stacks": "Number of stacks (wheels that can get blocks)",
             "blocks_per_stack": "Blocks per stack",
@@ -227,8 +227,8 @@
           },
           "data_description": {
             "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
-            "wheelbase": "Distance front axle to rear axle",
-            "track": "Distance left to right wheel",
+            "wheelbase": "Distance from the centre of the front wheel to the centre of the rear wheel, not the vehicle length. Ducato 6 m (L4): 403.5 cm.",
+            "track": "Distance from the centre of the left tyre to the centre of the right tyre.",
             "stacks": "How many wheels you can raise at the same time, e.g. 2 with two ramps",
             "air_suspension": "Left and right adjustable separately. The recommendation then also says how much each side should go up or down.",
             "air_up": "Per side, from normal ride height",

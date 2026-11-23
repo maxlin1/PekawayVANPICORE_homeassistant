@@ -186,8 +186,8 @@
           "description": "Alles lässt sich später über das Zahnrad am Eintrag Nivellierung ändern. Dashboard: Karten custom:vanpi-level-card (Wasserwaage) und custom:vanpi-van-card (Draufsicht). Eigenes Foto von oben unter /config/www/ ablegen und als image: /local/van_top.png angeben (Dateiname frei wählbar).",
           "data": {
             "forward": "Vorwärtsrichtung des Boards",
-            "wheelbase": "Radstand",
-            "track": "Spurweite",
+            "wheelbase": "Radstand (Achsmitte zu Achsmitte)",
+            "track": "Spurweite (Reifenmitte zu Reifenmitte)",
             "block_height": "Höhe eines Blocks",
             "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
             "blocks_per_stack": "Blöcke pro Stapel",
@@ -199,8 +199,8 @@
           },
           "data_description": {
             "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen. Fahrt-Kalibrierung nur auf ruhiger, gerader Strecke, StVO beachten.",
-            "wheelbase": "Abstand Vorderachse zu Hinterachse",
-            "track": "Abstand linkes zu rechtem Rad",
+            "wheelbase": "Abstand Mitte Vorderrad zu Mitte Hinterrad, nicht die Fahrzeuglänge. Ducato 6 m (L4): 403,5 cm.",
+            "track": "Abstand Mitte linker Reifen zu Mitte rechter Reifen.",
             "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen",
             "air_suspension": "Links und rechts getrennt verstellbar. Die Empfehlung nennt dann zusätzlich, um wie viel jede Seite hoch oder runter soll.",
             "air_up": "Je Seite, ab normaler Fahrhöhe",
@@ -214,8 +214,8 @@
           "description": "Kurzanleitung: 1) Vorwärtsrichtung: die Board-Achse wählen, die nach vorne zeigt, oder 'Aus Fahrt-Kalibrierung'. 2) Auf wirklich ebenem Boden 'Als eben speichern' drücken (jederzeit wiederholbar, ändert nur die Ebene). 3) Fahrt-Kalibrierung (nur bei 'Aus Fahrt-Kalibrierung' nötig): Starten, 2 s stehen, 1 bis 3 Mal geradeaus anfahren und bis zum Stillstand bremsen, dann Beenden. Den Schalter 'Aktiv' braucht man zum Kalibrieren nicht. Ausführliche Anleitung: Link 'Besuchen' auf der Geräteseite. Dashboard: Karten custom:vanpi-level-card (Wasserwaage) und custom:vanpi-van-card (Draufsicht). Eigenes Foto von oben unter /config/www/ ablegen und als image: /local/van_top.png angeben (Dateiname frei wählbar). Sicherheit: Fahrt-Kalibrierung nur auf einer verkehrsberuhigten, geraden und freien Strecke (z. B. leerer Parkplatz, mind. 50 m) durchführen. Alle Schritte vorher in Ruhe lesen. Während der Fahrt nicht auf das Display schauen und die StVO beachten. Nutzung auf eigene Gefahr.",
           "data": {
             "forward": "Vorwärtsrichtung des Boards",
-            "wheelbase": "Radstand",
-            "track": "Spurweite",
+            "wheelbase": "Radstand (Achsmitte zu Achsmitte)",
+            "track": "Spurweite (Reifenmitte zu Reifenmitte)",
             "block_height": "Höhe eines Blocks",
             "stacks": "Anzahl Stapel (Räder, die Blöcke bekommen können)",
             "blocks_per_stack": "Blöcke pro Stapel",
@@ -227,8 +227,8 @@
           },
           "data_description": {
             "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen. Fahrt-Kalibrierung nur auf ruhiger, gerader Strecke, StVO beachten.",
-            "wheelbase": "Abstand Vorderachse zu Hinterachse",
-            "track": "Abstand linkes zu rechtem Rad",
+            "wheelbase": "Abstand Mitte Vorderrad zu Mitte Hinterrad, nicht die Fahrzeuglänge. Ducato 6 m (L4): 403,5 cm.",
+            "track": "Abstand Mitte linker Reifen zu Mitte rechter Reifen.",
             "stacks": "Wie viele Räder du gleichzeitig unterlegen kannst, z. B. 2 bei zwei Keilen",
             "air_suspension": "Links und rechts getrennt verstellbar. Die Empfehlung nennt dann zusätzlich, um wie viel jede Seite hoch oder runter soll.",
             "air_up": "Je Seite, ab normaler Fahrhöhe",
