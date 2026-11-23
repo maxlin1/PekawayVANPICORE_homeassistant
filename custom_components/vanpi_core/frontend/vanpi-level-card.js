@@ -404,10 +404,9 @@ class VanPiTiltCard extends HTMLElement {
     // SVG dreht im Uhrzeigersinn: höhere rechte Seite = negative Drehung
     g.setAttribute("transform", `translate(120 100) rotate(${-shown})`);
     ground.classList.toggle("ok", Math.abs(angle) <= c.tolerance);
-    const mm = Math.round(Math.tan((angle * Math.PI) / 180) * 1000);
     root.getElementById(`${id}v`).textContent = `${angle.toFixed(1).replace(".", ",")}°`;
     const dir = Math.abs(angle) < 0.05 ? "eben" : angle > 0 ? pos : neg;
-    root.getElementById(`${id}h`).textContent = `${mm} mm/m · ${dir}`;
+    root.getElementById(`${id}h`).textContent = dir;
   }
 
   _update() {

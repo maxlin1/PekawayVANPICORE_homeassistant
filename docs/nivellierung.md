@@ -87,7 +87,7 @@ max_angle: 5     # Rand der Libelle
 
 Wie bei einer echten Libelle wandert die Blase zur höheren Seite. Oben ist vorne, rechts ist rechts in Fahrtrichtung. Neigung längs ist positiv, wenn vorne höher ist, quer positiv, wenn rechts höher ist.
 
-Alternativ die Fahrzeuglage als gekippter Van, seitlich (vorne rechts) und von hinten. Die Bodenlinie ist grün, solange der Winkel innerhalb der Toleranz liegt. Die Neigung wird im Bild verstärkt (`exaggerate`), damit auch 1° gut sichtbar ist; die Zahlen sind die echten Werte, dazu die Steigung in mm/m:
+Alternativ die Fahrzeuglage als gekippter Van, seitlich (vorne rechts) und von hinten. Die Bodenlinie ist grün, solange der Winkel innerhalb der Toleranz liegt. Die Neigung wird im Bild verstärkt (`exaggerate`), damit auch 1° gut sichtbar ist; die Zahlen sind die echten Werte:
 
 ```yaml
 type: custom:vanpi-tilt-card
