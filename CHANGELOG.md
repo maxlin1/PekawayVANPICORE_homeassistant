@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen an diesem Projekt. Format angelehnt an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [2.0.5] - 2026-11-23
+
+### Neu
+- Einstellung „Luftfederung: max. Unterschied links/rechts“ (`air_max_diff`).
+
+### Geändert
+- Liegt die Neigung innerhalb der Toleranz, werden keine Blöcke mehr empfohlen.
+- Die Fahrzeuglage-Karte (`vanpi-tilt-card`) zeigt Seiten- und Heckansicht nebeneinander.
+
 ## [2.0.4] - 2026-11-23
 
 ### Neu
@@ -63,5 +72,6 @@ Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bish
 Erste Veröffentlichung mit den Einzel-Komponenten (YAML-Konfiguration): Relais und Eingänge (MCP23017), Wasserstand
 (ADS1115), MPU6050, 1-Wire, Victron MPPT und SmartShunt.
 
+[2.0.5]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/2.0.5
 [2.0.4]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/2.0.4
 [1.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/V1.0.0
