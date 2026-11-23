@@ -63,5 +63,5 @@ Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bish
 Erste Veröffentlichung mit den Einzel-Komponenten (YAML-Konfiguration): Relais und Eingänge (MCP23017), Wasserstand
 (ADS1115), MPU6050, 1-Wire, Victron MPPT und SmartShunt.
 
-[2.0.4]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/v2.0.4
+[2.0.4]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/2.0.4
 [1.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/V1.0.0
