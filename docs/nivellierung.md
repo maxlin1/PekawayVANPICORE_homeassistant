@@ -69,7 +69,7 @@ Die genauen Entity-IDs hängen von der Sprache bei der Einrichtung ab.
 - **Achsen:** Aus „oben“ (Nullung) und der Vorwärtsrichtung entsteht ein rechtshändiges Achsensystem. Jede Einbaulage funktioniert, Vorzeichen-Helfer sind nicht nötig.
 - **Glättung:** 20 Messungen pro Sekunde, Median über 5 Werte gegen Ausreißer, dann ein ruhiger Mittelwert (1,5 s). Bei echter Lageänderung über 0,5° wird sofort nachgezogen, deshalb reagiert die Anzeige beim Draufrollen nach etwa einer halben Sekunde. An Home Assistant gehen höchstens 2 Werte pro Sekunde und nur bei Änderung ab 0,1°.
 - **Hubhöhe:** bezogen auf das höchste Rad, mit vollem Radstand und voller Spurweite.
-- **Blockplan:** alle Kombinationen aus bis zu „Anzahl Stapel“ Rädern mit 0 bis „Blöcke pro Stapel“ Blöcken. Gewählt wird die kleinste Restneigung (Ausgleichsebene durch die vier Radpunkte), bei Gleichstand die Variante mit weniger Blöcken.
+- **Blockplan:** alle Kombinationen aus bis zu „Anzahl Stapel“ Rädern mit 0 bis „Blöcke pro Stapel“ Blöcken. Gewählt wird die kleinste Restneigung (Ausgleichsebene durch die vier Radpunkte), bei Gleichstand die Variante mit weniger Blöcken. Varianten, die den Rahmen um mehr als 3 cm verwinden würden (z. B. viele Blöcke unter nur einem Rad), werden nicht empfohlen: Dort hebt ein Rad ab, und der Van steht anders als berechnet. Die Luftfederung hinten kann eine Verwindung ausgleichen.
 
 Federung, Reifen und Untergrund werden nicht modelliert. Die Live-Anzeige nach dem Draufrollen zeigt das echte Ergebnis.
 

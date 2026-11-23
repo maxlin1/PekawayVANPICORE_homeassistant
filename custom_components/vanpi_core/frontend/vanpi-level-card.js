@@ -104,10 +104,16 @@ class VanPiLevelCard extends HTMLElement {
     const fmt = (v) => (v === null ? "–" : `${v.toFixed(1).replace(".", ",")}°`);
     root.getElementById("p").textContent = fmt(pitch);
     root.getElementById("r").textContent = fmt(roll);
-    root.getElementById("ph").textContent =
-      pitch === null ? "" : Math.abs(pitch) <= c.tolerance ? "eben" : pitch > 0 ? "vorne höher" : "vorne tiefer";
-    root.getElementById("rh").textContent =
-      roll === null ? "" : Math.abs(roll) <= c.tolerance ? "eben" : roll > 0 ? "rechts höher" : "rechts tiefer";
+    // Richtung immer nennen; "eben" nur, wenn wirklich nichts zu sehen ist.
+    // Innerhalb der Toleranz kommt "(in Toleranz)" dazu.
+    const hint = (v, pos, neg) => {
+      if (v === null) return "";
+      if (Math.abs(v) < 0.05) return "eben";
+      const dir = v > 0 ? pos : neg;
+      return Math.abs(v) <= c.tolerance ? `${dir} (in Toleranz)` : dir;
+    };
+    root.getElementById("ph").textContent = hint(pitch, "vorne höher", "vorne tiefer");
+    root.getElementById("rh").textContent = hint(roll, "rechts höher", "rechts tiefer");
     if (pitch === null || roll === null) {
       bubble.classList.add("off");
       bubble.setAttribute("transform", "translate(0 0)");

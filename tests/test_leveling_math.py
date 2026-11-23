@@ -36,6 +36,7 @@ from leveling.geometry import (  # noqa: E402
     best_block_plan,
     lift_per_wheel,
     normalize,
+    twist,
 )
 
 VAN_A = Vehicle(wheelbase=431.8, track=173.5, block_height=2.1, stacks=2, blocks_per_stack=3)
@@ -385,9 +386,38 @@ def test_front_right_low_any_mount(mount_name, head):
 def test_fewest_blocks_when_practically_level():
     """Saftkiste-Werte von Max: 1,0° vorne tiefer, 1,5° links tiefer.
 
-    Vorher: VL 3 + VR 1 und Luftfederung hoch (0,02°). Jetzt: VL 2 reicht (0,1°).
+    Vorher: VL 3 + VR 1 und Luftfederung hoch (0,02°). VL 2 allein würde den
+    Rahmen um fast 9 cm verwinden, also VL 2 + VR 1 mit Luftfederung.
     """
     van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=2, air_down=2, head="right")
     plan = best_block_plan(van, -1.0, 1.5)
-    assert plan.blocks == {"vl": 2, "vr": 0, "hl": 0, "hr": 0}
+    assert plan.blocks == {"vl": 2, "vr": 1, "hl": 0, "hr": 0}
     assert plan.residual < 0.2
+
+
+def _changes(van, plan):
+    lifted = {w: n * van.block_height for w, n in plan.blocks.items()}
+    for w, v in plan.air.items():
+        lifted[w] += v
+    return lifted
+
+
+def test_no_big_twist_single_wheel():
+    """Max am 23.11.: 1,1° vorne tiefer, 2,7° links tiefer.
+
+    Vorher: 3 Blöcke nur vorne links (13,5 cm Verwindung), der Van stand schief.
+    Jetzt: Blöcke links vorne und hinten, Verwindung höchstens 3 cm.
+    """
+    van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=2, air_down=2, head="right")
+    plan = best_block_plan(van, -1.1, 2.7)
+    assert abs(twist(_changes(van, plan))) <= 3.0
+    assert plan.blocks["vl"] >= 1 and plan.blocks["hl"] >= 1
+    assert plan.blocks["vr"] == plan.blocks["hr"] == 0
+
+
+@pytest.mark.parametrize(("pitch", "roll"), [(-3, 2), (2.5, -1), (-1, -3), (4, 4), (0.5, 0.2)])
+def test_twist_limit_always_kept(pitch, roll):
+    for air in (0, 2):
+        van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=air, air_down=air)
+        plan = best_block_plan(van, pitch, roll)
+        assert abs(twist(_changes(van, plan))) <= 3.0 + 1e-9
