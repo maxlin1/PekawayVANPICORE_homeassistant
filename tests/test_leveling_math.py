@@ -421,3 +421,20 @@ def test_twist_limit_always_kept(pitch, roll):
         van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=air, air_down=air)
         plan = best_block_plan(van, pitch, roll)
         assert abs(twist(_changes(van, plan))) <= 3.0 + 1e-9
+
+
+def test_within_tolerance_no_blocks():
+    """Max: -0,6° / 0,1° bei Toleranz 1° -> "eben", also auch keine Blöcke."""
+    van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=2, air_down=2)
+    plan = best_block_plan(van, -0.6, 0.1, tolerance=1.0)
+    assert plan.total_blocks == 0
+    assert plan.text(4.5) == "Keine Blöcke nötig"
+    assert best_block_plan(van, -0.6, 0.1).total_blocks > 0  # ohne Toleranz wie bisher
+
+
+@pytest.mark.parametrize(("pitch", "roll"), [(-1.1, 2.7), (-2.5, -1.8), (0.8, 1.5)])
+def test_air_difference_limited(pitch, roll):
+    """Goldschmidt bei Max: nur links hoch -> links 2,7 cm, rechts 1,1 cm (max. 1,6 cm Unterschied)."""
+    van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=3, air_down=2, air_diff=1.6)
+    plan = best_block_plan(van, pitch, roll)
+    assert abs(plan.air["hl"] - plan.air["hr"]) <= 1.6 + 1e-9

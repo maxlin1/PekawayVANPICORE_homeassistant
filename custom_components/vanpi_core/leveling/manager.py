@@ -25,6 +25,7 @@ from homeassistant.util import dt as dt_util
 
 from ..const import (
     AUTO_OFF_MINUTES,
+    CONF_AIR_DIFF,
     CONF_AIR_DOWN,
     CONF_AIR_SUSPENSION,
     CONF_AIR_UP,
@@ -134,6 +135,7 @@ class LevelingManager:
             blocks_per_stack=int(self.config[CONF_BLOCKS_PER_STACK]),
             air_up=float(self.config[CONF_AIR_UP]) if self.config[CONF_AIR_SUSPENSION] else 0.0,
             air_down=float(self.config[CONF_AIR_DOWN]) if self.config[CONF_AIR_SUSPENSION] else 0.0,
+            air_diff=float(self.config[CONF_AIR_DIFF]),
             head=None if self.config[CONF_HEAD] == HEAD_NONE else self.config[CONF_HEAD],
         )
         self.tolerance = float(self.config[CONF_TOLERANCE])
@@ -457,7 +459,7 @@ class LevelingManager:
             pitch=pitch,
             roll=roll,
             lift=lift_per_wheel(self.vehicle, pitch, roll),
-            plan=best_block_plan(self.vehicle, pitch, roll),
+            plan=best_block_plan(self.vehicle, pitch, roll, self.tolerance),
             level=level,
         )
         if not self.zeroed:

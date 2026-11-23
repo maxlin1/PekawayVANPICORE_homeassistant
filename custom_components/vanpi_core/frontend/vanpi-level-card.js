@@ -307,11 +307,11 @@ class VanPiTiltCard extends HTMLElement {
   }
 
   getCardSize() {
-    return 6;
+    return 4;
   }
 
   getGridOptions() {
-    return { columns: 12, rows: 6, min_rows: 5 };
+    return { columns: 12, rows: 4, min_rows: 3 };
   }
 
   static getStubConfig() {
@@ -354,7 +354,7 @@ class VanPiTiltCard extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         ha-card { padding: 16px; }
-        .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .view { text-align: center; font-family: var(--ha-font-family-body, sans-serif); }
         svg { width: 100%; max-width: 280px; height: auto; display: block; margin: 0 auto; overflow: visible; }
         .tilt { transition: transform 0.5s ease-out; }
@@ -366,8 +366,8 @@ class VanPiTiltCard extends HTMLElement {
         .lamp { fill: var(--card-background-color, #fff); opacity: 0.7; }
         .wheel { fill: var(--primary-text-color, #222); stroke: var(--card-background-color, #fff); stroke-width: 2; }
         .hub { fill: var(--card-background-color, #fff); }
-        .v { font-size: 26px; font-weight: 600; color: var(--primary-text-color); margin-top: 4px; }
-        .hint { font-size: 13px; color: var(--secondary-text-color); }
+        .v { font-size: 22px; font-weight: 600; color: var(--primary-text-color); margin-top: 2px; }
+        .hint { font-size: 12px; color: var(--secondary-text-color); }
         .off { opacity: 0.35; }
       </style>
       <ha-card>

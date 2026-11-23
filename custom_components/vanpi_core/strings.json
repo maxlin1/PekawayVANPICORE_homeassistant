@@ -195,7 +195,8 @@
             "air_suspension": "Air suspension on rear axle",
             "air_up": "Air suspension: max. raise",
             "air_down": "Air suspension: max. lower",
-            "head_direction": "Sleeping direction (head points to)"
+            "head_direction": "Sleeping direction (head points to)",
+            "air_max_diff": "Air suspension: max. difference left/right"
           },
           "data_description": {
             "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
@@ -206,7 +207,8 @@
             "air_up": "Per side, from normal ride height",
             "air_down": "Per side, from normal ride height",
             "block_height": "Height of one step or layer of the ramp",
-            "head_direction": "If the van cannot be levelled completely, this only chooses between variants that are at most 0.2° less level than the best one; the one with the head higher wins. Level (0.0°) always comes first."
+            "head_direction": "If the van cannot be levelled completely, this only chooses between variants that are at most 0.2° less level than the best one; the one with the head higher wins. Level (0.0°) always comes first.",
+            "air_max_diff": "How far rear left and rear right can differ at most. Test: raise only one side fully and read both heights (e.g. 2.7 and 1.1 cm gives 1.6 cm)."
           }
         },
         "reconfigure": {
@@ -223,7 +225,8 @@
             "air_suspension": "Air suspension on rear axle",
             "air_up": "Air suspension: max. raise",
             "air_down": "Air suspension: max. lower",
-            "head_direction": "Sleeping direction (head points to)"
+            "head_direction": "Sleeping direction (head points to)",
+            "air_max_diff": "Air suspension: max. difference left/right"
           },
           "data_description": {
             "forward": "Which board axis points to the front? For a rotated board choose 'From drive calibration' and accelerate and brake once. Drive calibration only on a quiet straight road, obey traffic rules.",
@@ -234,7 +237,8 @@
             "air_up": "Per side, from normal ride height",
             "air_down": "Per side, from normal ride height",
             "block_height": "Height of one step or layer of the ramp",
-            "head_direction": "If the van cannot be levelled completely, this only chooses between variants that are at most 0.2° less level than the best one; the one with the head higher wins. Level (0.0°) always comes first."
+            "head_direction": "If the van cannot be levelled completely, this only chooses between variants that are at most 0.2° less level than the best one; the one with the head higher wins. Level (0.0°) always comes first.",
+            "air_max_diff": "How far rear left and rear right can differ at most. Test: raise only one side fully and read both heights (e.g. 2.7 and 1.1 cm gives 1.6 cm)."
           }
         }
       },
