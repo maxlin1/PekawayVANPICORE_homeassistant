@@ -380,3 +380,14 @@ def test_front_right_low_any_mount(mount_name, head):
     assert plan.blocks["hl"] == plan.blocks["hr"] == 0
     assert all(-2 <= v <= 2 for v in plan.air.values())
     assert plan.residual < 1.3
+
+
+def test_fewest_blocks_when_practically_level():
+    """Saftkiste-Werte von Max: 1,0° vorne tiefer, 1,5° links tiefer.
+
+    Vorher: VL 3 + VR 1 und Luftfederung hoch (0,02°). Jetzt: VL 2 reicht (0,1°).
+    """
+    van = Vehicle(403.5, 180, 4.5, 2, 3, air_up=2, air_down=2, head="right")
+    plan = best_block_plan(van, -1.0, 1.5)
+    assert plan.blocks == {"vl": 2, "vr": 0, "hl": 0, "hr": 0}
+    assert plan.residual < 0.2

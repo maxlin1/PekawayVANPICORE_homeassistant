@@ -260,6 +260,9 @@ def _air_adjust(vehicle: Vehicle, heights: dict[str, float]) -> tuple[float, flo
 # höchstens so viel schlechter ist als die beste (Grad), und nur wenn der Kopf
 # dadurch mindestens so viel höher liegt.
 HEAD_MARGIN = 0.2
+# Bleibt höchstens so viel Neigung (Grad), gilt der Van als praktisch eben und
+# die Variante mit den wenigsten Blöcken gewinnt. 0,2° sind auf 4 m etwa 1,4 cm.
+BLOCK_MARGIN = 0.2
 
 
 def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
@@ -268,7 +271,8 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
     Probiert jede Auswahl von bis zu ``stacks`` Rädern mit 0..blocks_per_stack
     Blöcken. Mit Luftfederung wird für jede Verteilung zusätzlich die beste
     Höhe hinten links/rechts im Federweg berechnet. Bei gleicher Restneigung
-    (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken.
+    (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken. Bleiben mehrere
+    Varianten unter BLOCK_MARGIN, gewinnt die mit den wenigsten Blöcken.
 
     Ist eine Schlafrichtung gesetzt, wird statt der besten eine Variante
     gewählt, die höchstens HEAD_MARGIN schlechter ist und den Kopf mindestens
@@ -296,16 +300,24 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
             plans.append(
                 BlockPlan(blocks=dict(blocks), residual_pitch=rp, residual_roll=rr, air=air)
             )
-    best = min(plans, key=lambda p: (round(p.residual, 2), p.total_blocks))
+    straightest = min(plans, key=lambda p: (round(p.residual, 2), p.total_blocks))
+    # Steht der Van danach ohnehin praktisch eben (unter BLOCK_MARGIN), gewinnt
+    # die Variante mit den wenigsten Blöcken. Sonst zählt nur: so gerade wie möglich.
+    limit = max(round(straightest.residual, 2) + 0.005, BLOCK_MARGIN)
+    best = min(
+        (p for p in plans if p.residual <= limit),
+        key=lambda p: (p.total_blocks, round(sum(abs(v) for v in p.air.values()), 1), p.residual),
+    )
     if not vehicle.head:
         return best
+
     def head_low(p: BlockPlan) -> float:
         return max(0.0, -p.head_tilt(vehicle.head))
 
     near = [
         p
         for p in plans
-        if p.residual <= best.residual + HEAD_MARGIN
+        if p.residual <= straightest.residual + HEAD_MARGIN
         and head_low(p) <= head_low(best) - HEAD_MARGIN
     ]
     if not near:
