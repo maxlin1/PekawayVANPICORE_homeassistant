@@ -66,6 +66,7 @@ from .geometry import (
     best_block_plan,
     dot,
     lift_per_wheel,
+    norm,
     normalize,
 )
 from .mpu6050 import MPU6050
@@ -106,6 +107,7 @@ class LevelingManager:
         self._task: asyncio.Task | None = None
         self._auto_off_unsub: CALLBACK_TYPE | None = None
         self._filter = AdaptiveVectorFilter()
+        self._raw: Vector | None = None  # letzter geglätteter Rohwert (Diagnose)
         self._level_debounce = Debounce(LEVEL_DEBOUNCE_S)
         self._mpu: MPU6050 | None = None
         self._last_publish = 0.0
@@ -199,6 +201,15 @@ class LevelingManager:
             warning = self._axis_warning(fwd)
             if warning:
                 info["warnung"] = warning
+        if self._raw is not None and self.sampling:
+            # Diagnose: Rohwerte in g. In Ruhe sollte der Betrag ca. 1,00 sein.
+            info["rohwert_g"] = [round(v, 3) for v in self._raw]
+            info["betrag_g"] = round(norm(self._raw), 3)
+            up = self._stored.get("up")
+            if up is not None:
+                info["gesamtneigung_grad"] = round(
+                    math.degrees(math.acos(max(-1.0, min(1.0, dot(normalize(self._raw), up))))), 2
+                )
         if self.recorder is not None:
             info["signal_g"] = round(self.recorder.signal_g, 2)
             info["spitze_g"] = round(self.recorder.peak_g, 2)
@@ -418,6 +429,7 @@ class LevelingManager:
             return
 
         vec = self._filter.update(sample, max(dt, 1e-3))
+        self._raw = vec
         if now - self._last_publish < PUBLISH_INTERVAL:
             return
         try:

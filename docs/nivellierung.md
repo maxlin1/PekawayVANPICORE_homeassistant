@@ -69,7 +69,7 @@ Die genauen Entity-IDs hängen von der Sprache bei der Einrichtung ab.
 - **Achsen:** Aus „oben“ (Nullung) und der Vorwärtsrichtung entsteht ein rechtshändiges Achsensystem. Jede Einbaulage funktioniert, Vorzeichen-Helfer sind nicht nötig.
 - **Glättung:** 20 Messungen pro Sekunde, Median über 5 Werte gegen Ausreißer, dann ein ruhiger Mittelwert (1,5 s). Bei echter Lageänderung über 0,5° wird sofort nachgezogen, deshalb reagiert die Anzeige beim Draufrollen nach etwa einer halben Sekunde. An Home Assistant gehen höchstens 2 Werte pro Sekunde und nur bei Änderung ab 0,1°.
 - **Hubhöhe:** bezogen auf das höchste Rad, mit vollem Radstand und voller Spurweite.
-- **Blockplan:** alle Kombinationen aus bis zu „Anzahl Stapel“ Rädern mit 0 bis „Blöcke pro Stapel“ Blöcken. Gewählt wird die kleinste Restneigung (Ausgleichsebene durch die vier Radpunkte), bei Gleichstand die Variante mit weniger Blöcken.
+- **Blockplan:** alle Kombinationen aus bis zu „Anzahl Stapel“ Rädern mit 0 bis „Blöcke pro Stapel“ Blöcken. Gewählt wird die kleinste Restneigung (Ausgleichsebene durch die vier Radpunkte), bei Gleichstand die Variante mit weniger Blöcken. Varianten, die den Rahmen um mehr als 3 cm verwinden würden (z. B. viele Blöcke unter nur einem Rad), werden nicht empfohlen: Dort hebt ein Rad ab, und der Van steht anders als berechnet. Die Luftfederung hinten kann eine Verwindung ausgleichen.
 
 Federung, Reifen und Untergrund werden nicht modelliert. Die Live-Anzeige nach dem Draufrollen zeigt das echte Ergebnis.
 
@@ -86,6 +86,16 @@ max_angle: 5     # Rand der Libelle
 ```
 
 Wie bei einer echten Libelle wandert die Blase zur höheren Seite. Oben ist vorne, rechts ist rechts in Fahrtrichtung. Neigung längs ist positiv, wenn vorne höher ist, quer positiv, wenn rechts höher ist.
+
+Alternativ die Fahrzeuglage als gekippter Van, seitlich (vorne rechts) und von hinten. Die Bodenlinie ist grün, solange der Winkel innerhalb der Toleranz liegt. Die Neigung wird im Bild verstärkt (`exaggerate`), damit auch 1° gut sichtbar ist; die Zahlen sind die echten Werte:
+
+```yaml
+type: custom:vanpi-tilt-card
+entity_pitch: sensor.nivellierung_neigung_langs
+entity_roll: sensor.nivellierung_neigung_quer
+tolerance: 1.0   # Bodenlinie grün
+exaggerate: 3    # Neigung im Bild verdreifachen
+```
 
 Dazu die Draufsicht mit Blöcken, fehlender Höhe und Luftfederung je Rad:
 

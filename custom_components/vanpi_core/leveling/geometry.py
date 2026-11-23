@@ -260,15 +260,71 @@ def _air_adjust(vehicle: Vehicle, heights: dict[str, float]) -> tuple[float, flo
 # höchstens so viel schlechter ist als die beste (Grad), und nur wenn der Kopf
 # dadurch mindestens so viel höher liegt.
 HEAD_MARGIN = 0.2
+# So viel Verwindung (cm) nimmt die Federung auf, ohne dass ein Rad entlastet
+# wird. Mehr empfiehlt die Rechnung nicht, z. B. 3 Blöcke unter nur einem Rad.
+MAX_TWIST = 3.0
+# Bleibt höchstens so viel Neigung (Grad), gilt der Van als praktisch eben und
+# die Variante mit den wenigsten Blöcken gewinnt. 0,2° sind auf 4 m etwa 1,4 cm.
+BLOCK_MARGIN = 0.2
+
+
+def twist(changes: dict[str, float]) -> float:
+    """Verwindung durch Anheben einzelner Räder (cm).
+
+    Ein Fahrzeugrahmen ist (fast) starr: Hebt man vorne links und hinten rechts
+    gleich viel wie vorne rechts und hinten links, bleibt er eben. Jede
+    Abweichung davon muss die Federung als Verschränkung aufnehmen, sonst
+    hebt ein Rad ab und die Neigung danach stimmt nicht mehr mit der Rechnung.
+    """
+    return (changes["vl"] + changes["hr"]) - (changes["vr"] + changes["hl"])
+
+
+def _air_steps(lo: float, hi: float) -> list[float]:
+    n = max(1, round((hi - lo) / 0.5))
+    return [lo + (hi - lo) * i / n for i in range(n + 1)] if hi > lo else [0.0]
+
+
+def _best_with_air(
+    vehicle: Vehicle, heights: dict[str, float], blocks: dict[str, int]
+) -> BlockPlan | None:
+    """Beste Luftfederung hinten für eine Blockverteilung, ohne zu verwinden.
+
+    Ohne Luftfederung bleibt nur die Blockverteilung selbst. Mit Luftfederung
+    wird der Federweg in 0,5-cm-Schritten durchprobiert, und zwar zuerst die
+    analytisch beste Einstellung, dann das Raster.
+    """
+    lifted = {w: blocks[w] * vehicle.block_height for w in WHEELS}
+    candidates: list[tuple[float, float]] = [(0.0, 0.0)]
+    if vehicle.has_air:
+        candidates.append(_air_adjust(vehicle, heights))
+        steps = _air_steps(-vehicle.air_down, vehicle.air_up)
+        candidates.extend(product(steps, steps))
+    best: BlockPlan | None = None
+    for a, b in candidates:
+        a, b = round(a, 1), round(b, 1)
+        changes = {**lifted, "hl": lifted["hl"] + a, "hr": lifted["hr"] + b}
+        if abs(twist(changes)) > MAX_TWIST + 1e-9:
+            continue
+        h = {**heights, "hl": heights["hl"] + a, "hr": heights["hr"] + b}
+        rp, rr = plane_tilt(vehicle, h)
+        air = {"hl": a, "hr": b} if vehicle.has_air else {}
+        plan = BlockPlan(blocks=dict(blocks), residual_pitch=rp, residual_roll=rr, air=air)
+        key = (round(plan.residual, 2), abs(a) + abs(b))
+        if best is None or key < (round(best.residual, 2), sum(abs(v) for v in best.air.values())):
+            best = plan
+    return best
 
 
 def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
     """Sucht die Blockverteilung mit der kleinsten Restneigung.
 
     Probiert jede Auswahl von bis zu ``stacks`` Rädern mit 0..blocks_per_stack
-    Blöcken. Mit Luftfederung wird für jede Verteilung zusätzlich die beste
+    Blöcken. Varianten, die den Rahmen um mehr als MAX_TWIST verwinden würden
+    (z. B. viele Blöcke unter nur einem Rad), fallen weg, denn dort hebt ein
+    Rad ab und das Fahrzeug steht anders als berechnet. Mit Luftfederung wird für jede Verteilung zusätzlich die beste
     Höhe hinten links/rechts im Federweg berechnet. Bei gleicher Restneigung
-    (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken.
+    (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken. Bleiben mehrere
+    Varianten unter BLOCK_MARGIN, gewinnt die mit den wenigsten Blöcken.
 
     Ist eine Schlafrichtung gesetzt, wird statt der besten eine Variante
     gewählt, die höchstens HEAD_MARGIN schlechter ist und den Kopf mindestens
@@ -286,26 +342,27 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
             heights = {
                 w: base[w] + blocks[w] * vehicle.block_height for w in WHEELS
             }
-            air: dict[str, float] = {}
-            if vehicle.has_air:
-                a, b = _air_adjust(vehicle, heights)
-                heights["hl"] += a
-                heights["hr"] += b
-                air = {"hl": round(a, 1), "hr": round(b, 1)}
-            rp, rr = plane_tilt(vehicle, heights)
-            plans.append(
-                BlockPlan(blocks=dict(blocks), residual_pitch=rp, residual_roll=rr, air=air)
-            )
-    best = min(plans, key=lambda p: (round(p.residual, 2), p.total_blocks))
+            plan = _best_with_air(vehicle, heights, blocks)
+            if plan is not None:
+                plans.append(plan)
+    straightest = min(plans, key=lambda p: (round(p.residual, 2), p.total_blocks))
+    # Steht der Van danach ohnehin praktisch eben (unter BLOCK_MARGIN), gewinnt
+    # die Variante mit den wenigsten Blöcken. Sonst zählt nur: so gerade wie möglich.
+    limit = max(round(straightest.residual, 2) + 0.005, BLOCK_MARGIN)
+    best = min(
+        (p for p in plans if p.residual <= limit),
+        key=lambda p: (p.total_blocks, round(sum(abs(v) for v in p.air.values()), 1), p.residual),
+    )
     if not vehicle.head:
         return best
+
     def head_low(p: BlockPlan) -> float:
         return max(0.0, -p.head_tilt(vehicle.head))
 
     near = [
         p
         for p in plans
-        if p.residual <= best.residual + HEAD_MARGIN
+        if p.residual <= straightest.residual + HEAD_MARGIN
         and head_low(p) <= head_low(best) - HEAD_MARGIN
     ]
     if not near:
