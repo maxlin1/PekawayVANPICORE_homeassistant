@@ -131,6 +131,8 @@ class Vehicle:
     # Luftfederung hinten: jede Seite um bis zu air_up cm heben, air_down cm senken
     air_up: float = 0.0
     air_down: float = 0.0
+    # Größter Unterschied hinten links zu rechts (cm), None = nur durch Federweg begrenzt
+    air_diff: float | None = None
     # Kopf beim Schlafen: "front", "rear", "left", "right" oder None
     head: str | None = None
 
@@ -302,6 +304,8 @@ def _best_with_air(
     best: BlockPlan | None = None
     for a, b in candidates:
         a, b = round(a, 1), round(b, 1)
+        if vehicle.air_diff is not None and abs(a - b) > vehicle.air_diff + 1e-9:
+            continue
         changes = {**lifted, "hl": lifted["hl"] + a, "hr": lifted["hr"] + b}
         if abs(twist(changes)) > MAX_TWIST + 1e-9:
             continue
@@ -315,7 +319,9 @@ def _best_with_air(
     return best
 
 
-def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
+def best_block_plan(
+    vehicle: Vehicle, pitch: float, roll: float, tolerance: float | None = None
+) -> BlockPlan:
     """Sucht die Blockverteilung mit der kleinsten Restneigung.
 
     Probiert jede Auswahl von bis zu ``stacks`` Rädern mit 0..blocks_per_stack
@@ -326,11 +332,22 @@ def best_block_plan(vehicle: Vehicle, pitch: float, roll: float) -> BlockPlan:
     (Toleranz 0,01°) gewinnt die Variante mit weniger Blöcken. Bleiben mehrere
     Varianten unter BLOCK_MARGIN, gewinnt die mit den wenigsten Blöcken.
 
+    Mit ``tolerance``: Liegen beide Winkel innerhalb, gilt der Van als eben
+    und es wird nichts empfohlen (passend zum Sensor "eben").
+
     Ist eine Schlafrichtung gesetzt, wird statt der besten eine Variante
     gewählt, die höchstens HEAD_MARGIN schlechter ist und den Kopf mindestens
     HEAD_MARGIN höher legt. Ziel bleibt also immer möglichst gerade, und fast
     gleiche Varianten springen nicht hin und her.
     """
+    if tolerance is not None and abs(pitch) <= tolerance and abs(roll) <= tolerance:
+        # Innerhalb der Toleranz gilt der Van als eben: nichts unterlegen.
+        return BlockPlan(
+            blocks={w: 0 for w in WHEELS},
+            residual_pitch=pitch,
+            residual_roll=roll,
+            air={"hl": 0.0, "hr": 0.0} if vehicle.has_air else {},
+        )
     base = wheel_heights(vehicle, pitch, roll)
     stacks = max(0, min(vehicle.stacks, len(WHEELS)))
     plans: list[BlockPlan] = []

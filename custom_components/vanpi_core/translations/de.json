@@ -195,7 +195,8 @@
             "air_suspension": "Luftfederung an der Hinterachse",
             "air_up": "Luftfederung: max. anheben",
             "air_down": "Luftfederung: max. absenken",
-            "head_direction": "Schlafrichtung (Kopf zeigt nach)"
+            "head_direction": "Schlafrichtung (Kopf zeigt nach)",
+            "air_max_diff": "Luftfederung: max. Unterschied links/rechts"
           },
           "data_description": {
             "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen. Fahrt-Kalibrierung nur auf ruhiger, gerader Strecke, StVO beachten.",
@@ -206,7 +207,8 @@
             "air_up": "Je Seite, ab normaler Fahrhöhe",
             "air_down": "Je Seite, ab normaler Fahrhöhe",
             "block_height": "Höhe einer Stufe bzw. Lage des Keils",
-            "head_direction": "Ziel bleibt immer 0,0°. Nur wenn das nicht ganz geht, wählt die Empfehlung unter den Varianten, die höchstens 0,2° schlechter sind als die beste, die mit dem Kopf höher."
+            "head_direction": "Ziel bleibt immer 0,0°. Nur wenn das nicht ganz geht, wählt die Empfehlung unter den Varianten, die höchstens 0,2° schlechter sind als die beste, die mit dem Kopf höher.",
+            "air_max_diff": "Wie weit hinten links und rechts höchstens auseinander gehen. Test: nur eine Seite ganz hochfahren und beide Höhen ablesen (z. B. 2,7 und 1,1 cm ergibt 1,6 cm)."
           }
         },
         "reconfigure": {
@@ -223,7 +225,8 @@
             "air_suspension": "Luftfederung an der Hinterachse",
             "air_up": "Luftfederung: max. anheben",
             "air_down": "Luftfederung: max. absenken",
-            "head_direction": "Schlafrichtung (Kopf zeigt nach)"
+            "head_direction": "Schlafrichtung (Kopf zeigt nach)",
+            "air_max_diff": "Luftfederung: max. Unterschied links/rechts"
           },
           "data_description": {
             "forward": "Welche Achse des Boards zeigt zur Fahrzeugfront? Bei schräg eingebautem Board 'Aus Fahrt-Kalibrierung' wählen und einmal anfahren und bremsen. Fahrt-Kalibrierung nur auf ruhiger, gerader Strecke, StVO beachten.",
@@ -234,7 +237,8 @@
             "air_up": "Je Seite, ab normaler Fahrhöhe",
             "air_down": "Je Seite, ab normaler Fahrhöhe",
             "block_height": "Höhe einer Stufe bzw. Lage des Keils",
-            "head_direction": "Ziel bleibt immer 0,0°. Nur wenn das nicht ganz geht, wählt die Empfehlung unter den Varianten, die höchstens 0,2° schlechter sind als die beste, die mit dem Kopf höher."
+            "head_direction": "Ziel bleibt immer 0,0°. Nur wenn das nicht ganz geht, wählt die Empfehlung unter den Varianten, die höchstens 0,2° schlechter sind als die beste, die mit dem Kopf höher.",
+            "air_max_diff": "Wie weit hinten links und rechts höchstens auseinander gehen. Test: nur eine Seite ganz hochfahren und beide Höhen ablesen (z. B. 2,7 und 1,1 cm ergibt 1,6 cm)."
           }
         }
       },

@@ -24,6 +24,7 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .const import (
+    CONF_AIR_DIFF,
     CONF_AIR_DOWN,
     CONF_AIR_SUSPENSION,
     CONF_AIR_UP,
@@ -121,6 +122,7 @@ def vehicle_schema(values: dict[str, Any]) -> vol.Schema:
             ): selector.BooleanSelector(),
             vol.Required(CONF_AIR_UP, default=v[CONF_AIR_UP]): _cm(0, 20, 0.5),
             vol.Required(CONF_AIR_DOWN, default=v[CONF_AIR_DOWN]): _cm(0, 20, 0.5),
+            vol.Required(CONF_AIR_DIFF, default=v[CONF_AIR_DIFF]): _cm(0, 40, 0.1),
             vol.Required(CONF_HEAD, default=v[CONF_HEAD]): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=HEAD_DIRECTIONS,
