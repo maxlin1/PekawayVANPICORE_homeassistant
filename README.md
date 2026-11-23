@@ -28,7 +28,7 @@ ships English and German translations.*
 | **Tanks** | ADS1115, 4 Eingänge, Pull-up je Kanalpaar umschaltbar | Füllstand (L oder %) mit eigener Kennlinie, Spannung, Widerstand |
 | **Temperatur** | 1-Wire (DS18B20 u. ä.) | ein Sensor je Fühler, automatisch gefunden |
 | **Victron VE.Direct** | UART4, UART5 (oder jeder andere Port) | alle Werte von MPPT und SmartShunt/BMV, Energie-Dashboard-tauglich |
-| **Nivellierung** | MPU6050 auf dem Board oder beliebiger X/Y/Z-Sensor (z. B. RuuviTag) | Neigung, Blockempfehlung je Rad, optional Luftfederung, Wasserwaage und Draufsicht als Dashboard-Karten |
+| **Nivellierung** | MPU6050 auf dem Board oder beliebiger X/Y/Z-Sensor (z. B. RuuviTag) | Neigung, Blockempfehlung je Rad, optional Luftfederung, Wasserwaage, Draufsicht und Seiten-/Heckansicht als Dashboard-Karten |
 
 Jede Funktion ist ein eigener Eintrag unter dem Hauptgerät *VAN PI CORE* und kann einzeln hinzugefügt, geändert
 oder entfernt werden.

@@ -3,6 +3,26 @@
 Alle nennenswerten Änderungen an diesem Projekt. Format angelehnt an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [2.0.4] - 2026-11-23
+
+### Neu
+- Dashboard-Karte `custom:vanpi-tilt-card`: der Van von der Seite und von hinten, gekippt um die aktuelle Neigung.
+
+### Geändert
+- Klarere Feldnamen für Radstand und Spurweite in der Einrichtung.
+
+## [2.0.3] - 2026-11-23
+
+### Geändert
+- Keine Blockempfehlung mehr, die den Rahmen um mehr als 3 cm verwindet (z. B. 3 Blöcke unter nur einem Rad).
+- Die Wasserwaage zeigt immer die Richtung an.
+
+## [2.0.2] - 2026-11-23
+
+### Geändert
+- Bei praktisch ebenem Stand (unter 0,2°) wird die Variante mit den wenigsten Blöcken empfohlen.
+- Rohwerte als Diagnose im Status der Nivellierung.
+
 ## [2.0.1] - 2026-11-22
 
 ### Korrigiert
@@ -43,6 +63,5 @@ Neue Integration **VAN PI CORE** (`custom_components/vanpi_core`), die alle bish
 Erste Veröffentlichung mit den Einzel-Komponenten (YAML-Konfiguration): Relais und Eingänge (MCP23017), Wasserstand
 (ADS1115), MPU6050, 1-Wire, Victron MPPT und SmartShunt.
 
-[2.0.1]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/v2.0.1
-[2.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/compare/V1.0.0...v2.0.1
+[2.0.4]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/v2.0.4
 [1.0.0]: https://github.com/maxlin1/PekawayVANPICORE_homeassistant/releases/tag/V1.0.0
