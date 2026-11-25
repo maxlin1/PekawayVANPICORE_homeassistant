@@ -4,6 +4,12 @@ Ein eigener Lese-Thread liest die serielle Schnittstelle mit Timeout,
 prüft jede Prüfsumme und verbindet sich nach Fehlern selbst neu. Werte gehen
 höchstens alle `scan_interval` Sekunden an Home Assistant und nur, wenn sie
 sich geändert haben.
+
+Entitäten entstehen erst, wenn das Gerät das Feld wirklich sendet. Ein
+SmartShunt hat z. B. kein Relais und ein MPPT ohne Lastausgang keinen
+Laststrom; solche Entitäten blieben sonst für immer "nicht verfügbar".
+Hat das Gerät eine Minute lang Daten geliefert, werden alte Einträge für
+Felder, die es nie sendet, aus der Entitätsregistrierung entfernt.
 """
 
 from __future__ import annotations
@@ -35,6 +41,7 @@ from homeassistant.const import (
     UnitOfTime,
 )
 from homeassistant.core import CALLBACK_TYPE, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util import dt as dt_util
@@ -186,6 +193,10 @@ SHUNT_BINARY = (
 )
 BINARY = {DEVICE_MPPT: MPPT_BINARY, DEVICE_SHUNT: SHUNT_BINARY}
 
+# So lange muss ein Gerät Daten liefern, bevor nie gesendete Felder als
+# "gibt es bei diesem Gerät nicht" gelten (Verlaufsblöcke kommen seltener).
+VICTRON_CLEANUP_AFTER = 60
+
 
 class SerialReader(threading.Thread):
     """Liest VE.Direct-Blöcke und übergibt sie an `on_block` (im Lese-Thread)."""
@@ -241,6 +252,10 @@ class VictronModule(BoardModule):
         self._reader: SerialReader | None = None
         self._unsub: CALLBACK_TYPE | None = None
         self.model = "MPPT-Laderegler" if self.device_type == DEVICE_MPPT else "Batteriemonitor"
+        # Bereits gebaute Entitäten je (Plattform, Feld); immer dieselben Objekte
+        self._built: dict[tuple[Platform, str], Entity] = {}
+        self._first_block: float | None = None
+        self._cleaned_up = False
 
     # -- Lese-Thread ------------------------------------------------------
 
@@ -284,6 +299,12 @@ class VictronModule(BoardModule):
             self.product = product_name(block.get("PID")) or self.product
             self.serial = block.get("SER#") or self.serial
             self.set_error(None)
+            self._add_new_entities()
+            if self._first_block is None:
+                self._first_block = now
+            elif not self._cleaned_up and now - self._first_block >= VICTRON_CLEANUP_AFTER:
+                self._cleaned_up = True
+                self._remove_unsent_entities()
         elif self.available and now - self.last_block > VICTRON_STALE_AFTER:
             self.set_error(error or f"{self.port}: seit {VICTRON_STALE_AFTER} s keine gültigen Daten")
         elif error and not self.available:
@@ -296,14 +317,59 @@ class VictronModule(BoardModule):
         raw = self.raw.get(label)
         return None if raw is None else convert(kind, raw)
 
+    def _build(self) -> dict[Platform, list[Entity]]:
+        """Entitäten für alle bisher empfangenen Felder, neue zuerst bauen."""
+        fresh: dict[Platform, list[Entity]] = {}
+
+        def get(platform: Platform, label: str, factory) -> Entity:
+            key = (platform, label)
+            if key not in self._built:
+                self._built[key] = factory()
+                fresh.setdefault(platform, []).append(self._built[key])
+            return self._built[key]
+
+        get(Platform.SENSOR, "", lambda: VictronInfoSensor(self))
+        for f in FIELDS[self.device_type]:
+            if f.label in self.raw:
+                get(Platform.SENSOR, f.label, lambda f=f: VictronSensor(self, f))
+        for label, key, name, dc in BINARY[self.device_type]:
+            if label in self.raw:
+                get(
+                    Platform.BINARY_SENSOR,
+                    label,
+                    lambda a=(label, key, name, dc): VictronBinarySensor(self, *a),
+                )
+        return fresh
+
+    @callback
+    def _add_new_entities(self) -> None:
+        fresh = self._build()
+        if self.add_entities_later:
+            for platform, entities in fresh.items():
+                self.add_entities_later(platform, entities)
+
+    @callback
+    def _remove_unsent_entities(self) -> None:
+        """Registry-Einträge für Felder löschen, die dieses Gerät nie sendet."""
+        keys = [(f.label, f.key) for f in FIELDS[self.device_type]]
+        keys += [(label, key) for label, key, _n, _d in BINARY[self.device_type]]
+        unsent = {self.unique_id(key) for label, key in keys if label not in self.raw}
+        registry = er.async_get(self.hass)
+        for entry in er.async_entries_for_config_entry(registry, self.entry.entry_id):
+            if entry.config_subentry_id == self.subentry_id and entry.unique_id in unsent:
+                _LOGGER.info(
+                    "%s: %s entfernt, das Gerät sendet diesen Wert nicht",
+                    self.subentry.title,
+                    entry.entity_id,
+                )
+                registry.async_remove(entry.entity_id)
+
     def create_entities(self) -> dict[Platform, list[Entity]]:
-        sensors: list[Entity] = [VictronSensor(self, f) for f in FIELDS[self.device_type]]
-        sensors.append(VictronInfoSensor(self))
-        binaries: list[Entity] = [
-            VictronBinarySensor(self, label, key, name, dc)
-            for label, key, name, dc in BINARY[self.device_type]
-        ]
-        return {Platform.SENSOR: sensors, Platform.BINARY_SENSOR: binaries}
+        self._build()
+        result: dict[Platform, list[Entity]] = {}
+        for (platform, _label), entity in self._built.items():
+            result.setdefault(platform, []).append(entity)
+        return result
 
 
 class VictronSensor(ModuleEntity, SensorEntity):
