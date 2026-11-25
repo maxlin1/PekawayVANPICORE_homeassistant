@@ -3,6 +3,19 @@
 Alle nennenswerten Änderungen an diesem Projekt. Format angelehnt an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [2.0.6] - 2026-11-25
+
+### Behoben
+- Victron: Entitäten entstehen erst, wenn das Gerät den Wert wirklich sendet. Felder, die es
+  nie sendet (z. B. „Relais“ beim SmartShunt ohne Relais, „Laststrom“ beim MPPT ohne
+  Lastausgang), blieben vorher dauerhaft „nicht verfügbar“. Ihre alten Einträge werden nach
+  einer Minute mit Daten automatisch entfernt.
+
+### Hinweis
+- Die Nivellierungs-Sensoren sind absichtlich „nicht verfügbar“, solange die Nivellierung
+  ausgeschaltet ist (auch nach einem Neustart). Die Knöpfe „Fahrt-Kalibrierung beenden“ und
+  „abbrechen“ gibt es nur während einer laufenden Fahrt-Kalibrierung.
+
 ## [2.0.5] - 2026-11-23
 
 ### Neu

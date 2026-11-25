@@ -289,6 +289,30 @@ async def test_victron_modules(hass: HomeAssistant, hardware, monkeypatch, freez
     assert hass.states.get("binary_sensor.mppt_lastausgang").state == "on"
     assert hass.states.get("sensor.mppt_gerat").state == "SmartSolar MPPT 100/30"
 
+    # Felder, die das Gerät nicht sendet, bekommen keine Entität
+    assert hass.states.get("sensor.mppt_laststrom") is None
+    assert hass.states.get("binary_sensor.smartshunt_relais") is None
+
+    # Alter Registry-Eintrag (aus Version 2.0.5) wird nach einer Minute Daten entfernt
+    from custom_components.vanpi_core.const import DOMAIN
+    from custom_components.vanpi_core.modules.vedirect import VEDirectParser
+
+    shunt_id = next(s.subentry_id for s in entry.subentries.values() if s.title == "SmartShunt")
+    registry = er.async_get(hass)
+    old = registry.async_get_or_create(
+        "binary_sensor", DOMAIN, f"{shunt_id}_relay",
+        config_entry=entry, config_subentry_id=shunt_id,
+    )
+    shunt = entry.runtime_data.modules.modules[shunt_id]
+    (block,) = VEDirectParser().feed(make_block(SHUNT))
+    shunt._on_block(block)
+    freezer.tick(timedelta(seconds=61))
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+    assert registry.async_get(old.entity_id) is None
+    assert hass.states.get("binary_sensor.smartshunt_alarm").state == "off"
+    assert float(hass.states.get("sensor.smartshunt_batteriespannung").state) == 13.31
+
     # Keine Daten mehr -> nach 30 s nicht verfügbar
     freezer.tick(timedelta(seconds=40))
     async_fire_time_changed(hass)
